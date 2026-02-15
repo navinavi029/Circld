@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { Item } from '../types/item';
 import { UserProfile } from '../types/user';
+import { useProfile } from '../contexts/ProfileContext';
+import { calculateDistanceForItem, formatDistanceDisplay } from '../utils/location';
 
 interface SwipeCardProps {
   item: Item;
@@ -21,6 +23,7 @@ const SWIPE_THRESHOLD = 100; // pixels to trigger swipe
 const ROTATION_FACTOR = 0.1; // rotation per pixel moved
 
 export function SwipeCard({ item, ownerProfile, onSwipeLeft, onSwipeRight }: SwipeCardProps) {
+  const { profile } = useProfile();
   const [dragState, setDragState] = useState<DragState>({
     isDragging: false,
     startX: 0,
@@ -32,6 +35,13 @@ export function SwipeCard({ item, ownerProfile, onSwipeLeft, onSwipeRight }: Swi
   const cardRef = useRef<HTMLDivElement>(null);
 
   const [isAnimatingOut, setIsAnimatingOut] = useState(false);
+
+  // Calculate distance between current user and item owner
+  const distance = calculateDistanceForItem(
+    profile?.coordinates || null,
+    ownerProfile.coordinates
+  );
+  const distanceDisplay = formatDistanceDisplay(distance, ownerProfile.location);
 
   // Calculate transform values based on drag position
   const deltaX = dragState.currentX - dragState.startX;
@@ -246,7 +256,7 @@ export function SwipeCard({ item, ownerProfile, onSwipeLeft, onSwipeRight }: Swi
       {/* Card Container */}
       <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl overflow-hidden border-2 border-gray-100 dark:border-gray-700">
         {/* Image Section */}
-        <div className="relative aspect-[3/4] bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800">
+        <div className="relative aspect-[4/3] bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800">
           {item.images && item.images.length > 0 ? (
             <>
               <img
@@ -406,15 +416,15 @@ export function SwipeCard({ item, ownerProfile, onSwipeLeft, onSwipeRight }: Swi
                 </div>
               )}
               <div className="flex-1 min-w-0">
-                <p className="text-base font-bold text-gray-900 dark:text-white">
+                <p className="text-base font-bold text-gray-900 dark:text-white truncate">
                   {ownerProfile.firstName} {ownerProfile.lastName}
                 </p>
                 <div className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
-                  <span className="truncate">{ownerProfile.location}</span>
+                  <span className="truncate">{distanceDisplay}</span>
                 </div>
               </div>
             </div>

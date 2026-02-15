@@ -165,14 +165,16 @@ export function SwipeInterface({
       )}
 
       {/* Main Swipe Area */}
-      <div className="flex-1 flex items-center justify-center px-4 pt-24 pb-24 relative">
-        <SwipeCard
-          key={displayItem.id}
-          item={displayItem}
-          ownerProfile={displayProfile}
-          onSwipeLeft={() => handleSwipe('left')}
-          onSwipeRight={() => handleSwipe('right')}
-        />
+      <div className="flex-1 flex items-center justify-center px-4 pt-24 pb-24 relative overflow-y-auto">
+        <div className="w-full max-w-md">
+          <SwipeCard
+            key={displayItem.id}
+            item={displayItem}
+            ownerProfile={displayProfile}
+            onSwipeLeft={() => handleSwipe('left')}
+            onSwipeRight={() => handleSwipe('right')}
+          />
+        </div>
         
         {/* Like Animation - Floating Hearts */}
         {showLikeAnimation && (

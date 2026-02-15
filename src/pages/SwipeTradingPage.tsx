@@ -234,10 +234,16 @@ export function SwipeTradingPage() {
    */
   const loadOwnerProfile = async (ownerId: string) => {
     try {
-      const profileDoc = await getDoc(doc(db, 'profiles', ownerId));
+      console.log('Loading owner profile for ownerId:', ownerId);
+      const profileDoc = await getDoc(doc(db, 'users', ownerId));
+      console.log('Profile doc exists:', profileDoc.exists());
+      
       if (profileDoc.exists()) {
-        setCurrentOwnerProfile(profileDoc.data() as UserProfile);
+        const profileData = profileDoc.data() as UserProfile;
+        console.log('Profile loaded:', profileData.firstName, profileData.lastName);
+        setCurrentOwnerProfile(profileData);
       } else {
+        console.warn('Profile not found for ownerId:', ownerId);
         // Set a default profile if not found
         setCurrentOwnerProfile({
           uid: ownerId,
@@ -255,6 +261,7 @@ export function SwipeTradingPage() {
       }
     } catch (err) {
       console.error('Error loading owner profile:', err);
+      console.error('Error details:', err instanceof Error ? err.message : 'Unknown error');
       // Set a default profile on error
       setCurrentOwnerProfile({
         uid: ownerId,
