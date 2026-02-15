@@ -13,14 +13,11 @@ import { Button } from '../components/ui/Button';
 import { Select } from '../components/ui/Select';
 import { QuickActions } from '../components/QuickActions';
 import { useAuth } from '../contexts/AuthContext';
-import { useProfile } from '../contexts/ProfileContext';
 import { toggleFavorite } from '../utils/metadata';
-import { calculateDistanceForItem, formatDistanceDisplay } from '../utils/location';
 
 export function Listings() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { profile } = useProfile();
   const [items, setItems] = useState<Item[]>([]);
   const [filteredItems, setFilteredItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
@@ -207,18 +204,6 @@ export function Listings() {
     return `${ownerProfile.firstName} ${ownerProfile.lastName}`;
   };
 
-  const getDistanceDisplay = (ownerId: string): string | null => {
-    const ownerProfile = ownerProfiles.get(ownerId);
-    if (!ownerProfile) return null;
-    
-    const distance = calculateDistanceForItem(
-      profile?.coordinates || null,
-      ownerProfile.coordinates || null
-    );
-    
-    return formatDistanceDisplay(distance, ownerProfile.location);
-  };
-
   const categories = Array.from(new Set(items.map(item => item.category)));
 
   if (loading) {
@@ -359,7 +344,6 @@ export function Listings() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {filteredItems.map((item) => {
               const isFavorited = favorites.has(item.id);
-              const distanceDisplay = getDistanceDisplay(item.ownerId);
               const ownerName = getOwnerName(item.ownerId);
               const ownerInitials = getOwnerInitials(item.ownerId);
               

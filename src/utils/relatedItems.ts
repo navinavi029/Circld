@@ -63,6 +63,7 @@ export async function findRelatedItems(
       ...scored.item,
       viewCount: scored.item.viewCount || 0,
       favoriteCount: scored.item.favoriteCount || 0,
+      swipeInterestCount: scored.item.swipeInterestCount || 0,
       isFavorited: false, // This would need to be checked against user's favorites
       distance: null, // Distance calculation would be done separately if needed
     }));

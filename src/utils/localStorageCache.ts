@@ -3,7 +3,7 @@
  * Handles caching of swipe actions and session state
  */
 
-import { SwipeRecord, SwipeSession } from '../types/swipe-trading';
+import { SwipeSession } from '../types/swipe-trading';
 import { Timestamp } from 'firebase/firestore';
 
 const CACHE_KEYS = {

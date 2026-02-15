@@ -17,7 +17,6 @@ import {
   getPendingSwipes,
   cacheSessionState,
   getCachedSessionState,
-  clearCachedSessionState,
 } from '../utils/localStorageCache';
 
 /**

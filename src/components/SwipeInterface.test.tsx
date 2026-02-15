@@ -60,14 +60,17 @@ describe('SwipeInterface', () => {
     coordinates: { latitude: 40.7128, longitude: -74.0060 },
     eligible_to_match: true,
     createdAt: Timestamp.now(),
+    photoUrl: null,
+    lastPhotoUpdate: null,
+    lastLocationUpdate: null,
   };
 
-  let mockOnSwipe: ReturnType<typeof vi.fn>;
-  let mockOnChangeAnchor: ReturnType<typeof vi.fn>;
+  let mockOnSwipe: (direction: 'left' | 'right') => void;
+  let mockOnChangeAnchor: () => void;
 
   beforeEach(() => {
-    mockOnSwipe = vi.fn();
-    mockOnChangeAnchor = vi.fn();
+    mockOnSwipe = vi.fn() as (direction: 'left' | 'right') => void;
+    mockOnChangeAnchor = vi.fn() as () => void;
   });
 
   it('displays trade anchor and current item when available', () => {

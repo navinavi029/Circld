@@ -39,6 +39,7 @@ describe('RelatedItems Component', () => {
       images: [],
       status: 'available',
       createdAt: Timestamp.now(),
+      swipeInterestCount: 0,
     };
 
     const relatedItem: EnhancedItem = {
@@ -53,6 +54,7 @@ describe('RelatedItems Component', () => {
       createdAt: Timestamp.now(),
       viewCount: 0,
       favoriteCount: 0,
+      swipeInterestCount: 0,
       isFavorited: false,
       distance: null,
     };
@@ -170,6 +172,7 @@ describe('RelatedItems Component', () => {
       createdAt: Timestamp.now(),
       viewCount: 0,
       favoriteCount: 0,
+      swipeInterestCount: 0,
       isFavorited: false,
       distance: null,
     }));
