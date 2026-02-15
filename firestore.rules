@@ -1,0 +1,47 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && request.auth.uid == userId;
+      allow update: if request.auth != null && request.auth.uid == userId;
+      allow delete: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    match /items/{itemId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null 
+                    && request.resource.data.ownerId == request.auth.uid
+                    && request.resource.data.keys().hasAll(['ownerId', 'title', 'description', 'category', 'condition', 'images', 'status', 'createdAt'])
+                    && request.resource.data.status == 'available';
+      allow update: if request.auth != null 
+                    && resource.data.ownerId == request.auth.uid;
+      allow delete: if request.auth != null 
+                    && resource.data.ownerId == request.auth.uid;
+    }
+    
+    match /swipeSessions/{sessionId} {
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow update: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
+    }
+    
+    match /tradeOffers/{offerId} {
+      allow read: if request.auth != null 
+                  && (resource.data.offerorId == request.auth.uid 
+                      || resource.data.targetOwnerId == request.auth.uid);
+      allow create: if request.auth != null && request.resource.data.offerorId == request.auth.uid;
+      allow update: if request.auth != null 
+                    && (resource.data.offerorId == request.auth.uid 
+                        || resource.data.targetOwnerId == request.auth.uid);
+    }
+    
+    match /notifications/{notificationId} {
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
+    }
+  }
+}

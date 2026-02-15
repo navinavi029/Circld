@@ -1,0 +1,211 @@
+@import "tailwindcss";
+
+/* Configure dark mode to use class-based toggling */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* Primary colors */
+  --color-primary: #1A5C3E;
+  --color-primary-light: #2D7A54;
+  --color-primary-dark: #0F3D28;
+  
+  /* Accent colors */
+  --color-accent: #45A049;
+  --color-accent-light: #5CB860;
+  --color-accent-dark: #3D8B40;
+  
+  /* Info colors */
+  --color-info: #2E7BC4;
+  --color-info-light: #4A90E2;
+  --color-info-dark: #1E5A94;
+  
+  /* Semantic colors */
+  --color-success: #45A049;
+  --color-success-light: #5CB860;
+  --color-success-dark: #3D8B40;
+  
+  --color-warning: #F59E0B;
+  --color-warning-light: #FBBF24;
+  --color-warning-dark: #D97706;
+  
+  --color-error: #DC2626;
+  --color-error-light: #EF4444;
+  --color-error-dark: #B91C1C;
+  
+  /* Background colors - Light mode */
+  --color-background: #FAFAF8;
+  --color-background-light: #FFFFFF;
+  --color-background-dark: #F0EDE3;
+  
+  /* Text colors - Light mode */
+  --color-text: #1A1A1A;
+  --color-text-secondary: #4A4A4A;
+  --color-text-disabled: #8A8A8A;
+  
+  /* Border colors - Light mode */
+  --color-border: #D4D4D4;
+  --color-border-dark: #B0B0B0;
+  --color-border-light: #E8E8E8;
+}
+
+/* Dark mode color overrides */
+.dark {
+  --color-background: #1F2937;
+  --color-background-light: #374151;
+  --color-background-dark: #111827;
+  
+  --color-text: #F9FAFB;
+  --color-text-secondary: #D1D5DB;
+  --color-text-disabled: #9CA3AF;
+  
+  --color-border: #4B5563;
+  --color-border-dark: #374151;
+  --color-border-light: #6B7280;
+}
+
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+body {
+  font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+}
+
+@layer utilities {
+  .animate-fadeIn {
+    animation: fadeIn 0.5s ease-in-out;
+    animation-fill-mode: both;
+    will-change: opacity, transform;
+  }
+  
+  .animate-fadeInFast {
+    animation: fadeIn 0.3s ease-in-out;
+    animation-fill-mode: both;
+    will-change: opacity, transform;
+  }
+  
+  .animate-fadeInSlow {
+    animation: fadeIn 0.8s ease-in-out;
+    animation-fill-mode: both;
+    will-change: opacity, transform;
+  }
+  
+  .animate-scaleIn {
+    animation: scaleIn 0.4s ease-out;
+  }
+  
+  .animate-slideDown {
+    animation: slideDown 0.4s ease-out;
+  }
+  
+  .animate-floatHeart {
+    animation: floatHeart 1s ease-out forwards;
+  }
+  
+  .animate-floatX {
+    animation: floatX 1s ease-out forwards;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translate(-50%, -20px);
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+  }
+  
+  @keyframes floatHeart {
+    0% {
+      opacity: 0;
+      transform: translateY(0) scale(0.5) rotate(0deg);
+    }
+    20% {
+      opacity: 1;
+      transform: translateY(-20px) scale(1) rotate(10deg);
+    }
+    80% {
+      opacity: 1;
+      transform: translateY(-120px) scale(1.2) rotate(-10deg);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-180px) scale(0.8) rotate(20deg);
+    }
+  }
+  
+  @keyframes floatX {
+    0% {
+      opacity: 0;
+      transform: translateY(0) scale(0.5) rotate(0deg);
+    }
+    20% {
+      opacity: 1;
+      transform: translateY(-20px) scale(1) rotate(-15deg);
+    }
+    80% {
+      opacity: 1;
+      transform: translateY(-100px) scale(1.1) rotate(15deg);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-150px) scale(0.7) rotate(-30deg);
+    }
+  }
+}
+
+/* Leaflet Map Styles */
+.leaflet-container {
+  font-family: inherit;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 0.5rem;
+}
+
+.leaflet-popup-tip {
+  background: white;
+}
+
+/* Dark mode support for Leaflet */
+.dark .leaflet-popup-content-wrapper {
+  background: #1f2937;
+  color: #f3f4f6;
+}
+
+.dark .leaflet-popup-tip {
+  background: #1f2937;
+}
+
+.dark .leaflet-control-attribution {
+  background: rgba(31, 41, 55, 0.8);
+  color: #9ca3af;
+}
+
+.dark .leaflet-control-attribution a {
+  color: #60a5fa;
+}
