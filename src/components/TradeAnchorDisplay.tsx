@@ -17,11 +17,11 @@ export const TradeAnchorDisplay: React.FC<TradeAnchorDisplayProps> = ({
   onChangeClick,
 }) => {
   return (
-    <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-10 w-full max-w-md px-4">
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border-2 border-accent dark:border-primary-light overflow-hidden">
-        <div className="flex items-center gap-3 p-3">
+    <div className="fixed bottom-6 left-4 z-10 max-w-xs">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl border-2 border-accent dark:border-primary-light overflow-hidden backdrop-blur-sm bg-opacity-95 dark:bg-opacity-95">
+        <div className="flex items-center gap-2 p-2.5">
           {/* Item Image */}
-          <div className="relative w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700">
+          <div className="relative w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700">
             {item.images && item.images.length > 0 ? (
               <img
                 src={item.images[0]}
@@ -31,7 +31,7 @@ export const TradeAnchorDisplay: React.FC<TradeAnchorDisplayProps> = ({
             ) : (
               <div className="w-full h-full flex items-center justify-center">
                 <svg 
-                  className="w-8 h-8 text-gray-300 dark:text-gray-600" 
+                  className="w-6 h-6 text-gray-300 dark:text-gray-600" 
                   fill="none" 
                   stroke="currentColor" 
                   viewBox="0 0 24 24"
@@ -53,7 +53,7 @@ export const TradeAnchorDisplay: React.FC<TradeAnchorDisplayProps> = ({
             <p className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-0.5">
               Trading Away
             </p>
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+            <h3 className="text-xs font-semibold text-gray-900 dark:text-white truncate">
               {item.title}
             </h3>
           </div>
@@ -61,10 +61,24 @@ export const TradeAnchorDisplay: React.FC<TradeAnchorDisplayProps> = ({
           {/* Change Button */}
           <button
             onClick={onChangeClick}
-            className="flex-shrink-0 px-3 py-1.5 bg-accent dark:bg-primary-light text-white rounded-lg text-xs font-medium hover:bg-accent-dark dark:hover:bg-primary transition-colors"
+            className="flex-shrink-0 p-1.5 bg-accent dark:bg-primary-light text-white rounded-lg hover:bg-accent-dark dark:hover:bg-primary transition-colors"
             aria-label="Change trade anchor"
+            title="Change trade anchor"
           >
-            Change
+            <svg 
+              className="w-4 h-4" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth={2} 
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" 
+              />
+            </svg>
           </button>
         </div>
       </div>

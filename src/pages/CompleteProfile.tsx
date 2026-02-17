@@ -174,9 +174,10 @@ export function CompleteProfile() {
               <input
                 type="text"
                 value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                className="w-full px-4 py-3 pr-12 border-2 border-border dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-text dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-accent transition-all outline-none placeholder:text-text/40 dark:placeholder:text-gray-500"
-                placeholder="New York, USA"
+                readOnly
+                className="w-full px-4 py-3 pr-12 border-2 border-border dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-text dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-accent transition-all outline-none placeholder:text-text/40 dark:placeholder:text-gray-500 cursor-pointer"
+                placeholder="Click map icon to select location"
+                onClick={() => setShowMapPicker(true)}
                 required
               />
               <button

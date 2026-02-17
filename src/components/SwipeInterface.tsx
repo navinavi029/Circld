@@ -24,7 +24,6 @@ interface SwipeInterfaceProps {
  * - Show trade anchor in fixed position
  * - Handle swipe completion and load next item
  * - Show empty state when pool exhausted
- * - Provide button alternatives for swipe actions
  * 
  * Requirements: 2.1, 2.6, 3.4, 3.7
  */
@@ -43,6 +42,7 @@ export function SwipeInterface({
   const [displayProfile, setDisplayProfile] = useState<UserProfile | null>(ownerProfile);
   const [showLikeAnimation, setShowLikeAnimation] = useState(false);
   const [showDislikeAnimation, setShowDislikeAnimation] = useState(false);
+  const [showTips, setShowTips] = useState(false);
 
   // Update display item when not animating
   useEffect(() => {
@@ -72,18 +72,7 @@ export function SwipeInterface({
     }, 450); // Slightly longer than card animation (400ms)
   };
 
-  // Button handlers for accessibility
-  const handlePassClick = () => {
-    if (!isAnimating && displayItem) {
-      handleSwipe('left');
-    }
-  };
 
-  const handleLikeClick = () => {
-    if (!isAnimating && displayItem) {
-      handleSwipe('right');
-    }
-  };
 
   // Empty state when no items available
   if (!loading && !currentItem && !hasMoreItems) {
@@ -93,7 +82,7 @@ export function SwipeInterface({
         <TradeAnchorDisplay item={tradeAnchor} onChangeClick={onChangeAnchor} />
 
         {/* Empty State */}
-        <div className="flex-1 flex items-center justify-center px-4 pt-24">
+        <div className="flex-1 flex items-center justify-center px-4 py-8">
           <div className="text-center max-w-md">
             <div className="mb-6">
               <svg
@@ -137,7 +126,7 @@ export function SwipeInterface({
         <TradeAnchorDisplay item={tradeAnchor} onChangeClick={onChangeAnchor} />
 
         {/* Loading State */}
-        <div className="flex-1 flex items-center justify-center px-4 pt-24">
+        <div className="flex-1 flex items-center justify-center px-4 py-8">
           <div className="text-center">
             <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-gray-300 dark:border-gray-600 border-t-accent dark:border-t-primary-light mb-4"></div>
             <p className="text-gray-600 dark:text-gray-400">Loading items...</p>
@@ -149,8 +138,122 @@ export function SwipeInterface({
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex flex-col">
-      {/* Trade Anchor Display - Fixed at top */}
+      {/* Trade Anchor Display - Fixed at bottom left */}
       <TradeAnchorDisplay item={tradeAnchor} onChangeClick={onChangeAnchor} />
+
+      {/* Tips Button - Fixed at top right */}
+      <button
+        onClick={() => setShowTips(!showTips)}
+        className="fixed top-6 right-6 z-20 p-3 bg-white dark:bg-gray-800 rounded-full shadow-lg border-2 border-gray-200 dark:border-gray-700 hover:scale-105 transition-transform"
+        aria-label="Show tips"
+      >
+        <svg
+          className="w-5 h-5 text-accent dark:text-primary-light"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+      </button>
+
+      {/* Tips Panel */}
+      {showTips && (
+        <div className="fixed top-20 right-6 z-20 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border-2 border-accent dark:border-primary-light overflow-hidden animate-slideDown">
+          <div className="bg-gradient-to-r from-accent to-accent-dark dark:from-primary-light dark:to-primary px-4 py-3 flex items-center justify-between">
+            <h3 className="text-white font-semibold flex items-center gap-2">
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+              Swipe Tips
+            </h3>
+            <button
+              onClick={() => setShowTips(false)}
+              className="text-white hover:bg-white/20 rounded-full p-1 transition-colors"
+              aria-label="Close tips"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <div className="p-4 space-y-3 max-h-96 overflow-y-auto">
+            <div className="flex gap-3">
+              <div className="flex-shrink-0 w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
+                <svg className="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">Swipe Right to Like</p>
+                <p className="text-xs text-gray-600 dark:text-gray-400">Send a trade offer for items you're interested in</p>
+              </div>
+            </div>
+            
+            <div className="flex gap-3">
+              <div className="flex-shrink-0 w-8 h-8 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
+                <svg className="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">Swipe Left to Pass</p>
+                <p className="text-xs text-gray-600 dark:text-gray-400">Skip items that don't interest you</p>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <div className="flex-shrink-0 w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">Review Item Details</p>
+                <p className="text-xs text-gray-600 dark:text-gray-400">Tap the card to see full description and photos</p>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <div className="flex-shrink-0 w-8 h-8 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center">
+                <svg className="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">Change Your Item</p>
+                <p className="text-xs text-gray-600 dark:text-gray-400">Click the card in the bottom-left to trade a different item</p>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <div className="flex-shrink-0 w-8 h-8 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center">
+                <svg className="w-5 h-5 text-yellow-600 dark:text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">Quick Swiping</p>
+                <p className="text-xs text-gray-600 dark:text-gray-400">Swipe fast to browse more items quickly</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Backdrop for tips panel */}
+      {showTips && (
+        <div
+          className="fixed inset-0 bg-black/20 z-10"
+          onClick={() => setShowTips(false)}
+        />
+      )}
 
       {/* Sync Status Banner */}
       {syncStatus && (
@@ -165,7 +268,7 @@ export function SwipeInterface({
       )}
 
       {/* Main Swipe Area */}
-      <div className="flex-1 flex items-center justify-center px-4 pt-24 pb-24 relative overflow-y-auto">
+      <div className="flex-1 flex items-center justify-center px-4 py-8 relative overflow-y-auto">
         <div className="w-full max-w-md">
           <SwipeCard
             key={displayItem.id}
@@ -233,79 +336,7 @@ export function SwipeInterface({
         )}
       </div>
 
-      {/* Button Controls - Fixed at bottom */}
-      <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-white via-white to-transparent dark:from-gray-800 dark:via-gray-800 dark:to-transparent border-t border-gray-200 dark:border-gray-700 px-4 py-4 backdrop-blur-sm">
-        <div className="max-w-md mx-auto">
-          <div className="flex items-center justify-center gap-4">
-            {/* Pass Button */}
-            <button
-              onClick={handlePassClick}
-              disabled={isAnimating}
-              className={`group relative w-14 h-14 rounded-full bg-white dark:bg-gray-700 border-2 border-red-500 text-red-500 flex items-center justify-center hover:bg-red-50 dark:hover:bg-red-900/30 hover:scale-105 active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg ${
-                showDislikeAnimation ? 'animate-pulse' : ''
-              }`}
-              aria-label="Pass on this item"
-            >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2.5}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
 
-            {/* Like Button */}
-            <button
-              onClick={handleLikeClick}
-              disabled={isAnimating}
-              className={`group relative w-16 h-16 rounded-full bg-gradient-to-br from-accent to-accent-dark dark:from-primary-light dark:to-primary text-white flex items-center justify-center hover:scale-105 active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl ${
-                showLikeAnimation ? 'animate-pulse' : ''
-              }`}
-              aria-label="Like this item and send trade offer"
-            >
-              <svg
-                className="w-8 h-8"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-              </svg>
-            </button>
-
-            {/* Info Button */}
-            <button
-              onClick={() => {/* Could open item details modal */}}
-              disabled={isAnimating}
-              className="group relative w-12 h-12 rounded-full bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-600 hover:scale-105 active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
-              aria-label="View item details"
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

@@ -572,12 +572,13 @@ export function EditProfile() {
                   type="text"
                   id="location"
                   value={location}
-                  onChange={handleLocationChange}
+                  readOnly
                   disabled={locationCooldownActive}
-                  className={`w-full px-4 py-2 pr-12 border-2 rounded-md bg-white dark:bg-gray-700 text-text dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-accent disabled:bg-gray-50 dark:disabled:bg-gray-700 disabled:text-gray-500 dark:disabled:text-gray-400 disabled:cursor-not-allowed ${
+                  className={`w-full px-4 py-2 pr-12 border-2 rounded-md bg-white dark:bg-gray-700 text-text dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-accent disabled:bg-gray-50 dark:disabled:bg-gray-700 disabled:text-gray-500 dark:disabled:text-gray-400 disabled:cursor-not-allowed cursor-pointer ${
                     validationErrors.location ? 'border-red-500' : 'border-border dark:border-gray-600'
                   }`}
-                  placeholder="Enter your location"
+                  placeholder="Click map icon to select location"
+                  onClick={() => !locationCooldownActive && setShowMapPicker(true)}
                 />
                 <button
                   type="button"
