@@ -7,9 +7,10 @@ export interface RetryOptions {
   initialDelay?: number;
   maxDelay?: number;
   backoffFactor?: number;
+  onRetry?: (attempt: number, error: Error) => void;
 }
 
-const DEFAULT_OPTIONS: Required<RetryOptions> = {
+const DEFAULT_OPTIONS: Required<Omit<RetryOptions, 'onRetry'>> & Pick<RetryOptions, 'onRetry'> = {
   maxRetries: 3,
   initialDelay: 1000, // 1 second
   maxDelay: 10000, // 10 seconds
@@ -34,23 +35,34 @@ export async function retryWithBackoff<T>(
 
   for (let attempt = 0; attempt <= config.maxRetries; attempt++) {
     try {
+      console.log('[retryWithBackoff] Attempt', attempt + 1, 'of', config.maxRetries + 1);
       return await fn();
     } catch (error) {
       lastError = error as Error;
+      
+      console.error('[retryWithBackoff] Attempt', attempt + 1, 'failed:', lastError.message);
 
       // Don't retry on certain errors
       if (isNonRetryableError(error)) {
+        console.log('[retryWithBackoff] Non-retryable error, throwing immediately');
         throw error;
       }
 
       // If this was the last attempt, throw the error
       if (attempt === config.maxRetries) {
+        console.error('[retryWithBackoff] All retries exhausted');
         throw new Error(
           `Operation failed after ${config.maxRetries} retries: ${lastError.message}`
         );
       }
 
+      // Call retry callback if provided
+      if (config.onRetry) {
+        config.onRetry(attempt + 1, lastError);
+      }
+
       // Wait before retrying
+      console.log('[retryWithBackoff] Waiting', delay, 'ms before retry');
       await sleep(delay);
 
       // Increase delay for next attempt (exponential backoff)

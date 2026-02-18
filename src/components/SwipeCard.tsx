@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, memo } from 'react';
 import { Item } from '../types/item';
 import { UserProfile } from '../types/user';
 import { useProfile } from '../contexts/ProfileContext';
@@ -9,6 +9,7 @@ interface SwipeCardProps {
   ownerProfile: UserProfile;
   onSwipeLeft: () => void;
   onSwipeRight: () => void;
+  compact?: boolean;
 }
 
 interface DragState {
@@ -22,7 +23,7 @@ interface DragState {
 const SWIPE_THRESHOLD = 100; // pixels to trigger swipe
 const ROTATION_FACTOR = 0.1; // rotation per pixel moved
 
-export function SwipeCard({ item, ownerProfile, onSwipeLeft, onSwipeRight }: SwipeCardProps) {
+export const SwipeCard = memo(function SwipeCard({ item, ownerProfile, onSwipeLeft, onSwipeRight, compact = false }: SwipeCardProps) {
   const { profile } = useProfile();
   const [dragState, setDragState] = useState<DragState>({
     isDragging: false,
@@ -78,6 +79,9 @@ export function SwipeCard({ item, ownerProfile, onSwipeLeft, onSwipeRight }: Swi
 
   // Touch event handlers
   const handleTouchStart = (e: React.TouchEvent) => {
+    // Prevent multiple simultaneous drags
+    if (dragState.isDragging) return;
+    
     const touch = e.touches[0];
     setDragState({
       isDragging: true,
@@ -103,8 +107,24 @@ export function SwipeCard({ item, ownerProfile, onSwipeLeft, onSwipeRight }: Swi
     handleSwipeEnd();
   };
 
+  const handleTouchCancel = () => {
+    // Handle interrupted touch gesture
+    if (!dragState.isDragging) return;
+    
+    console.log('Touch gesture interrupted, resetting card position');
+    setDragState(prev => ({
+      ...prev,
+      isDragging: false,
+      currentX: prev.startX,
+      currentY: prev.startY,
+    }));
+  };
+
   // Mouse event handlers
   const handleMouseDown = (e: React.MouseEvent) => {
+    // Prevent multiple simultaneous drags
+    if (dragState.isDragging) return;
+    
     setDragState({
       isDragging: true,
       startX: e.clientX,
@@ -218,18 +238,40 @@ export function SwipeCard({ item, ownerProfile, onSwipeLeft, onSwipeRight }: Swi
       });
     };
 
+    const handleMouseLeave = (e: MouseEvent) => {
+      // Handle interrupted mouse gesture when cursor leaves window
+      setDragState(prev => {
+        if (!prev.isDragging) return prev;
+        
+        // Check if mouse actually left the window (not just the card)
+        if (e.clientX <= 0 || e.clientX >= window.innerWidth || 
+            e.clientY <= 0 || e.clientY >= window.innerHeight) {
+          console.log('Mouse left window during drag, resetting card position');
+          return {
+            ...prev,
+            isDragging: false,
+            currentX: prev.startX,
+            currentY: prev.startY,
+          };
+        }
+        return prev;
+      });
+    };
+
     if (dragState.isDragging) {
       window.addEventListener('mousemove', handleMove);
       window.addEventListener('mouseup', handleUp);
+      window.addEventListener('mouseleave', handleMouseLeave);
       return () => {
         window.removeEventListener('mousemove', handleMove);
         window.removeEventListener('mouseup', handleUp);
+        window.removeEventListener('mouseleave', handleMouseLeave);
       };
     }
   }, [dragState.isDragging, onSwipeLeft, onSwipeRight]);
 
   const cardStyle: React.CSSProperties = {
-    transform: `translate(${deltaX}px, ${deltaY}px) rotate(${rotation}deg) scale(${isAnimatingOut ? 0.9 : 1})`,
+    transform: `translate(${deltaX}px, ${deltaY}px) rotate(${rotation}deg) scale(${isAnimatingOut ? 0.9 : 1}) translateZ(0)`,
     opacity,
     transition: dragState.isDragging 
       ? 'none' 
@@ -237,6 +279,7 @@ export function SwipeCard({ item, ownerProfile, onSwipeLeft, onSwipeRight }: Swi
         ? 'transform 0.4s cubic-bezier(0.4, 0, 1, 1), opacity 0.4s cubic-bezier(0.4, 0, 1, 1), scale 0.4s cubic-bezier(0.4, 0, 1, 1)'
         : 'transform 0.3s ease-out, opacity 0.3s ease-out',
     cursor: dragState.isDragging ? 'grabbing' : 'grab',
+    willChange: dragState.isDragging || isAnimatingOut ? 'transform, opacity' : 'auto',
   };
 
   return (
@@ -247,6 +290,7 @@ export function SwipeCard({ item, ownerProfile, onSwipeLeft, onSwipeRight }: Swi
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
+      onTouchCancel={handleTouchCancel}
       onMouseDown={handleMouseDown}
       onKeyDown={handleKeyDown}
       tabIndex={0}
@@ -254,7 +298,7 @@ export function SwipeCard({ item, ownerProfile, onSwipeLeft, onSwipeRight }: Swi
       aria-label={`Swipe card for ${item.title}. Press left arrow to pass, right arrow to like.`}
     >
       {/* Card Container */}
-      <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl overflow-hidden border-2 border-gray-100 dark:border-gray-700">
+      <div className={`bg-white dark:bg-gray-800 rounded-3xl shadow-2xl overflow-hidden border-2 border-gray-100 dark:border-gray-700 ${compact ? 'rounded-2xl' : 'rounded-3xl'}`}>
         {/* Image Section */}
         <div className="relative aspect-[4/3] bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800">
           {item.images && item.images.length > 0 ? (
@@ -264,6 +308,7 @@ export function SwipeCard({ item, ownerProfile, onSwipeLeft, onSwipeRight }: Swi
                 alt={item.title}
                 className="w-full h-full object-cover"
                 draggable={false}
+                loading="lazy"
               />
               
               {/* Image Navigation Buttons */}
@@ -274,10 +319,10 @@ export function SwipeCard({ item, ownerProfile, onSwipeLeft, onSwipeRight }: Swi
                       e.stopPropagation();
                       prevImage();
                     }}
-                    className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 hover:bg-black/70 backdrop-blur-sm text-white rounded-full flex items-center justify-center transition-all z-10"
+                    className={`absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 backdrop-blur-sm text-white rounded-full flex items-center justify-center transition-all z-10 ${compact ? 'w-8 h-8' : 'w-10 h-10'}`}
                     aria-label="Previous image"
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className={compact ? 'w-4 h-4' : 'w-5 h-5'} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
                     </svg>
                   </button>
@@ -286,16 +331,16 @@ export function SwipeCard({ item, ownerProfile, onSwipeLeft, onSwipeRight }: Swi
                       e.stopPropagation();
                       nextImage();
                     }}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/50 hover:bg-black/70 backdrop-blur-sm text-white rounded-full flex items-center justify-center transition-all z-10"
+                    className={`absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 backdrop-blur-sm text-white rounded-full flex items-center justify-center transition-all z-10 ${compact ? 'w-8 h-8' : 'w-10 h-10'}`}
                     aria-label="Next image"
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className={compact ? 'w-4 h-4' : 'w-5 h-5'} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                     </svg>
                   </button>
                   
                   {/* Image Dots Indicator */}
-                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+                  <div className={`absolute left-1/2 -translate-x-1/2 flex gap-1.5 z-10 ${compact ? 'bottom-2' : 'bottom-4'}`}>
                     {item.images.map((_, idx) => (
                       <button
                         key={idx}
@@ -373,53 +418,54 @@ export function SwipeCard({ item, ownerProfile, onSwipeLeft, onSwipeRight }: Swi
           )}
 
           {/* Condition Badge */}
-          <div className="absolute top-4 left-4 z-10">
-            <span className="px-3 py-1.5 bg-white/95 dark:bg-gray-800/95 backdrop-blur-md text-sm font-bold text-gray-900 dark:text-white rounded-full shadow-lg border border-gray-200 dark:border-gray-700 capitalize">
+          <div className={`absolute z-10 ${compact ? 'top-2 left-2' : 'top-4 left-4'}`}>
+            <span className={`bg-white/95 dark:bg-gray-800/95 backdrop-blur-md font-bold text-gray-900 dark:text-white rounded-full shadow-lg border border-gray-200 dark:border-gray-700 capitalize ${compact ? 'px-2 py-1 text-xs' : 'px-3 py-1.5 text-sm'}`}>
               {item.condition.replace('-', ' ')}
             </span>
           </div>
 
           {/* Category Badge */}
-          <div className="absolute top-4 right-4 z-10">
-            <span className="px-3 py-1.5 bg-accent/95 dark:bg-primary-light/95 backdrop-blur-md text-sm font-bold text-white rounded-full shadow-lg capitalize">
+          <div className={`absolute z-10 ${compact ? 'top-2 right-2' : 'top-4 right-4'}`}>
+            <span className={`bg-accent/95 dark:bg-primary-light/95 backdrop-blur-md font-bold text-white rounded-full shadow-lg capitalize ${compact ? 'px-2 py-1 text-xs' : 'px-3 py-1.5 text-sm'}`}>
               {item.category}
             </span>
           </div>
         </div>
 
         {/* Item Details Section */}
-        <div className="p-6 space-y-4 bg-gradient-to-b from-white to-gray-50 dark:from-gray-800 dark:to-gray-900">
+        <div className={`space-y-4 bg-gradient-to-b from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 ${compact ? 'p-4 space-y-3' : 'p-6 space-y-4'}`}>
           {/* Title */}
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white leading-tight">
+          <h2 className={`font-bold text-gray-900 dark:text-white leading-tight ${compact ? 'text-xl' : 'text-2xl'}`}>
             {item.title}
           </h2>
 
           {/* Description */}
-          <p className="text-gray-600 dark:text-gray-300 leading-relaxed line-clamp-3 text-base">
+          <p className={`text-gray-600 dark:text-gray-300 leading-relaxed line-clamp-3 ${compact ? 'text-sm line-clamp-2' : 'text-base line-clamp-3'}`}>
             {item.description}
           </p>
 
           {/* Owner Info */}
-          <div className="pt-4 border-t-2 border-gray-200 dark:border-gray-700">
+          <div className={`border-t-2 border-gray-200 dark:border-gray-700 ${compact ? 'pt-3' : 'pt-4'}`}>
             <div className="flex items-center gap-4">
               {ownerProfile.photoUrl ? (
                 <img
                   src={ownerProfile.photoUrl}
                   alt={`${ownerProfile.firstName} ${ownerProfile.lastName}`}
-                  className="w-14 h-14 rounded-full object-cover border-3 border-white dark:border-gray-700 shadow-lg"
+                  className={`rounded-full object-cover border-3 border-white dark:border-gray-700 shadow-lg ${compact ? 'w-10 h-10' : 'w-14 h-14'}`}
+                  loading="lazy"
                 />
               ) : (
-                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-accent to-accent-dark dark:from-primary-light dark:to-primary flex items-center justify-center border-3 border-white dark:border-gray-700 shadow-lg">
-                  <span className="text-white font-bold text-xl">
+                <div className={`rounded-full bg-gradient-to-br from-accent to-accent-dark dark:from-primary-light dark:to-primary flex items-center justify-center border-3 border-white dark:border-gray-700 shadow-lg ${compact ? 'w-10 h-10' : 'w-14 h-14'}`}>
+                  <span className={`text-white font-bold ${compact ? 'text-lg' : 'text-xl'}`}>
                     {ownerProfile.firstName[0]}{ownerProfile.lastName[0]}
                   </span>
                 </div>
               )}
               <div className="flex-1 min-w-0">
-                <p className="text-base font-bold text-gray-900 dark:text-white truncate">
+                <p className={`font-bold text-gray-900 dark:text-white truncate ${compact ? 'text-sm' : 'text-base'}`}>
                   {ownerProfile.firstName} {ownerProfile.lastName}
                 </p>
-                <div className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400">
+                <div className={`flex items-center gap-1.5 text-gray-500 dark:text-gray-400 ${compact ? 'text-xs' : 'text-sm'}`}>
                   <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -438,4 +484,4 @@ export function SwipeCard({ item, ownerProfile, onSwipeLeft, onSwipeRight }: Swi
       </div>
     </div>
   );
-}
+});

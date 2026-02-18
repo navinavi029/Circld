@@ -1,109 +1,176 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
 import { Item } from '../types/item';
 import { UserProfile } from '../types/user';
-import { SwipeCard } from './SwipeCard';
+import { CardGrid } from './CardGrid';
 import { TradeAnchorDisplay } from './TradeAnchorDisplay';
-import { LoadingSpinner } from './ui/LoadingSpinner';
 
-interface SwipeInterfaceProps {
+interface MultiCardSwipeInterfaceProps {
   tradeAnchor: Item;
-  currentItem: Item | null;
-  ownerProfile: UserProfile | null;
-  onSwipe: (direction: 'left' | 'right') => void;
+  itemPool: Item[];
+  ownerProfiles: Map<string, UserProfile>;
+  onSwipe: (itemId: string, direction: 'left' | 'right') => void;
   onChangeAnchor: () => void;
-  hasMoreItems: boolean;
-  loading?: boolean;
-  syncStatus?: string | null;
+  loading: boolean;
+  syncStatus: string | null;
+  loadingError?: string | null;
 }
 
 /**
- * SwipeInterface component integrates SwipeCard and TradeAnchorDisplay
- * to provide the core swipe trading experience.
+ * MultiCardSwipeInterface component displays multiple cards simultaneously
+ * and manages the multi-card swipe trading experience.
  * 
  * Responsibilities:
- * - Display current item in swipeable card
- * - Show trade anchor in fixed position
- * - Handle swipe completion and load next item
- * - Show empty state when pool exhausted
+ * - Determines how many cards to show based on viewport size
+ * - Manages the visible subset of the item pool
+ * - Coordinates animations for card entrance/exit
+ * - Provides loading states for individual card positions
+ * - Maintains tips panel and trade anchor display
  * 
- * Requirements: 2.1, 2.6, 3.4, 3.7
+ * Requirements: 2.1, 2.5, 3.4, 9.2
  */
-export function SwipeInterface({
+export function MultiCardSwipeInterface({
   tradeAnchor,
-  currentItem,
-  ownerProfile,
+  itemPool,
+  ownerProfiles,
   onSwipe,
   onChangeAnchor,
-  hasMoreItems,
-  loading = false,
-  syncStatus = null,
-}: SwipeInterfaceProps) {
-  const navigate = useNavigate();
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [displayItem, setDisplayItem] = useState<Item | null>(currentItem);
-  const [displayProfile, setDisplayProfile] = useState<UserProfile | null>(ownerProfile);
-  const [showLikeAnimation, setShowLikeAnimation] = useState(false);
-  const [showDislikeAnimation, setShowDislikeAnimation] = useState(false);
+  loading,
+  syncStatus,
+  loadingError = null,
+}: MultiCardSwipeInterfaceProps) {
+  const [visibleCardCount, setVisibleCardCount] = useState(3);
   const [showTips, setShowTips] = useState(false);
+  const [animatingCards, setAnimatingCards] = useState<Set<string>>(new Set());
+  const animationTimeoutsRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
 
-  // Update display item when not animating
+  // Determine visible card count based on viewport size
   useEffect(() => {
-    if (!isAnimating && currentItem) {
-      setDisplayItem(currentItem);
-      setDisplayProfile(ownerProfile);
-    }
-  }, [currentItem, ownerProfile, isAnimating]);
+    const updateCardCount = () => {
+      const width = window.innerWidth;
+      
+      if (width >= 1280) {
+        // Desktop: 5 cards
+        setVisibleCardCount(5);
+      } else if (width >= 768) {
+        // Tablet: 4 cards
+        setVisibleCardCount(4);
+      } else if (width >= 640) {
+        // Mobile landscape: 3 cards
+        setVisibleCardCount(3);
+      } else {
+        // Mobile portrait: 2 cards
+        setVisibleCardCount(2);
+      }
+    };
 
-  // Handle swipe with animation state
-  const handleSwipe = (direction: 'left' | 'right') => {
-    setIsAnimating(true);
+    // Initial calculation
+    updateCardCount();
+
+    // Debounced resize handler with animation protection
+    let resizeTimer: NodeJS.Timeout;
+    const handleResize = () => {
+      clearTimeout(resizeTimer);
+      
+      resizeTimer = setTimeout(() => {
+        // Wait for animations to complete before recalculating layout
+        if (animatingCards.size === 0) {
+          updateCardCount();
+        } else {
+          // Retry after animations complete
+          const checkAnimations = setInterval(() => {
+            if (animatingCards.size === 0) {
+              clearInterval(checkAnimations);
+              updateCardCount();
+            }
+          }, 100);
+          
+          // Force update after 1 second even if animations haven't completed
+          setTimeout(() => {
+            clearInterval(checkAnimations);
+            updateCardCount();
+          }, 1000);
+        }
+      }, 300);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      clearTimeout(resizeTimer);
+    };
+  }, [animatingCards.size]);
+
+  // Handle card swipe with animation and timeout
+  const handleCardSwipe = (itemId: string, direction: 'left' | 'right') => {
+    // Add card to animating set
+    setAnimatingCards(prev => new Set(prev).add(itemId));
+
+    // Set animation timeout (600ms max as per design spec)
+    const timeoutId = setTimeout(() => {
+      console.log(`Animation timeout for card ${itemId}, forcing completion`);
+      
+      // Force complete animation
+      onSwipe(itemId, direction);
+      
+      // Remove from animating set
+      setAnimatingCards(prev => {
+        const next = new Set(prev);
+        next.delete(itemId);
+        return next;
+      });
+      
+      // Clean up timeout reference
+      animationTimeoutsRef.current.delete(itemId);
+    }, 600);
     
-    // Trigger animation based on direction
-    if (direction === 'right') {
-      setShowLikeAnimation(true);
-      setTimeout(() => setShowLikeAnimation(false), 1000);
-    } else {
-      setShowDislikeAnimation(true);
-      setTimeout(() => setShowDislikeAnimation(false), 1000);
-    }
-    
-    // Wait for card animation to complete before updating state
+    // Store timeout reference
+    animationTimeoutsRef.current.set(itemId, timeoutId);
+
+    // Wait for animation to complete before calling parent callback
     setTimeout(() => {
-      onSwipe(direction);
-      setIsAnimating(false);
-    }, 450); // Slightly longer than card animation (400ms)
+      // Clear the timeout if animation completes normally
+      const timeout = animationTimeoutsRef.current.get(itemId);
+      if (timeout) {
+        clearTimeout(timeout);
+        animationTimeoutsRef.current.delete(itemId);
+      }
+      
+      onSwipe(itemId, direction);
+      
+      // Remove from animating set after callback
+      setAnimatingCards(prev => {
+        const next = new Set(prev);
+        next.delete(itemId);
+        return next;
+      });
+    }, 400); // Match card exit animation duration
   };
 
+  // Cleanup animation timeouts on unmount
+  useEffect(() => {
+    return () => {
+      animationTimeoutsRef.current.forEach(timeout => clearTimeout(timeout));
+      animationTimeoutsRef.current.clear();
+    };
+  }, []);
 
+  // Get visible items (first N items from pool)
+  const visibleItems = itemPool.slice(0, visibleCardCount);
+  
+  // Calculate loading slots (if we have fewer items than card count)
+  // Show loading placeholders when:
+  // 1. Initial loading (loading=true)
+  // 2. Cards are being replaced after swipe (animating cards exist and pool is smaller than card count)
+  const hasAnimatingCards = animatingCards.size > 0;
+  const shouldShowLoading = loading || (hasAnimatingCards && visibleItems.length < visibleCardCount);
+  const loadingSlots = shouldShowLoading ? Math.max(0, visibleCardCount - visibleItems.length) : 0;
 
   // Empty state when no items available
-  if (!loading && !currentItem && !hasMoreItems) {
+  if (!loading && itemPool.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
         {/* Trade Anchor Display */}
         <TradeAnchorDisplay item={tradeAnchor} onChangeClick={onChangeAnchor} />
-
-        {/* Return Button - Fixed at top left */}
-        <button
-          onClick={() => navigate('/listings')}
-          className="fixed top-6 left-6 z-20 p-3 bg-white dark:bg-gray-800 rounded-full shadow-lg border-2 border-gray-200 dark:border-gray-700 hover:scale-105 transition-transform"
-          aria-label="Return to listings"
-        >
-          <svg
-            className="w-5 h-5 text-gray-700 dark:text-gray-300"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M10 19l-7-7m0 0l7-7m-7 7h18"
-            />
-          </svg>
-        </button>
 
         {/* Empty State */}
         <div className="flex-1 flex items-center justify-center px-4 py-8">
@@ -142,70 +209,10 @@ export function SwipeInterface({
     );
   }
 
-  // Loading state
-  if (loading || !displayItem || !displayProfile) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
-        {/* Trade Anchor Display */}
-        <TradeAnchorDisplay item={tradeAnchor} onChangeClick={onChangeAnchor} />
-
-        {/* Return Button - Fixed at top left */}
-        <button
-          onClick={() => navigate('/listings')}
-          className="fixed top-6 left-6 z-20 p-3 bg-white dark:bg-gray-800 rounded-full shadow-lg border-2 border-gray-200 dark:border-gray-700 hover:scale-105 transition-transform"
-          aria-label="Return to listings"
-        >
-          <svg
-            className="w-5 h-5 text-gray-700 dark:text-gray-300"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M10 19l-7-7m0 0l7-7m-7 7h18"
-            />
-          </svg>
-        </button>
-
-        {/* Loading State */}
-        <div className="flex-1 flex items-center justify-center px-4 py-8">
-          <div className="text-center">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-gray-300 dark:border-gray-600 border-t-accent dark:border-t-primary-light mb-4"></div>
-            <p className="text-gray-600 dark:text-gray-400">Loading items...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex flex-col">
       {/* Trade Anchor Display - Fixed at bottom left */}
       <TradeAnchorDisplay item={tradeAnchor} onChangeClick={onChangeAnchor} />
-
-      {/* Return Button - Fixed at top left */}
-      <button
-        onClick={() => navigate('/listings')}
-        className="fixed top-6 left-6 z-20 p-3 bg-white dark:bg-gray-800 rounded-full shadow-lg border-2 border-gray-200 dark:border-gray-700 hover:scale-105 transition-transform"
-        aria-label="Return to listings"
-      >
-        <svg
-          className="w-5 h-5 text-gray-700 dark:text-gray-300"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M10 19l-7-7m0 0l7-7m-7 7h18"
-          />
-        </svg>
-      </button>
 
       {/* Tips Button - Fixed at top right */}
       <button
@@ -276,13 +283,12 @@ export function SwipeInterface({
             <div className="flex gap-3">
               <div className="flex-shrink-0 w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
                 <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                 </svg>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">Review Item Details</p>
-                <p className="text-xs text-gray-600 dark:text-gray-400">Tap the card to see full description and photos</p>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">Multiple Cards</p>
+                <p className="text-xs text-gray-600 dark:text-gray-400">Swipe any card independently to browse efficiently</p>
               </div>
             </div>
 
@@ -333,83 +339,17 @@ export function SwipeInterface({
         </div>
       )}
 
-      {/* Main Swipe Area */}
+      {/* Main Card Grid Area */}
       <div className="flex-1 flex items-center justify-center px-4 py-8 relative overflow-y-auto">
-        <div className="w-full max-w-md">
-          <SwipeCard
-            key={displayItem.id}
-            item={displayItem}
-            ownerProfile={displayProfile}
-            onSwipeLeft={() => handleSwipe('left')}
-            onSwipeRight={() => handleSwipe('right')}
-          />
-          
-          {/* Loading indicator for next items */}
-          {hasMoreItems && (
-            <div className="mt-6">
-              <LoadingSpinner size="sm" message="Loading more items..." />
-            </div>
-          )}
-        </div>
-        
-        {/* Like Animation - Floating Hearts */}
-        {showLikeAnimation && (
-          <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-            {[...Array(8)].map((_, i) => (
-              <div
-                key={i}
-                className="absolute animate-floatHeart"
-                style={{
-                  left: `${50 + (Math.random() - 0.5) * 40}%`,
-                  animationDelay: `${i * 0.1}s`,
-                  animationDuration: `${0.8 + Math.random() * 0.4}s`,
-                }}
-              >
-                <svg
-                  className="w-12 h-12 text-red-500"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                </svg>
-              </div>
-            ))}
-          </div>
-        )}
-        
-        {/* Dislike Animation - Floating X marks */}
-        {showDislikeAnimation && (
-          <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-            {[...Array(6)].map((_, i) => (
-              <div
-                key={i}
-                className="absolute animate-floatX"
-                style={{
-                  left: `${50 + (Math.random() - 0.5) * 40}%`,
-                  animationDelay: `${i * 0.1}s`,
-                  animationDuration: `${0.8 + Math.random() * 0.4}s`,
-                }}
-              >
-                <svg
-                  className="w-10 h-10 text-red-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  strokeWidth={3}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </div>
-            ))}
-          </div>
-        )}
+        <CardGrid
+          items={visibleItems}
+          ownerProfiles={ownerProfiles}
+          onSwipe={handleCardSwipe}
+          animatingCards={animatingCards}
+          loadingSlots={loadingSlots}
+          loadingError={loadingError}
+        />
       </div>
-
-
     </div>
   );
 }
