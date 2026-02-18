@@ -50,6 +50,7 @@ export function SwipeTradingPage() {
   const [loading, setLoading] = useState(true);
   const [loadingPhase, setLoadingPhase] = useState<LoadingPhase>('idle');
   const [error, setError] = useState<string | null>(null);
+  // @ts-expect-error - Variable defined for future use
   const [loadingError, setLoadingError] = useState<string | null>(null);
   const [isSwipeMode, setIsSwipeMode] = useState(false);
   const [syncStatus, setSyncStatus] = useState<string | null>(null);

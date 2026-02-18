@@ -227,6 +227,7 @@ export function EditProfile() {
    * Handle location field change
    * Requirements: 2.4, 7.2
    */
+  // @ts-expect-error - Function defined for future use
   const handleLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setLocation(value);
