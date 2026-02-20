@@ -60,7 +60,7 @@ export interface Notification {
   tradeOfferId?: string;
   read: boolean;
   createdAt: Timestamp;
-  data: TradeOfferNotificationData | Record<string, unknown>;
+  data: TradeOfferNotificationData | MessageNotificationData | Record<string, unknown>;
 }
 
 /**
@@ -121,4 +121,68 @@ export interface NotificationService {
   getUserNotifications(userId: string): Promise<Notification[]>;
   
   markAsRead(notificationId: string): Promise<void>;
+}
+
+/**
+ * Represents a conversation between two users for an accepted trade
+ */
+export interface Conversation {
+  id: string;
+  tradeOfferId: string;
+  participantIds: [string, string]; // [offeringUserId, targetItemOwnerId]
+  tradeAnchorId: string;
+  targetItemId: string;
+  createdAt: Timestamp;
+  lastMessageAt: Timestamp;
+  lastMessageText: string;
+  unreadCount: {
+    [userId: string]: number;
+  };
+}
+
+/**
+ * Represents a single message within a conversation
+ */
+export interface Message {
+  id: string;
+  conversationId: string;
+  senderId: string;
+  text: string;
+  createdAt: Timestamp;
+  readBy: string[]; // Array of user IDs who have read the message
+}
+
+/**
+ * Enriched conversation data for displaying in conversation lists
+ */
+export interface ConversationSummary {
+  conversation: Conversation;
+  tradeAnchorTitle: string;
+  tradeAnchorImage: string;
+  targetItemTitle: string;
+  targetItemImage: string;
+  partnerName: string;
+  partnerId: string;
+  unreadCount: number;
+}
+
+/**
+ * Data structure for message notifications
+ */
+export interface MessageNotificationData {
+  conversationId: string;
+  senderId: string;
+  senderName: string;
+  messagePreview: string; // First 50 chars of message
+  tradeAnchorTitle: string;
+  targetItemTitle: string;
+}
+
+/**
+ * Filter preferences for swipe trading
+ */
+export interface SwipeFilterPreferences {
+  maxDistance: number | null; // in kilometers, null = no limit
+  categories: string[];
+  conditions: string[]; // item conditions: new, like-new, good, fair, poor
 }

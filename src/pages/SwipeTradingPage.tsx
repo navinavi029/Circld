@@ -5,9 +5,10 @@ import { useAuth } from '../contexts/AuthContext';
 import { useProfile } from '../contexts/ProfileContext';
 import { Item } from '../types/item';
 import { UserProfile } from '../types/user';
-import { SwipeSession } from '../types/swipe-trading';
+import { SwipeSession, SwipeFilterPreferences } from '../types/swipe-trading';
 import { TradeAnchorSelector } from '../components/TradeAnchorSelector';
 import { SwipeInterface } from '../components/SwipeInterface';
+import { SwipeFilters } from '../components/SwipeFilters';
 import { Navigation } from '../components/Navigation';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 import { buildItemPool } from '../services/itemPoolService';
@@ -57,6 +58,11 @@ export function SwipeTradingPage() {
   const [showExtendedLoadingMessage, setShowExtendedLoadingMessage] = useState(false);
   const [showNewSessionOption, setShowNewSessionOption] = useState(false);
   const hasAttemptedRestoreRef = useRef(false);
+  const [filterPreferences, setFilterPreferences] = useState<SwipeFilterPreferences>(() => {
+    // Load filter preferences from localStorage
+    const saved = localStorage.getItem('swipeFilterPreferences');
+    return saved ? JSON.parse(saved) : { maxDistance: null, categories: [], conditions: [] };
+  });
 
   // Restore session from cache on mount (only once, even in Strict Mode)
   useEffect(() => {
@@ -264,7 +270,14 @@ export function SwipeTradingPage() {
           phase: 'history-loaded',
         });
         
-        const items = await buildItemPool(user.uid, swipeHistory, 20);
+        const items = await buildItemPool(
+          user.uid, 
+          swipeHistory, 
+          20, 
+          undefined, 
+          filterPreferences,
+          profile?.coordinates || null
+        );
         
         // Log successful restoration (Requirement 6.5)
         console.log('[SwipeTradingPage] Session restored successfully:', {
@@ -368,7 +381,14 @@ export function SwipeTradingPage() {
       setError(null);
       
       const swipeHistory = await getSwipeHistory(session.id, user.uid);
-      const items = await buildItemPool(user.uid, swipeHistory, 20);
+      const items = await buildItemPool(
+        user.uid, 
+        swipeHistory, 
+        20, 
+        undefined, 
+        filterPreferences,
+        profile?.coordinates || null
+      );
       
       // Empty pool is a valid state, not an error
       setItemPool(items);
@@ -606,7 +626,14 @@ export function SwipeTradingPage() {
         phase: 'history-loaded'
       });
       
-      const items = await buildItemPool(user.uid, swipeHistory, 20);
+      const items = await buildItemPool(
+        user.uid, 
+        swipeHistory, 
+        20, 
+        undefined, 
+        filterPreferences,
+        profile?.coordinates || null
+      );
       console.log('[SwipeTradingPage] Item pool loaded:', {
         sessionId: newSession.id,
         itemCount: items.length,
@@ -638,6 +665,46 @@ export function SwipeTradingPage() {
       setLoading(false);
     }
   };
+  /**
+   * Handles filter changes and reloads the item pool
+   */
+  const handleFilterChange = async (filters: SwipeFilterPreferences) => {
+    // Save to localStorage
+    localStorage.setItem('swipeFilterPreferences', JSON.stringify(filters));
+    setFilterPreferences(filters);
+    
+    // If we're in swipe mode, reload the item pool with new filters
+    if (isSwipeMode && session && user) {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const swipeHistory = await getSwipeHistory(session.id, user.uid);
+        const items = await buildItemPool(
+          user.uid, 
+          swipeHistory, 
+          20, 
+          undefined, 
+          filters,
+          profile?.coordinates || null
+        );
+        
+        setItemPool(items);
+        
+        // Load owner profiles for the items
+        if (items.length > 0) {
+          const profiles = await loadOwnerProfiles(items);
+          setOwnerProfiles(profiles);
+        }
+      } catch (err) {
+        console.error('Error reloading items with new filters:', err);
+        setError('Failed to apply filters. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
   /**
    * Handles creating a new session with the same trade anchor after restoration failure
    * Requirements: 6.4
@@ -822,7 +889,14 @@ export function SwipeTradingPage() {
     try {
       setLoadingError(null); // Clear any previous loading errors
       const swipeHistory = await getSwipeHistory(session.id, user.uid);
-      const moreItems = await buildItemPool(user.uid, swipeHistory, 20);
+      const moreItems = await buildItemPool(
+        user.uid, 
+        swipeHistory, 
+        20, 
+        undefined, 
+        filterPreferences,
+        profile?.coordinates || null
+      );
       
       // Add new items that aren't already in the pool
       const existingIds = new Set(itemPool.map(item => item.id));
@@ -910,6 +984,10 @@ export function SwipeTradingPage() {
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <Navigation />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <SwipeFilters 
+            onApply={handleFilterChange} 
+            initialFilters={filterPreferences}
+          />
           <TradeAnchorSelector
             userItems={userItems}
             onSelect={handleTradeAnchorSelect}

@@ -11,8 +11,9 @@ import {
 } from 'firebase/firestore';
 import { db } from '../firebase';
 import { Item } from '../types/item';
-import { SwipeRecord } from '../types/swipe-trading';
+import { SwipeRecord, SwipeFilterPreferences } from '../types/swipe-trading';
 import { retryWithBackoff } from '../utils/retryWithBackoff';
+import { calculateDistance } from '../utils/location';
 
 // Query execution queue to ensure sequential execution
 let queryQueue: Promise<any> = Promise.resolve();
@@ -25,6 +26,9 @@ let queryExecutionCounter = 0;
  * - Only items with status="available"
  * - Excludes items owned by the current user
  * - Excludes items already swiped on in the current session
+ * - Optional: Distance filter (requires user coordinates)
+ * - Optional: Category filter
+ * - Optional: Condition filter (new, like-new, good, fair, poor)
  * - Orders by createdAt descending (newest first)
  * - Supports batch loading with limit/offset
  * 
@@ -32,13 +36,17 @@ let queryExecutionCounter = 0;
  * @param swipeHistory - Array of swipe records from the current session
  * @param limit - Maximum number of items to return (default: 20)
  * @param lastDoc - Last document from previous batch for pagination
+ * @param filters - Optional filter preferences
+ * @param userCoordinates - User's coordinates for distance filtering
  * @returns Array of items matching the criteria
  */
 export async function buildItemPool(
   currentUserId: string,
   swipeHistory: SwipeRecord[],
   limit: number = 20,
-  lastDoc?: DocumentSnapshot
+  lastDoc?: DocumentSnapshot,
+  filters?: SwipeFilterPreferences,
+  userCoordinates?: { latitude: number; longitude: number } | null
 ): Promise<Item[]> {
   // Ensure sequential execution by chaining onto the query queue
   const queryId = ++queryExecutionCounter;
@@ -50,6 +58,8 @@ export async function buildItemPool(
     historyCount: swipeHistory.length,
     limit,
     hasLastDoc: !!lastDoc,
+    filters: filters || 'none',
+    hasUserCoordinates: !!userCoordinates,
   });
 
   if (!currentUserId) {
@@ -73,7 +83,7 @@ export async function buildItemPool(
     console.log('[itemPoolService] Excluding swiped items:', swipedItemIds.length);
     
     // Build query constraints
-    // Note: We need to fetch more items than the limit because we'll filter by swipe history
+    // Note: We need to fetch more items than the limit because we'll filter by swipe history and other filters
     // Fetch 3x the limit to account for filtering
     const fetchLimit = Math.min(limit * 3, 100);
     
@@ -89,6 +99,9 @@ export async function buildItemPool(
     if (lastDoc) {
       constraints.push(startAfter(lastDoc));
     }
+    
+    // Note: Category and age filters are applied client-side after fetching
+    // because Firestore has limitations on compound queries
     
     const q = query(itemsRef, ...constraints);
     
@@ -111,8 +124,50 @@ export async function buildItemPool(
       ...doc.data(),
     } as Item));
     
-    // Filter out swiped items
-    const filteredItems = allItems.filter(item => !swipedItemIds.includes(item.id));
+    // Apply filters
+    let filteredItems = allItems.filter(item => !swipedItemIds.includes(item.id));
+    
+    // Apply category filter
+    if (filters?.categories && filters.categories.length > 0) {
+      filteredItems = filteredItems.filter(item => 
+        filters.categories.includes(item.category)
+      );
+    }
+    
+    // Apply condition filter
+    if (filters?.conditions && filters.conditions.length > 0) {
+      filteredItems = filteredItems.filter(item => 
+        filters.conditions.includes(item.condition)
+      );
+    }
+    
+    // Apply distance filter (requires user coordinates and item owner coordinates)
+    if (filters?.maxDistance && userCoordinates) {
+      // Fetch owner profiles to get coordinates for distance calculation
+      const ownerIds = [...new Set(filteredItems.map(item => item.ownerId))];
+      const ownerProfiles = await fetchOwnerCoordinates(ownerIds);
+      
+      filteredItems = filteredItems.filter(item => {
+        const ownerProfile = ownerProfiles.get(item.ownerId);
+        if (!ownerProfile?.coordinates) {
+          // Skip items where owner location is unknown
+          return false;
+        }
+        
+        const distance = calculateDistance(
+          userCoordinates,
+          ownerProfile.coordinates
+        );
+        
+        return distance <= filters.maxDistance!;
+      });
+      
+      console.log('[itemPoolService] Distance filter applied:', {
+        queryId,
+        maxDistance: filters.maxDistance,
+        itemsAfterDistanceFilter: filteredItems.length,
+      });
+    }
     
     // Limit to requested amount after filtering
     const limitedItems = filteredItems.slice(0, limit);
@@ -124,6 +179,11 @@ export async function buildItemPool(
       postFilterCount: filteredItems.length,
       filteredOut: allItems.length - filteredItems.length,
       finalCount: limitedItems.length,
+      appliedFilters: {
+        categories: filters?.categories?.length || 0,
+        conditions: filters?.conditions?.length || 0,
+        maxDistance: filters?.maxDistance || 'none',
+      },
     });
     
     // Distinguish empty results (no items vs all filtered)
@@ -205,4 +265,31 @@ export async function getLastDocument(
   });
 
   return queryQueue;
+}
+
+/**
+ * Fetches owner coordinates for distance filtering
+ * Returns a map of ownerId to coordinates
+ */
+async function fetchOwnerCoordinates(
+  ownerIds: string[]
+): Promise<Map<string, { coordinates: { latitude: number; longitude: number } | null }>> {
+  const { doc, getDoc } = await import('firebase/firestore');
+  const profiles = new Map<string, { coordinates: { latitude: number; longitude: number } | null }>();
+  
+  await Promise.all(
+    ownerIds.map(async (ownerId) => {
+      try {
+        const profileDoc = await getDoc(doc(db, 'users', ownerId));
+        if (profileDoc.exists()) {
+          const data = profileDoc.data();
+          profiles.set(ownerId, { coordinates: data.coordinates || null });
+        }
+      } catch (err) {
+        console.warn('[itemPoolService] Failed to fetch coordinates for owner:', ownerId, err);
+      }
+    })
+  );
+  
+  return profiles;
 }
