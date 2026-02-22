@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { collection, query, where, getDocs, doc, getDoc, or } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useAuth } from '../contexts/AuthContext';
-import { Navigation } from '../components/Navigation';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 import { TradeOffer } from '../types/swipe-trading';
 import { Item } from '../types/item';
@@ -156,8 +155,7 @@ export function TradeHistory() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <Navigation />
+      <div className="flex-1 w-full bg-gray-50 dark:bg-gray-900">
         <div className="flex items-center justify-center pt-20">
           <LoadingSpinner />
         </div>
@@ -166,15 +164,14 @@ export function TradeHistory() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Navigation />
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="flex-1 w-full bg-gray-50 dark:bg-gray-900 flex flex-col">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex-1">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-1.5">
             Trade History
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
             View all your past and current trades
           </p>
         </div>
@@ -183,41 +180,37 @@ export function TradeHistory() {
         <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
           <button
             onClick={() => setFilter('all')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors whitespace-nowrap ${
-              filter === 'all'
-                ? 'bg-primary text-white'
-                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-            }`}
+            className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${filter === 'all'
+              ? 'bg-primary text-white'
+              : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+              }`}
           >
             All ({tradeHistory.length})
           </button>
           <button
             onClick={() => setFilter('accepted')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors whitespace-nowrap ${
-              filter === 'accepted'
-                ? 'bg-green-600 text-white'
-                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-            }`}
+            className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${filter === 'accepted'
+              ? 'bg-green-600 text-white'
+              : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+              }`}
           >
             Accepted ({tradeHistory.filter(t => t.status === 'accepted').length})
           </button>
           <button
             onClick={() => setFilter('completed')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors whitespace-nowrap ${
-              filter === 'completed'
-                ? 'bg-blue-600 text-white'
-                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-            }`}
+            className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${filter === 'completed'
+              ? 'bg-blue-600 text-white'
+              : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+              }`}
           >
             Completed ({tradeHistory.filter(t => t.status === 'completed').length})
           </button>
           <button
             onClick={() => setFilter('declined')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors whitespace-nowrap ${
-              filter === 'declined'
-                ? 'bg-red-600 text-white'
-                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-            }`}
+            className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${filter === 'declined'
+              ? 'bg-red-600 text-white'
+              : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+              }`}
           >
             Declined ({tradeHistory.filter(t => t.status === 'declined').length})
           </button>
@@ -252,10 +245,10 @@ export function TradeHistory() {
                 d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"
               />
             </svg>
-            <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
+            <h3 className="mt-2 text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
               No trade history
             </h3>
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            <p className="mt-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
               Start trading to see your history here
             </p>
             <button
@@ -277,17 +270,15 @@ export function TradeHistory() {
               <div className="flex items-start gap-4">
                 {/* Trade Direction Indicator */}
                 <div className="flex-shrink-0 pt-2">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                    trade.isOffering
-                      ? 'bg-blue-100 dark:bg-blue-900/30'
-                      : 'bg-purple-100 dark:bg-purple-900/30'
-                  }`}>
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${trade.isOffering
+                    ? 'bg-blue-100 dark:bg-blue-900/30'
+                    : 'bg-purple-100 dark:bg-purple-900/30'
+                    }`}>
                     <svg
-                      className={`w-5 h-5 ${
-                        trade.isOffering
-                          ? 'text-blue-600 dark:text-blue-400'
-                          : 'text-purple-600 dark:text-purple-400'
-                      }`}
+                      className={`w-5 h-5 ${trade.isOffering
+                        ? 'text-blue-600 dark:text-blue-400'
+                        : 'text-purple-600 dark:text-purple-400'
+                        }`}
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -310,11 +301,10 @@ export function TradeHistory() {
                   <div className="flex items-start justify-between gap-2 mb-3">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className={`text-xs font-medium ${
-                          trade.isOffering
-                            ? 'text-blue-600 dark:text-blue-400'
-                            : 'text-purple-600 dark:text-purple-400'
-                        }`}>
+                        <span className={`text-xs font-medium ${trade.isOffering
+                          ? 'text-blue-600 dark:text-blue-400'
+                          : 'text-purple-600 dark:text-purple-400'
+                          }`}>
                           {trade.isOffering ? 'You offered' : 'Received offer'}
                         </span>
                         {getStatusBadge(trade.status)}

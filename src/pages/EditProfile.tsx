@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useProfile } from '../contexts/ProfileContext';
 import { useProfileUpdate } from '../hooks/useProfileUpdate';
 import { ProfilePhotoUpload } from '../components/ProfilePhotoUpload';
-import { ThemeToggle } from '../components/ThemeToggle';
+
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 import { MapPicker } from '../components/MapPicker';
 import { type Coordinates } from '../utils/location';
@@ -425,30 +425,7 @@ export function EditProfile() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      {/* Navigation Bar */}
-      <nav className="bg-primary/90 dark:bg-primary-dark/90 backdrop-blur-md border-b border-white/20 dark:border-gray-700/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-primary dark:bg-primary-light rounded-xl flex items-center justify-center shadow-lg">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-              </div>
-              <h1 className="text-2xl font-bold text-white">Circl'd</h1>
-            </div>
-            <div className="flex items-center space-x-3">
-              <ThemeToggle />
-              <button
-                onClick={handleCancel}
-                className="bg-primary-light hover:bg-primary dark:bg-primary dark:hover:bg-primary-light text-white font-semibold px-4 py-2 rounded-lg transition-all"
-              >
-                Back to Dashboard
-              </button>
-            </div>
-          </div>
-        </div>
-      </nav>
+
 
       {/* Main Content */}
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useAuth } from '../contexts/AuthContext';
-import { Navigation } from '../components/Navigation';
 import { LoadingSpinner, Button, Card } from '../components/ui';
 import { Item } from '../types/item';
 import { UserProfile } from '../types/user';
@@ -117,8 +116,7 @@ export function ItemDetail() {
   if (loading) {
     console.log('Rendering loading state');
     return (
-      <div className="min-h-screen bg-background dark:bg-gray-900">
-        <Navigation />
+      <div className="flex-1 w-full flex items-center justify-center py-20">
         <div className="flex items-center justify-center py-20">
           <LoadingSpinner message="Loading item..." size="lg" />
         </div>
@@ -129,8 +127,7 @@ export function ItemDetail() {
   if (error || !item) {
     console.log('Rendering error state:', { error, hasItem: !!item });
     return (
-      <div className="min-h-screen bg-background dark:bg-gray-900">
-        <Navigation />
+      <div className="flex-1 w-full">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <Card variant="elevated">
             <div className="p-8 text-center">
@@ -158,9 +155,7 @@ export function ItemDetail() {
   console.log('Rendering main content, item:', item.title);
 
   return (
-    <div className="min-h-screen bg-background dark:bg-gray-900">
-      <Navigation />
-
+    <div className="flex-1 w-full">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Back Button */}
         <button
@@ -210,8 +205,8 @@ export function ItemDetail() {
                         key={index}
                         onClick={() => setSelectedImageIndex(index)}
                         className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${selectedImageIndex === index
-                            ? 'border-accent dark:border-primary-light ring-2 ring-accent/20 dark:ring-primary-light/20'
-                            : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                          ? 'border-accent dark:border-primary-light ring-2 ring-accent/20 dark:ring-primary-light/20'
+                          : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                           }`}
                       >
                         <img

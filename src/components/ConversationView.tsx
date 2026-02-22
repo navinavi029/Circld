@@ -8,7 +8,6 @@ import { db } from '../firebase';
 import { Message, Conversation, TradeOffer } from '../types/swipe-trading';
 import { LoadingSpinner } from './ui/LoadingSpinner';
 import { Button } from './ui/Button';
-import { Navigation } from './Navigation';
 
 export function ConversationView() {
   const { conversationId } = useParams<{ conversationId: string }>();
@@ -227,8 +226,7 @@ export function ConversationView() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-        <Navigation />
+      <div className="flex-1 w-full bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
         <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
           <LoadingSpinner message="Loading conversation..." size="lg" />
         </div>
@@ -238,8 +236,7 @@ export function ConversationView() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-        <Navigation />
+      <div className="flex-1 w-full bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
         <div className="max-w-4xl mx-auto px-4 py-8">
           <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 text-center">
             <svg
@@ -269,8 +266,7 @@ export function ConversationView() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex flex-col">
-      <Navigation />
+    <div className="flex-1 w-full flex flex-col bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Header with trade item details */}
       <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-700/50 sticky top-0 z-10 shadow-sm">
         <div className="max-w-4xl mx-auto px-4 py-4">
@@ -337,10 +333,9 @@ export function ConversationView() {
                   Trade Offer Request
                 </span>
                 <span
-                  className={`ml-auto text-xs font-medium px-2 py-0.5 rounded-full ${
-                    tradeOffer.status === 'completed'
-                      ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300'
-                      : tradeOffer.status === 'accepted'
+                  className={`ml-auto text-xs font-medium px-2 py-0.5 rounded-full ${tradeOffer.status === 'completed'
+                    ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300'
+                    : tradeOffer.status === 'accepted'
                       ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300'
                       : tradeOffer.status === 'declined'
                         ? 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300'

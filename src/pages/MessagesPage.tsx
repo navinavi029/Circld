@@ -5,7 +5,6 @@ import { getUserConversationsWithDetails } from '../services/messagingService';
 import { ConversationSummary } from '../types/swipe-trading';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 import { calculateTotalUnreadCountFromSummaries } from '../utils/messagingUtils';
-import { Navigation } from '../components/Navigation';
 
 export function MessagesPage() {
   const { user } = useAuth();
@@ -84,20 +83,16 @@ export function MessagesPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-        <Navigation />
-        <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
-          <LoadingSpinner message="Loading conversations..." size="lg" />
-        </div>
+      <div className="flex-1 w-full flex items-center justify-center h-[calc(100vh-4rem)] min-h-[50vh]">
+        <LoadingSpinner message="Loading conversations..." size="lg" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-        <Navigation />
-        <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="flex-1 w-full">
+        <div className="max-w-4xl mx-auto px-4 py-8 w-full">
           <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 text-center">
             <svg
               className="w-12 h-12 text-red-500 dark:text-red-400 mx-auto mb-4"
@@ -130,10 +125,9 @@ export function MessagesPage() {
 
   if (conversations.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-        <Navigation />
-        <div className="max-w-4xl mx-auto px-4 py-8">
-          <h1 className="text-3xl font-bold text-text dark:text-gray-100 mb-6">
+      <div className="flex-1 w-full flex flex-col items-center justify-center">
+        <div className="max-w-4xl mx-auto px-4 py-8 w-full">
+          <h1 className="text-2xl sm:text-3xl font-bold text-text dark:text-gray-100 mb-4 sm:mb-6">
             Messages
           </h1>
           <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl shadow-lg p-12 text-center border border-white/20 dark:border-gray-700/50">
@@ -150,10 +144,10 @@ export function MessagesPage() {
                 d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
               />
             </svg>
-            <h3 className="text-xl font-semibold text-text dark:text-gray-100 mb-2">
+            <h3 className="text-base sm:text-xl font-semibold text-text dark:text-gray-100 mb-2">
               No conversations yet
             </h3>
-            <p className="text-text-secondary dark:text-gray-400 mb-6">
+            <p className="text-sm sm:text-base text-text-secondary dark:text-gray-400 mb-6">
               Start trading to begin conversations with other users
             </p>
             <button
@@ -169,17 +163,16 @@ export function MessagesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      <Navigation />
-      <div className="max-w-4xl mx-auto px-4 py-8">
+    <div className="flex-1 w-full flex flex-col">
+      <div className="max-w-4xl mx-auto px-4 py-8 w-full">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold text-text dark:text-gray-100">
+          <h1 className="text-2xl sm:text-3xl font-bold text-text dark:text-gray-100">
             Messages
           </h1>
           {totalUnreadCount > 0 && (
             <div className="flex items-center space-x-2 px-4 py-2 bg-primary/10 dark:bg-primary-light/20 rounded-lg">
               <div className="w-2 h-2 bg-primary dark:bg-primary-light rounded-full animate-pulse" />
-              <span className="text-sm font-semibold text-primary dark:text-primary-light">
+              <span className="text-xs sm:text-sm font-semibold text-primary dark:text-primary-light">
                 {totalUnreadCount} unread {totalUnreadCount === 1 ? 'message' : 'messages'}
               </span>
             </div>
@@ -212,7 +205,7 @@ export function MessagesPage() {
               {/* Conversation Details */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-1">
-                  <h3 className="font-semibold text-text dark:text-gray-100 truncate">
+                  <h3 className="text-sm sm:text-base font-semibold text-text dark:text-gray-100 truncate">
                     {summary.partnerName}
                   </h3>
                   <span className="text-xs text-text-secondary dark:text-gray-400 flex-shrink-0 ml-2">

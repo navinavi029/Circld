@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useAuth } from '../contexts/AuthContext';
-import { Navigation } from '../components/Navigation';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 import { SwipeSession, SwipeRecord } from '../types/swipe-trading';
 import { Item } from '../types/item';
@@ -113,25 +112,21 @@ export function SwipeHistory() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <Navigation />
-        <div className="flex items-center justify-center pt-20">
-          <LoadingSpinner />
-        </div>
+      <div className="flex-1 w-full bg-gray-50 dark:bg-gray-900 flex items-center justify-center pt-20">
+        <LoadingSpinner />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Navigation />
+    <div className="flex-1 w-full bg-gray-50 dark:bg-gray-900">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-1.5">
             Swipe History
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
             View all your past swipes and interactions
           </p>
         </div>
@@ -140,36 +135,33 @@ export function SwipeHistory() {
         <div className="flex gap-2 mb-6">
           <button
             onClick={() => setFilter('all')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-              filter === 'all'
-                ? 'bg-primary text-white'
-                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-            }`}
+            className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors ${filter === 'all'
+              ? 'bg-primary text-white'
+              : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+              }`}
           >
             All ({swipeHistory.length})
           </button>
           <button
             onClick={() => setFilter('right')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
-              filter === 'right'
-                ? 'bg-green-600 text-white'
-                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-            }`}
+            className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors flex items-center gap-1.5 sm:gap-2 ${filter === 'right'
+              ? 'bg-green-600 text-white'
+              : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+              }`}
           >
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
             </svg>
             Interested ({swipeHistory.filter(s => s.direction === 'right').length})
           </button>
           <button
             onClick={() => setFilter('left')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
-              filter === 'left'
-                ? 'bg-gray-600 text-white'
-                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-            }`}
+            className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors flex items-center gap-1.5 sm:gap-2 ${filter === 'left'
+              ? 'bg-gray-600 text-white'
+              : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+              }`}
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
             Passed ({swipeHistory.filter(s => s.direction === 'left').length})
@@ -205,10 +197,10 @@ export function SwipeHistory() {
                 d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
               />
             </svg>
-            <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
+            <h3 className="mt-2 text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
               No swipe history
             </h3>
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            <p className="mt-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
               Start swiping to see your history here
             </p>
             <button
@@ -249,21 +241,20 @@ export function SwipeHistory() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white truncate">
                         {swipe.item?.title || 'Unknown Item'}
                       </h3>
                       <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                         For: {swipe.tradeAnchor?.title || 'Unknown Item'}
                       </p>
                     </div>
-                    
+
                     {/* Direction Badge */}
                     <div
-                      className={`flex-shrink-0 px-3 py-1 rounded-full text-sm font-medium ${
-                        swipe.direction === 'right'
-                          ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300'
-                          : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300'
-                      }`}
+                      className={`flex-shrink-0 px-3 py-1 rounded-full text-sm font-medium ${swipe.direction === 'right'
+                        ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300'
+                        : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300'
+                        }`}
                     >
                       {swipe.direction === 'right' ? 'Interested' : 'Passed'}
                     </div>

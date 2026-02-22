@@ -9,7 +9,6 @@ import { SwipeSession, SwipeFilterPreferences } from '../types/swipe-trading';
 import { TradeAnchorSelector } from '../components/TradeAnchorSelector';
 import { SwipeInterface } from '../components/SwipeInterface';
 import { SwipeFilters } from '../components/SwipeFilters';
-import { Navigation } from '../components/Navigation';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 import { buildItemPool } from '../services/itemPoolService';
 import { createTradeOffer } from '../services/tradeOfferService';
@@ -964,16 +963,13 @@ export function SwipeTradingPage() {
   // Loading state
   if (loading && !tradeAnchor) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <Navigation />
-        <div className="flex flex-col items-center justify-center pt-20">
-          <LoadingSpinner />
-          {showExtendedLoadingMessage && (
-            <p className="mt-4 text-gray-600 dark:text-gray-400">
-              This is taking longer than usual. Please wait...
-            </p>
-          )}
-        </div>
+      <div className="flex-1 w-full flex flex-col items-center justify-center pt-20">
+        <LoadingSpinner />
+        {showExtendedLoadingMessage && (
+          <p className="mt-4 text-gray-600 dark:text-gray-400">
+            This is taking longer than usual. Please wait...
+          </p>
+        )}
       </div>
     );
   }
@@ -981,8 +977,7 @@ export function SwipeTradingPage() {
   // Error state
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <Navigation />
+      <div className="flex-1 w-full bg-gray-50 dark:bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
             <p className="text-red-800 dark:text-red-200">{error}</p>
@@ -1024,9 +1019,8 @@ export function SwipeTradingPage() {
   // Trade anchor selection view
   if (!isSwipeMode || !tradeAnchor) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <Navigation />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="flex-1 w-full bg-gray-50 dark:bg-gray-900 flex flex-col">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
           <SwipeFilters
             onApply={handleFilterChange}
             initialFilters={filterPreferences}

@@ -7,7 +7,6 @@ import { UserProfile } from '../types/user';
 import { Input } from '../components/ui/Input';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 import { Alert } from '../components/ui/Alert';
-import { Navigation } from '../components/Navigation';
 import { AddItemForm } from '../components/AddItemForm';
 import { Button } from '../components/ui/Button';
 import { Select } from '../components/ui/Select';
@@ -208,25 +207,20 @@ export function Listings() {
 
   if (loading) {
     return (
-      <div className="h-screen bg-background dark:bg-gray-900 overflow-hidden">
-        <Navigation />
-        <div className="flex justify-center items-center" style={{ height: 'calc(100vh - 4rem)' }}>
-          <LoadingSpinner message="Loading items..." size="lg" />
-        </div>
+      <div className="flex-1 w-full flex justify-center items-center min-h-[50vh]">
+        <LoadingSpinner message="Loading items..." size="lg" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background dark:bg-gray-900">
-      <Navigation />
-
+    <div className="flex-1 w-full">
       <div className="container mx-auto px-4 py-6 max-w-7xl">
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-text dark:text-gray-100 tracking-tight">My Listings</h1>
-            <p className="text-sm text-text-secondary dark:text-gray-400 mt-2">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-text dark:text-gray-100 tracking-tight">My Listings</h1>
+            <p className="text-xs sm:text-sm text-text-secondary dark:text-gray-400 mt-1.5">
               {filteredItems.length} {filteredItems.length === 1 ? 'item' : 'items'} available
             </p>
           </div>
@@ -289,9 +283,9 @@ export function Listings() {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setShowTradeOffersOnly(!showTradeOffersOnly)}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${showTradeOffersOnly
-                    ? 'bg-accent dark:bg-primary-light text-white'
-                    : 'bg-gray-100 dark:bg-gray-700 text-text-secondary dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
+                className={`flex items-center gap-2 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors ${showTradeOffersOnly
+                  ? 'bg-accent dark:bg-primary-light text-white'
+                  : 'bg-gray-100 dark:bg-gray-700 text-text-secondary dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
                   }`}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -328,8 +322,8 @@ export function Listings() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-text dark:text-gray-100 mb-2">No items found</h3>
-            <p className="text-text-secondary dark:text-gray-400 mb-6 text-sm">
+            <h3 className="text-base sm:text-lg font-semibold text-text dark:text-gray-100 mb-2">No items found</h3>
+            <p className="text-text-secondary dark:text-gray-400 mb-6 text-xs sm:text-sm">
               {searchTerm || selectedCategory !== 'all' || selectedCondition !== 'all' || showTradeOffersOnly
                 ? 'Try adjusting your filters'
                 : 'Be the first to add an item'}
@@ -491,7 +485,7 @@ export function Listings() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex justify-between items-center z-10">
-              <h2 className="text-xl font-bold text-text dark:text-gray-100">Add New Listing</h2>
+              <h2 className="text-base sm:text-xl font-bold text-text dark:text-gray-100">Add New Listing</h2>
               <button
                 onClick={() => setShowAddForm(false)}
                 className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"

@@ -8,7 +8,6 @@ import { db } from '../firebase';
 import { TradeOffer } from '../types/swipe-trading';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 import { Button } from '../components/ui/Button';
-import { Navigation } from '../components/Navigation';
 
 interface EnrichedTradeOffer extends TradeOffer {
   tradeAnchorTitle: string;
@@ -119,7 +118,7 @@ export function TradeOffers() {
 
   const handleViewConversation = async (offer: EnrichedTradeOffer) => {
     if (!user) return;
-    
+
     try {
       // Get or create conversation
       const conversation = await createConversation(offer.id, user.uid);
@@ -182,8 +181,7 @@ export function TradeOffers() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-        <Navigation />
+      <div className="flex-1 w-full bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
         <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
           <LoadingSpinner message="Loading trade offers..." size="lg" />
         </div>
@@ -193,8 +191,7 @@ export function TradeOffers() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-        <Navigation />
+      <div className="flex-1 w-full bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
         <div className="max-w-4xl mx-auto px-4 py-8">
           <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 text-center">
             <svg
@@ -225,10 +222,9 @@ export function TradeOffers() {
 
   if (offers.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-        <Navigation />
+      <div className="flex-1 w-full bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex flex-col items-center justify-center">
         <div className="max-w-4xl mx-auto px-4 py-8">
-          <h1 className="text-3xl font-bold text-text dark:text-gray-100 mb-6">
+          <h1 className="text-2xl sm:text-3xl font-bold text-text dark:text-gray-100">
             Trade Offers
           </h1>
           <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl shadow-lg p-12 text-center border border-white/20 dark:border-gray-700/50">
@@ -245,10 +241,10 @@ export function TradeOffers() {
                 d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"
               />
             </svg>
-            <h3 className="text-xl font-semibold text-text dark:text-gray-100 mb-2">
+            <h3 className="text-base sm:text-xl font-semibold text-text dark:text-gray-100 mb-2">
               No trade offers yet
             </h3>
-            <p className="text-text-secondary dark:text-gray-400 mb-6">
+            <p className="text-sm sm:text-base text-text-secondary dark:text-gray-400 mb-6">
               When someone is interested in your items, their offers will appear here
             </p>
             <Button onClick={() => navigate('/listings')} variant="primary">
@@ -261,14 +257,13 @@ export function TradeOffers() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      <Navigation />
-      <div className="max-w-4xl mx-auto px-4 py-8">
+    <div className="flex-1 w-full flex flex-col bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <div className="max-w-4xl mx-auto px-4 py-8 w-full flex-1">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold text-text dark:text-gray-100">
+          <h1 className="text-2xl sm:text-3xl font-bold text-text dark:text-gray-100">
             Trade Offers
           </h1>
-          <div className="text-sm text-text-secondary dark:text-gray-400">
+          <div className="text-xs sm:text-sm text-text-secondary dark:text-gray-400">
             {offers.length} {offers.length === 1 ? 'offer' : 'offers'}
           </div>
         </div>
@@ -287,10 +282,10 @@ export function TradeOffers() {
                       {offer.offeringUserName.charAt(0).toUpperCase()}
                     </div>
                     <div>
-                      <p className="font-semibold text-text dark:text-gray-100">
+                      <p className="text-sm sm:text-base font-semibold text-text dark:text-gray-100">
                         {offer.offeringUserName}
                       </p>
-                      <p className="text-sm text-text-secondary dark:text-gray-400">
+                      <p className="text-xs sm:text-sm text-text-secondary dark:text-gray-400">
                         {formatOfferTime(offer.createdAt)}
                       </p>
                     </div>

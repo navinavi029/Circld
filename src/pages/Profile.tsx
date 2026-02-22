@@ -2,7 +2,6 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useProfile } from '../contexts/ProfileContext';
 import { useTheme } from '../contexts/ThemeContext';
-import { Navigation } from '../components/Navigation';
 import { Button, Card, CardHeader, CardTitle, CardDescription, CardContent } from '../components/ui';
 
 export function Profile() {
@@ -12,18 +11,16 @@ export function Profile() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      <Navigation />
-
+    <div className="flex-1 w-full">
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <Card variant="glass" className="animate-fadeIn shadow-xl border-white/20 dark:border-gray-700/50">
           {/* Welcome Section */}
           <CardHeader>
-            <CardTitle className="text-3xl text-primary dark:text-primary-light">
+            <CardTitle className="text-xl sm:text-2xl lg:text-3xl text-primary dark:text-primary-light">
               My Profile
             </CardTitle>
-            <CardDescription>Manage your account information</CardDescription>
+            <CardDescription className="text-xs sm:text-sm">Manage your account information</CardDescription>
           </CardHeader>
 
           <CardContent>
@@ -44,14 +41,14 @@ export function Profile() {
                   </div>
                 )}
                 <div>
-                  <h2 className="text-2xl font-bold text-text dark:text-gray-100">
+                  <h2 className="text-lg sm:text-2xl font-bold text-text dark:text-gray-100">
                     {profile ? (
                       profile.firstName && profile.lastName
                         ? `${profile.firstName} ${profile.lastName}`
                         : (profile as any).name || 'User'
                     ) : 'User'}
                   </h2>
-                  <p className="text-text-secondary dark:text-gray-400">{user?.email}</p>
+                  <p className="text-xs sm:text-sm text-text-secondary dark:text-gray-400">{user?.email}</p>
                 </div>
               </div>
 
@@ -72,19 +69,19 @@ export function Profile() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium text-text-secondary dark:text-gray-400">Location</label>
-                  <p className="text-lg text-text dark:text-gray-100">{profile?.location || 'Not set'}</p>
+                  <label className="text-xs font-medium text-text-secondary dark:text-gray-400">Location</label>
+                  <p className="text-sm sm:text-base text-text dark:text-gray-100">{profile?.location || 'Not set'}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-text-secondary dark:text-gray-400">Eligible to Match</label>
-                  <p className="text-lg text-text dark:text-gray-100">{profile?.eligible_to_match ? 'Yes' : 'No'}</p>
+                  <label className="text-xs font-medium text-text-secondary dark:text-gray-400">Eligible to Match</label>
+                  <p className="text-sm sm:text-base text-text dark:text-gray-100">{profile?.eligible_to_match ? 'Yes' : 'No'}</p>
                 </div>
               </div>
 
               {/* Theme Preference */}
               <Card variant="glass" className="bg-white/50 dark:bg-gray-800/50">
                 <div className="p-4">
-                  <h3 className="text-lg font-semibold text-text dark:text-gray-100 mb-4">Preferences</h3>
+                  <h3 className="text-base sm:text-lg font-semibold text-text dark:text-gray-100 mb-3">Preferences</h3>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                       <div className="w-10 h-10 rounded-lg bg-primary/10 dark:bg-primary-light/20 flex items-center justify-center">
