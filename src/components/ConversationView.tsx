@@ -7,6 +7,7 @@ import { db } from '../firebase';
 import { Message, Conversation } from '../types/swipe-trading';
 import { LoadingSpinner } from './ui/LoadingSpinner';
 import { Button } from './ui/Button';
+import { Navigation } from './Navigation';
 
 export function ConversationView() {
   const { conversationId } = useParams<{ conversationId: string }>();
@@ -180,6 +181,7 @@ export function ConversationView() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+        <Navigation />
         <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
           <LoadingSpinner message="Loading conversation..." size="lg" />
         </div>
@@ -190,6 +192,7 @@ export function ConversationView() {
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+        <Navigation />
         <div className="max-w-4xl mx-auto px-4 py-8">
           <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 text-center">
             <svg
@@ -220,6 +223,7 @@ export function ConversationView() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex flex-col">
+      <Navigation />
       {/* Header with trade item details */}
       <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-700/50 sticky top-0 z-10 shadow-sm">
         <div className="max-w-4xl mx-auto px-4 py-4">
@@ -303,15 +307,15 @@ export function ConversationView() {
                   >
                     <div
                       className={`max-w-[70%] rounded-2xl px-5 py-3 shadow-md ${isSent
-                          ? 'bg-gradient-to-br from-primary to-primary-dark dark:from-primary-light dark:to-primary text-white rounded-br-none'
-                          : 'bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm text-text dark:text-gray-100 border border-gray-200/50 dark:border-gray-700/50 rounded-bl-none'
+                        ? 'bg-gradient-to-br from-primary to-primary-dark dark:from-primary-light dark:to-primary text-white rounded-br-none'
+                        : 'bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm text-text dark:text-gray-100 border border-gray-200/50 dark:border-gray-700/50 rounded-bl-none'
                         }`}
                     >
                       <p className="whitespace-pre-wrap break-words">{message.text}</p>
                       <p
                         className={`text-xs mt-1 ${isSent
-                            ? 'text-white/70'
-                            : 'text-text-secondary dark:text-gray-400'
+                          ? 'text-white/70'
+                          : 'text-text-secondary dark:text-gray-400'
                           }`}
                       >
                         {formatMessageTime(message.createdAt)}
@@ -352,8 +356,8 @@ export function ConversationView() {
                 </p>
                 <p
                   className={`text-xs ${messageText.length > 1900
-                      ? 'text-error dark:text-error-light'
-                      : 'text-text-secondary dark:text-gray-400'
+                    ? 'text-error dark:text-error-light'
+                    : 'text-text-secondary dark:text-gray-400'
                     }`}
                 >
                   {messageText.length}/2000

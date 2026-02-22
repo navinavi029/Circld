@@ -103,67 +103,52 @@ export function Navigation() {
             {/* Listings Button */}
             <button
               onClick={() => navigate('/listings')}
-              className={`relative px-4 py-2 rounded-full font-medium transition-all duration-300 outline-none ${isActive('/listings')
-                ? 'text-white shadow-md shadow-primary/30 hover:-translate-y-0.5'
-                : 'text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light hover:bg-gray-100/50 dark:hover:bg-gray-800/50 hover:-translate-y-0.5'
+              className={`px-4 py-2 rounded-full font-medium transition-all duration-300 outline-none flex items-center space-x-2 w-32 justify-center group ${isActive('/listings')
+                ? 'bg-primary/20 dark:bg-primary/30 text-primary-dark dark:text-primary-light font-bold'
+                : 'text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light hover:bg-gray-100/50 dark:hover:bg-gray-800/50'
                 }`}
             >
-              {isActive('/listings') && (
-                <div className="absolute inset-0 bg-gradient-to-r from-primary to-primary-dark dark:from-primary-light dark:to-primary rounded-full -z-10" />
-              )}
-              <div className="relative flex items-center space-x-2">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                </svg>
-                <span>Listings</span>
-              </div>
+              <svg className={`w-5 h-5 transition-transform duration-300 ${!isActive('/listings') && 'group-hover:scale-110'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={isActive('/listings') ? 2.5 : 2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              </svg>
+              <span className="tracking-wide">Listings</span>
             </button>
 
             {/* Swipe Trading Button */}
             <button
               onClick={() => navigate('/swipe-trading')}
-              className={`relative px-4 py-2 rounded-full font-medium transition-all duration-300 outline-none ${isActive('/swipe-trading')
-                ? 'text-white shadow-md shadow-primary/30 hover:-translate-y-0.5'
-                : 'text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light hover:bg-gray-100/50 dark:hover:bg-gray-800/50 hover:-translate-y-0.5'
+              className={`px-4 py-2 rounded-full font-medium transition-all duration-300 outline-none flex items-center space-x-2 w-40 justify-center group ${isActive('/swipe-trading')
+                ? 'bg-primary/20 dark:bg-primary/30 text-primary-dark dark:text-primary-light font-bold'
+                : 'text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light hover:bg-gray-100/50 dark:hover:bg-gray-800/50'
                 }`}
             >
-              {isActive('/swipe-trading') && (
-                <div className="absolute inset-0 bg-gradient-to-r from-primary to-primary-dark dark:from-primary-light dark:to-primary rounded-full -z-10" />
-              )}
-              <div className="relative flex items-center space-x-2">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                </svg>
-                <span>Swipe Trading</span>
-              </div>
+              <svg className={`w-5 h-5 transition-transform duration-300 ${!isActive('/swipe-trading') && 'group-hover:scale-110'}`} fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+              </svg>
+              <span className="tracking-wide">Swipe</span>
             </button>
 
             {/* Messages Button */}
             <button
               onClick={() => navigate('/messages')}
-              className={`relative px-4 py-2 rounded-full font-medium transition-all duration-300 outline-none ${isActive('/messages') || location.pathname.startsWith('/messages/')
-                ? 'text-white shadow-md shadow-primary/30 hover:-translate-y-0.5'
-                : 'text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light hover:bg-gray-100/50 dark:hover:bg-gray-800/50 hover:-translate-y-0.5'
+              className={`px-4 py-2 rounded-full font-medium transition-all duration-300 outline-none flex items-center space-x-2 w-36 justify-center group ${isActive('/messages') || location.pathname.startsWith('/messages/')
+                ? 'bg-primary/20 dark:bg-primary/30 text-primary-dark dark:text-primary-light font-bold'
+                : 'text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light hover:bg-gray-100/50 dark:hover:bg-gray-800/50'
                 }`}
             >
-              {(isActive('/messages') || location.pathname.startsWith('/messages/')) && (
-                <div className="absolute inset-0 bg-gradient-to-r from-primary to-primary-dark dark:from-primary-light dark:to-primary rounded-full -z-10" />
-              )}
-              <div className="relative flex items-center space-x-2">
-                <div className="relative">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                  </svg>
-                  {unreadCount > 0 && (
-                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
-                      <span className="text-[10px] font-bold text-white">
-                        {unreadCount > 9 ? '9+' : unreadCount}
-                      </span>
-                    </div>
-                  )}
-                </div>
-                <span>Messages</span>
+              <div className="relative">
+                <svg className={`w-5 h-5 transition-transform duration-300 ${!(isActive('/messages') || location.pathname.startsWith('/messages/')) && 'group-hover:scale-110'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={(isActive('/messages') || location.pathname.startsWith('/messages/')) ? 2.5 : 2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+                {unreadCount > 0 && (
+                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center border-2 border-white dark:border-gray-900 shadow-sm transition-transform duration-300 scale-100 group-hover:scale-110">
+                    <span className="text-[9px] font-bold text-white leading-none">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                  </div>
+                )}
               </div>
+              <span className="tracking-wide">Messages</span>
             </button>
 
             {/* Divider */}
@@ -395,7 +380,7 @@ export function Navigation() {
                     <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                   </svg>
                 </div>
-                <span className="text-base sm:text-lg font-bold tracking-wide">Swipe Trading</span>
+                <span className="text-base sm:text-lg font-bold tracking-wide">Swipe</span>
               </button>
 
               <button

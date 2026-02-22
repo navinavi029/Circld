@@ -5,6 +5,7 @@ import { getUserConversationsWithDetails } from '../services/messagingService';
 import { ConversationSummary } from '../types/swipe-trading';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 import { calculateTotalUnreadCountFromSummaries } from '../utils/messagingUtils';
+import { Navigation } from '../components/Navigation';
 
 export function MessagesPage() {
   const { user } = useAuth();
@@ -72,6 +73,7 @@ export function MessagesPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+        <Navigation />
         <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
           <LoadingSpinner message="Loading conversations..." size="lg" />
         </div>
@@ -82,6 +84,7 @@ export function MessagesPage() {
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+        <Navigation />
         <div className="max-w-4xl mx-auto px-4 py-8">
           <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 text-center">
             <svg
@@ -116,6 +119,7 @@ export function MessagesPage() {
   if (conversations.length === 0) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+        <Navigation />
         <div className="max-w-4xl mx-auto px-4 py-8">
           <h1 className="text-3xl font-bold text-text dark:text-gray-100 mb-6">
             Messages
@@ -154,6 +158,7 @@ export function MessagesPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <Navigation />
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-bold text-text dark:text-gray-100">
