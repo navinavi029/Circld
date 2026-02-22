@@ -37,18 +37,20 @@ function AppRoutes() {
     <>
       {/* Auth routes — stable Routes, CSS animations handle entrance */}
       {isAuthPath && (
-        <Routes location={location}>
-          <Route path="/login" element={<Login />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route
-            path="/complete-profile"
-            element={
-              <ProtectedRoute requireProfile={false}>
-                <CompleteProfile />
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
+        <AnimatePresence mode="wait">
+          <Routes location={location} key={location.pathname}>
+            <Route path="/login" element={<Login />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route
+              path="/complete-profile"
+              element={
+                <ProtectedRoute requireProfile={false}>
+                  <CompleteProfile />
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </AnimatePresence>
       )}
 
       {/* Main layout routes — AnimatePresence inside MainLayout handles page transitions */}

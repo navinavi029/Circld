@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useProfile } from '../contexts/ProfileContext';
 import { useProfileUpdate } from '../hooks/useProfileUpdate';
 import { ProfilePhotoUpload } from '../components/ProfilePhotoUpload';
+import { PageTransition } from '../components/PageTransition';
 
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 import { MapPicker } from '../components/MapPicker';
@@ -424,214 +425,214 @@ export function EditProfile() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-
-
-      {/* Main Content */}
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl shadow-xl p-8 border border-white/20 dark:border-gray-700/50 animate-scaleIn">
-          {/* Header */}
-          <div className="mb-8">
-            <h2 className="text-3xl font-bold text-primary dark:text-primary-light mb-2">
-              Edit Profile
-            </h2>
-            <p className="text-text dark:text-gray-300">Update your profile information</p>
-          </div>
-
-          {/* Success Message */}
-          {success && (
-            <div className="mb-6 bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500 dark:border-green-400 p-4 rounded animate-fadeInFast">
-              <div className="flex items-center">
-                <svg className="w-5 h-5 text-green-500 dark:text-green-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-                <p className="text-green-700 dark:text-green-300 font-medium">Profile updated successfully!</p>
-              </div>
-            </div>
-          )}
-
-          {/* Update Error Message */}
-          {updateError && (
-            <div className="mb-6 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 dark:border-red-400 p-4 rounded animate-fadeInFast">
-              <div className="flex items-center">
-                <svg className="w-5 h-5 text-red-500 dark:text-red-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                </svg>
-                <p className="text-red-700 dark:text-red-300 font-medium">{updateError}</p>
-              </div>
-            </div>
-          )}
-
-          {/* Photo Error Message */}
-          {photoError && (
-            <div className="mb-6 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 dark:border-red-400 p-4 rounded animate-fadeInFast">
-              <div className="flex items-center">
-                <svg className="w-5 h-5 text-red-500 dark:text-red-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                </svg>
-                <p className="text-red-700 dark:text-red-300 font-medium">{photoError}</p>
-              </div>
-            </div>
-          )}
-
-          {/* Form */}
-          <div className="space-y-6">
-            {/* Profile Photo Upload */}
-            <ProfilePhotoUpload
-              currentPhotoUrl={newPhotoPreviewUrl || photoUrl}
-              lastPhotoUpdate={profile?.lastPhotoUpdate || null}
-              onPhotoUploaded={handlePhotoUploaded}
-              onError={handlePhotoError}
-              onPhotoPrepared={handlePhotoPrepared}
-            />
-
-            {/* First Name Field */}
-            <div>
-              <label htmlFor="firstName" className="block text-sm font-medium text-text dark:text-gray-200 mb-1">
-                First Name <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                id="firstName"
-                value={firstName}
-                onChange={handleFirstNameChange}
-                className={`w-full px-4 py-2 border-2 rounded-md bg-white dark:bg-gray-700 text-text dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-accent ${validationErrors.firstName ? 'border-red-500' : 'border-border dark:border-gray-600'
-                  }`}
-                placeholder="Enter your first name"
-              />
-              {validationErrors.firstName && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{validationErrors.firstName}</p>
-              )}
+    <PageTransition variant="page">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+        {/* Main Content */}
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl shadow-xl p-8 border border-white/20 dark:border-gray-700/50 animate-scaleIn">
+            {/* Header */}
+            <div className="mb-8">
+              <h2 className="text-3xl font-bold text-primary dark:text-primary-light mb-2">
+                Edit Profile
+              </h2>
+              <p className="text-text dark:text-gray-300">Update your profile information</p>
             </div>
 
-            {/* Last Name Field */}
-            <div>
-              <label htmlFor="lastName" className="block text-sm font-medium text-text dark:text-gray-200 mb-1">
-                Last Name <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                id="lastName"
-                value={lastName}
-                onChange={handleLastNameChange}
-                className={`w-full px-4 py-2 border-2 rounded-md bg-white dark:bg-gray-700 text-text dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-accent ${validationErrors.lastName ? 'border-red-500' : 'border-border dark:border-gray-600'
-                  }`}
-                placeholder="Enter your last name"
-              />
-              {validationErrors.lastName && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{validationErrors.lastName}</p>
-              )}
-            </div>
-
-            {/* Location Field */}
-            <div>
-              <label htmlFor="location" className="block text-sm font-medium text-text dark:text-gray-200 mb-1">
-                Location <span className="text-red-500">*</span>
-              </label>
-
-              {/* Location Cooldown Warning */}
-              {locationCooldownActive && (
-                <div className="mb-2 bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 dark:border-yellow-500 p-3 rounded">
-                  <div className="flex items-center">
-                    <svg className="w-5 h-5 text-yellow-400 dark:text-yellow-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                    </svg>
-                    <p className="text-sm text-yellow-700 dark:text-yellow-300">
-                      You can update your location in {locationCooldownRemaining}
-                    </p>
-                  </div>
+            {/* Success Message */}
+            {success && (
+              <div className="mb-6 bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500 dark:border-green-400 p-4 rounded animate-fadeInFast">
+                <div className="flex items-center">
+                  <svg className="w-5 h-5 text-green-500 dark:text-green-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  <p className="text-green-700 dark:text-green-300 font-medium">Profile updated successfully!</p>
                 </div>
-              )}
+              </div>
+            )}
 
-              <div className="relative">
+            {/* Update Error Message */}
+            {updateError && (
+              <div className="mb-6 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 dark:border-red-400 p-4 rounded animate-fadeInFast">
+                <div className="flex items-center">
+                  <svg className="w-5 h-5 text-red-500 dark:text-red-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                  <p className="text-red-700 dark:text-red-300 font-medium">{updateError}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Photo Error Message */}
+            {photoError && (
+              <div className="mb-6 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 dark:border-red-400 p-4 rounded animate-fadeInFast">
+                <div className="flex items-center">
+                  <svg className="w-5 h-5 text-red-500 dark:text-red-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                  <p className="text-red-700 dark:text-red-300 font-medium">{photoError}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Form */}
+            <div className="space-y-6">
+              {/* Profile Photo Upload */}
+              <ProfilePhotoUpload
+                currentPhotoUrl={newPhotoPreviewUrl || photoUrl}
+                lastPhotoUpdate={profile?.lastPhotoUpdate || null}
+                onPhotoUploaded={handlePhotoUploaded}
+                onError={handlePhotoError}
+                onPhotoPrepared={handlePhotoPrepared}
+              />
+
+              {/* First Name Field */}
+              <div>
+                <label htmlFor="firstName" className="block text-sm font-medium text-text dark:text-gray-200 mb-1">
+                  First Name <span className="text-red-500">*</span>
+                </label>
                 <input
                   type="text"
-                  id="location"
-                  value={location}
-                  readOnly
-                  disabled={locationCooldownActive}
-                  className={`w-full px-4 py-2 pr-12 border-2 rounded-md bg-white dark:bg-gray-700 text-text dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-accent disabled:bg-gray-50 dark:disabled:bg-gray-700 disabled:text-gray-500 dark:disabled:text-gray-400 disabled:cursor-not-allowed cursor-pointer ${validationErrors.location ? 'border-red-500' : 'border-border dark:border-gray-600'
+                  id="firstName"
+                  value={firstName}
+                  onChange={handleFirstNameChange}
+                  className={`w-full px-4 py-2 border-2 rounded-md bg-white dark:bg-gray-700 text-text dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-accent ${validationErrors.firstName ? 'border-red-500' : 'border-border dark:border-gray-600'
                     }`}
-                  placeholder="Click map icon to select location"
-                  onClick={() => !locationCooldownActive && setShowMapPicker(true)}
+                  placeholder="Enter your first name"
                 />
+                {validationErrors.firstName && (
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{validationErrors.firstName}</p>
+                )}
+              </div>
+
+              {/* Last Name Field */}
+              <div>
+                <label htmlFor="lastName" className="block text-sm font-medium text-text dark:text-gray-200 mb-1">
+                  Last Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="lastName"
+                  value={lastName}
+                  onChange={handleLastNameChange}
+                  className={`w-full px-4 py-2 border-2 rounded-md bg-white dark:bg-gray-700 text-text dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-accent ${validationErrors.lastName ? 'border-red-500' : 'border-border dark:border-gray-600'
+                    }`}
+                  placeholder="Enter your last name"
+                />
+                {validationErrors.lastName && (
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{validationErrors.lastName}</p>
+                )}
+              </div>
+
+              {/* Location Field */}
+              <div>
+                <label htmlFor="location" className="block text-sm font-medium text-text dark:text-gray-200 mb-1">
+                  Location <span className="text-red-500">*</span>
+                </label>
+
+                {/* Location Cooldown Warning */}
+                {locationCooldownActive && (
+                  <div className="mb-2 bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 dark:border-yellow-500 p-3 rounded">
+                    <div className="flex items-center">
+                      <svg className="w-5 h-5 text-yellow-400 dark:text-yellow-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                      <p className="text-sm text-yellow-700 dark:text-yellow-300">
+                        You can update your location in {locationCooldownRemaining}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                <div className="relative">
+                  <input
+                    type="text"
+                    id="location"
+                    value={location}
+                    readOnly
+                    disabled={locationCooldownActive}
+                    className={`w-full px-4 py-2 pr-12 border-2 rounded-md bg-white dark:bg-gray-700 text-text dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-accent disabled:bg-gray-50 dark:disabled:bg-gray-700 disabled:text-gray-500 dark:disabled:text-gray-400 disabled:cursor-not-allowed cursor-pointer ${validationErrors.location ? 'border-red-500' : 'border-border dark:border-gray-600'
+                      }`}
+                    placeholder="Click map icon to select location"
+                    onClick={() => !locationCooldownActive && setShowMapPicker(true)}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowMapPicker(true)}
+                    disabled={locationCooldownActive}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-primary dark:text-primary-light hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    title={locationCooldownActive ? `Location locked for ${locationCooldownRemaining}` : "Pick on map"}
+                  >
+                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                    </svg>
+                  </button>
+                </div>
+                {validationErrors.location && (
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{validationErrors.location}</p>
+                )}
+                <p className="mt-1 text-xs text-text-secondary dark:text-gray-400">
+                  {locationCooldownActive
+                    ? `Location is locked for ${locationCooldownRemaining}. You can update once every 14 days.`
+                    : 'Click the map icon to pick your location on a map. You can update once every 14 days.'
+                  }
+                </p>
+              </div>
+
+              {/* Eligible to Match Toggle */}
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="eligibleToMatch"
+                  checked={eligibleToMatch}
+                  onChange={handleEligibleToMatchChange}
+                  className="w-4 h-4 text-accent border-border dark:border-gray-600 rounded focus:ring-accent"
+                />
+                <label htmlFor="eligibleToMatch" className="ml-2 block text-sm text-text dark:text-gray-200">
+                  Eligible to match
+                </label>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex space-x-4 pt-4">
                 <button
-                  type="button"
-                  onClick={() => setShowMapPicker(true)}
-                  disabled={locationCooldownActive}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-primary dark:text-primary-light hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  title={locationCooldownActive ? `Location locked for ${locationCooldownRemaining}` : "Pick on map"}
+                  onClick={handleSave}
+                  disabled={isSaveDisabled}
+                  className="flex-1 bg-gradient-to-r from-primary to-primary-dark hover:from-primary-light hover:to-primary disabled:from-gray-400 disabled:to-gray-500 text-white font-medium py-3 px-6 rounded-xl shadow-md transition-all disabled:cursor-not-allowed transform flex items-center justify-center"
                 >
-                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                  </svg>
+                  {updateLoading ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                      Saving changes...
+                    </>
+                  ) : 'Save Changes'}
+                </button>
+                <button
+                  onClick={handleCancel}
+                  disabled={updateLoading}
+                  className="flex-1 bg-white/50 hover:bg-white/80 dark:bg-gray-700/50 dark:hover:bg-gray-600/80 border border-gray-200 dark:border-gray-600 disabled:opacity-50 text-text dark:text-gray-100 font-medium py-3 px-6 rounded-xl transition-all disabled:cursor-not-allowed flex items-center justify-center"
+                >
+                  Cancel
                 </button>
               </div>
-              {validationErrors.location && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{validationErrors.location}</p>
-              )}
-              <p className="mt-1 text-xs text-text-secondary dark:text-gray-400">
-                {locationCooldownActive
-                  ? `Location is locked for ${locationCooldownRemaining}. You can update once every 14 days.`
-                  : 'Click the map icon to pick your location on a map. You can update once every 14 days.'
-                }
-              </p>
-            </div>
-
-            {/* Eligible to Match Toggle */}
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="eligibleToMatch"
-                checked={eligibleToMatch}
-                onChange={handleEligibleToMatchChange}
-                className="w-4 h-4 text-accent border-border dark:border-gray-600 rounded focus:ring-accent"
-              />
-              <label htmlFor="eligibleToMatch" className="ml-2 block text-sm text-text dark:text-gray-200">
-                Eligible to match
-              </label>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex space-x-4 pt-4">
-              <button
-                onClick={handleSave}
-                disabled={isSaveDisabled}
-                className="flex-1 bg-gradient-to-r from-primary to-primary-dark hover:from-primary-light hover:to-primary disabled:from-gray-400 disabled:to-gray-500 text-white font-medium py-3 px-6 rounded-xl shadow-md transition-all disabled:cursor-not-allowed transform flex items-center justify-center"
-              >
-                {updateLoading ? (
-                  <>
-                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                    </svg>
-                    Saving changes...
-                  </>
-                ) : 'Save Changes'}
-              </button>
-              <button
-                onClick={handleCancel}
-                disabled={updateLoading}
-                className="flex-1 bg-white/50 hover:bg-white/80 dark:bg-gray-700/50 dark:hover:bg-gray-600/80 border border-gray-200 dark:border-gray-600 disabled:opacity-50 text-text dark:text-gray-100 font-medium py-3 px-6 rounded-xl transition-all disabled:cursor-not-allowed flex items-center justify-center"
-              >
-                Cancel
-              </button>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Map Picker Modal */}
-      {showMapPicker && (
-        <MapPicker
-          initialCoordinates={coordinates}
-          onLocationSelect={(coords, addr) => {
-            setCoordinates(coords);
-            setLocation(addr);
-          }}
-          onClose={() => setShowMapPicker(false)}
-        />
-      )}
-    </div>
+        {/* Map Picker Modal */}
+        {showMapPicker && (
+          <MapPicker
+            initialCoordinates={coordinates}
+            onLocationSelect={(coords, addr) => {
+              setCoordinates(coords);
+              setLocation(addr);
+            }}
+            onClose={() => setShowMapPicker(false)}
+          />
+        )}
+      </div>
+    </PageTransition>
   );
 }

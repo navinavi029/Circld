@@ -8,6 +8,7 @@ import { db } from '../firebase';
 import { TradeOffer } from '../types/swipe-trading';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 import { Button } from '../components/ui/Button';
+import { PageTransition } from '../components/PageTransition';
 
 interface EnrichedTradeOffer extends TradeOffer {
   tradeAnchorTitle: string;
@@ -222,166 +223,170 @@ export function TradeOffers() {
 
   if (offers.length === 0) {
     return (
-      <div className="flex-1 w-full bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex flex-col items-center justify-center">
-        <div className="max-w-4xl mx-auto px-4 py-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-text dark:text-gray-100">
-            Trade Offers
-          </h1>
-          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl shadow-lg p-12 text-center border border-white/20 dark:border-gray-700/50">
-            <svg
-              className="w-16 h-16 text-gray-400 dark:text-gray-600 mx-auto mb-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"
-              />
-            </svg>
-            <h3 className="text-base sm:text-xl font-semibold text-text dark:text-gray-100 mb-2">
-              No trade offers yet
-            </h3>
-            <p className="text-sm sm:text-base text-text-secondary dark:text-gray-400 mb-6">
-              When someone is interested in your items, their offers will appear here
-            </p>
-            <Button onClick={() => navigate('/listings')} variant="primary">
-              View Your Listings
-            </Button>
+      <PageTransition variant="page">
+        <div className="flex-1 w-full bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex flex-col items-center justify-center">
+          <div className="max-w-4xl mx-auto px-4 py-8">
+            <h1 className="text-2xl sm:text-3xl font-bold text-text dark:text-gray-100">
+              Trade Offers
+            </h1>
+            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl shadow-lg p-12 text-center border border-white/20 dark:border-gray-700/50">
+              <svg
+                className="w-16 h-16 text-gray-400 dark:text-gray-600 mx-auto mb-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"
+                />
+              </svg>
+              <h3 className="text-base sm:text-xl font-semibold text-text dark:text-gray-100 mb-2">
+                No trade offers yet
+              </h3>
+              <p className="text-sm sm:text-base text-text-secondary dark:text-gray-400 mb-6">
+                When someone is interested in your items, their offers will appear here
+              </p>
+              <Button onClick={() => navigate('/listings')} variant="primary">
+                View Your Listings
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
+      </PageTransition>
     );
   }
 
   return (
-    <div className="flex-1 w-full flex flex-col bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      <div className="max-w-4xl mx-auto px-4 py-8 w-full flex-1">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl sm:text-3xl font-bold text-text dark:text-gray-100">
-            Trade Offers
-          </h1>
-          <div className="text-xs sm:text-sm text-text-secondary dark:text-gray-400">
-            {offers.length} {offers.length === 1 ? 'offer' : 'offers'}
+    <PageTransition variant="page">
+      <div className="flex-1 w-full flex flex-col bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+        <div className="max-w-4xl mx-auto px-4 py-8 w-full flex-1">
+          <div className="flex items-center justify-between mb-6">
+            <h1 className="text-2xl sm:text-3xl font-bold text-text dark:text-gray-100">
+              Trade Offers
+            </h1>
+            <div className="text-xs sm:text-sm text-text-secondary dark:text-gray-400">
+              {offers.length} {offers.length === 1 ? 'offer' : 'offers'}
+            </div>
           </div>
-        </div>
 
-        <div className="space-y-4">
-          {offers.map((offer) => (
-            <div
-              key={offer.id}
-              className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl shadow-lg border border-white/20 dark:border-gray-700/50 overflow-hidden hover:shadow-xl transition-shadow"
-            >
-              <div className="p-6">
-                {/* Header */}
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary-dark dark:from-primary-light dark:to-primary flex items-center justify-center text-white font-semibold">
-                      {offer.offeringUserName.charAt(0).toUpperCase()}
+          <div className="space-y-4">
+            {offers.map((offer) => (
+              <div
+                key={offer.id}
+                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl shadow-lg border border-white/20 dark:border-gray-700/50 overflow-hidden hover:shadow-xl transition-shadow"
+              >
+                <div className="p-6">
+                  {/* Header */}
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary-dark dark:from-primary-light dark:to-primary flex items-center justify-center text-white font-semibold">
+                        {offer.offeringUserName.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <p className="text-sm sm:text-base font-semibold text-text dark:text-gray-100">
+                          {offer.offeringUserName}
+                        </p>
+                        <p className="text-xs sm:text-sm text-text-secondary dark:text-gray-400">
+                          {formatOfferTime(offer.createdAt)}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm sm:text-base font-semibold text-text dark:text-gray-100">
-                        {offer.offeringUserName}
+                    {getStatusBadge(offer.status)}
+                  </div>
+
+                  {/* Trade Items */}
+                  <div className="flex items-center gap-4 mb-4">
+                    {/* Their Item (Trade Anchor) */}
+                    <div className="flex-1 flex flex-col items-center text-center">
+                      <img
+                        src={offer.tradeAnchorImage}
+                        alt={offer.tradeAnchorTitle}
+                        className="w-24 h-24 rounded-xl object-cover shadow-md border-2 border-white dark:border-gray-700 mb-2"
+                      />
+                      <p className="text-sm font-medium text-text dark:text-gray-100 line-clamp-2">
+                        {offer.tradeAnchorTitle}
                       </p>
-                      <p className="text-xs sm:text-sm text-text-secondary dark:text-gray-400">
-                        {formatOfferTime(offer.createdAt)}
+                      <p className="text-xs text-text-secondary dark:text-gray-400">
+                        They offer
+                      </p>
+                    </div>
+
+                    {/* Swap Icon */}
+                    <div className="flex-shrink-0">
+                      <div className="w-10 h-10 rounded-full bg-primary/10 dark:bg-primary-light/20 flex items-center justify-center">
+                        <svg
+                          className="w-5 h-5 text-primary dark:text-primary-light"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+
+                    {/* Your Item (Target) */}
+                    <div className="flex-1 flex flex-col items-center text-center">
+                      <img
+                        src={offer.targetItemImage}
+                        alt={offer.targetItemTitle}
+                        className="w-24 h-24 rounded-xl object-cover shadow-md border-2 border-white dark:border-gray-700 mb-2"
+                      />
+                      <p className="text-sm font-medium text-text dark:text-gray-100 line-clamp-2">
+                        {offer.targetItemTitle}
+                      </p>
+                      <p className="text-xs text-text-secondary dark:text-gray-400">
+                        Your item
                       </p>
                     </div>
                   </div>
-                  {getStatusBadge(offer.status)}
-                </div>
 
-                {/* Trade Items */}
-                <div className="flex items-center gap-4 mb-4">
-                  {/* Their Item (Trade Anchor) */}
-                  <div className="flex-1 flex flex-col items-center text-center">
-                    <img
-                      src={offer.tradeAnchorImage}
-                      alt={offer.tradeAnchorTitle}
-                      className="w-24 h-24 rounded-xl object-cover shadow-md border-2 border-white dark:border-gray-700 mb-2"
-                    />
-                    <p className="text-sm font-medium text-text dark:text-gray-100 line-clamp-2">
-                      {offer.tradeAnchorTitle}
-                    </p>
-                    <p className="text-xs text-text-secondary dark:text-gray-400">
-                      They offer
-                    </p>
-                  </div>
-
-                  {/* Swap Icon */}
-                  <div className="flex-shrink-0">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 dark:bg-primary-light/20 flex items-center justify-center">
-                      <svg
-                        className="w-5 h-5 text-primary dark:text-primary-light"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-
-                  {/* Your Item (Target) */}
-                  <div className="flex-1 flex flex-col items-center text-center">
-                    <img
-                      src={offer.targetItemImage}
-                      alt={offer.targetItemTitle}
-                      className="w-24 h-24 rounded-xl object-cover shadow-md border-2 border-white dark:border-gray-700 mb-2"
-                    />
-                    <p className="text-sm font-medium text-text dark:text-gray-100 line-clamp-2">
-                      {offer.targetItemTitle}
-                    </p>
-                    <p className="text-xs text-text-secondary dark:text-gray-400">
-                      Your item
-                    </p>
-                  </div>
-                </div>
-
-                {/* Actions */}
-                <div className="flex gap-3">
-                  {offer.status === 'pending' && (
-                    <>
+                  {/* Actions */}
+                  <div className="flex gap-3">
+                    {offer.status === 'pending' && (
+                      <>
+                        <Button
+                          onClick={() => handleAcceptOffer(offer)}
+                          variant="primary"
+                          className="flex-1"
+                          isLoading={acceptingOfferId === offer.id}
+                          disabled={acceptingOfferId !== null}
+                        >
+                          Accept & Message
+                        </Button>
+                        <Button
+                          onClick={() => navigate(`/listings/${offer.targetItemId}`)}
+                          variant="secondary"
+                          className="flex-1"
+                        >
+                          View Your Item
+                        </Button>
+                      </>
+                    )}
+                    {(offer.status === 'accepted' || offer.status === 'completed') && (
                       <Button
-                        onClick={() => handleAcceptOffer(offer)}
+                        onClick={() => handleViewConversation(offer)}
                         variant="primary"
                         className="flex-1"
-                        isLoading={acceptingOfferId === offer.id}
-                        disabled={acceptingOfferId !== null}
                       >
-                        Accept & Message
+                        View Conversation
                       </Button>
-                      <Button
-                        onClick={() => navigate(`/listings/${offer.targetItemId}`)}
-                        variant="secondary"
-                        className="flex-1"
-                      >
-                        View Your Item
-                      </Button>
-                    </>
-                  )}
-                  {(offer.status === 'accepted' || offer.status === 'completed') && (
-                    <Button
-                      onClick={() => handleViewConversation(offer)}
-                      variant="primary"
-                      className="flex-1"
-                    >
-                      View Conversation
-                    </Button>
-                  )}
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
-    </div>
+    </PageTransition >
   );
 }

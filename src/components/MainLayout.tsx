@@ -1,6 +1,6 @@
 import { Outlet, useLocation } from 'react-router-dom';
 import { Navigation } from './Navigation';
-import { PageTransition } from './PageTransition';
+
 import { AnimatePresence, motion } from 'framer-motion';
 
 export function MainLayout() {
@@ -17,9 +17,15 @@ export function MainLayout() {
             </motion.div>
             <main className="flex-1 flex flex-col">
                 <AnimatePresence mode="wait" initial={false}>
-                    <PageTransition key={location.pathname} variant="page">
+                    <motion.div
+                        key={location.pathname}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0, transition: { duration: 0.15 } }}
+                        className="flex-1 flex flex-col w-full h-full"
+                    >
                         <Outlet />
-                    </PageTransition>
+                    </motion.div>
                 </AnimatePresence>
             </main>
         </div>
