@@ -53,24 +53,24 @@ export function EditProfile() {
   // Check if user can update location (14-day cooldown)
   const canUpdateLocation = () => {
     if (!profile?.lastLocationUpdate) return true;
-    
+
     const twoWeeksInMs = 14 * 24 * 60 * 60 * 1000;
     const lastUpdateTime = profile.lastLocationUpdate.toMillis();
     const now = Date.now();
-    
+
     return (now - lastUpdateTime) >= twoWeeksInMs;
   };
 
   const getRemainingLocationCooldown = () => {
     if (!profile?.lastLocationUpdate) return '';
-    
+
     const twoWeeksInMs = 14 * 24 * 60 * 60 * 1000;
     const lastUpdateTime = profile.lastLocationUpdate.toMillis();
     const now = Date.now();
     const remaining = twoWeeksInMs - (now - lastUpdateTime);
-    
+
     if (remaining <= 0) return '';
-    
+
     const days = Math.ceil(remaining / (24 * 60 * 60 * 1000));
     return `${days} day${days !== 1 ? 's' : ''}`;
   };
@@ -97,14 +97,14 @@ export function EditProfile() {
       // Handle migration from old format (name) to new format (firstName, lastName)
       let firstName = profile.firstName || '';
       let lastName = profile.lastName || '';
-      
+
       // If old format exists but new format doesn't, split the name
       if (!firstName && !lastName && (profile as any).name) {
         const nameParts = (profile as any).name.split(' ');
         firstName = nameParts[0] || '';
         lastName = nameParts.slice(1).join(' ') || '';
       }
-      
+
       const values = {
         firstName,
         lastName,
@@ -113,7 +113,7 @@ export function EditProfile() {
         eligibleToMatch: profile.eligible_to_match,
         photoUrl: profile.photoUrl
       };
-      
+
       setFirstName(values.firstName);
       setLastName(values.lastName);
       setLocation(values.location);
@@ -122,7 +122,7 @@ export function EditProfile() {
       setPhotoUrl(values.photoUrl);
       setOriginalValues(values);
     }
-    
+
     // Cleanup preview URL on unmount
     return () => {
       if (newPhotoPreviewUrl) {
@@ -136,7 +136,7 @@ export function EditProfile() {
    * Requirements: 7.3, 7.4
    */
   useEffect(() => {
-    const changed = 
+    const changed =
       firstName !== originalValues.firstName ||
       lastName !== originalValues.lastName ||
       location !== originalValues.location ||
@@ -144,7 +144,7 @@ export function EditProfile() {
       eligibleToMatch !== originalValues.eligibleToMatch ||
       photoUrl !== originalValues.photoUrl ||
       newPhotoBlob !== null; // New photo selected
-    
+
     setHasChanges(changed);
   }, [firstName, lastName, location, coordinates, eligibleToMatch, photoUrl, newPhotoBlob, originalValues]);
 
@@ -188,7 +188,7 @@ export function EditProfile() {
   const handleFirstNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setFirstName(value);
-    
+
     // Clear validation error when user modifies the field
     const error = validateFirstName(value);
     setValidationErrors(prev => {
@@ -209,7 +209,7 @@ export function EditProfile() {
   const handleLastNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setLastName(value);
-    
+
     // Clear validation error when user modifies the field
     const error = validateLastName(value);
     setValidationErrors(prev => {
@@ -231,7 +231,7 @@ export function EditProfile() {
   const handleLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setLocation(value);
-    
+
     // Clear validation error when user modifies the field
     const error = validateLocation(value);
     setValidationErrors(prev => {
@@ -259,7 +259,7 @@ export function EditProfile() {
   const handlePhotoPrepared = (blob: Blob | null, fileName: string | null) => {
     setNewPhotoBlob(blob);
     setNewPhotoFileName(fileName);
-    
+
     // Create preview URL for the new photo
     if (blob) {
       // Clean up old preview URL
@@ -308,14 +308,14 @@ export function EditProfile() {
     const firstNameError = validateFirstName(firstName);
     const lastNameError = validateLastName(lastName);
     const locationError = validateLocation(location);
-    
+
     const errors: Record<string, string> = {};
     if (firstNameError) errors.firstName = firstNameError;
     if (lastNameError) errors.lastName = lastNameError;
     if (locationError) errors.location = locationError;
-    
+
     setValidationErrors(errors);
-    
+
     // Don't save if validation errors exist
     if (Object.keys(errors).length > 0) {
       return;
@@ -347,7 +347,7 @@ export function EditProfile() {
         });
 
         finalPhotoUrl = result.url;
-        
+
         // Clean up the preview URL
         if (newPhotoPreviewUrl) {
           URL.revokeObjectURL(newPhotoPreviewUrl);
@@ -385,16 +385,16 @@ export function EditProfile() {
    * Determine if save button should be disabled
    * Requirements: 7.3, 7.4
    */
-  const isSaveDisabled = 
-    Object.keys(validationErrors).length > 0 || 
-    !hasChanges || 
+  const isSaveDisabled =
+    Object.keys(validationErrors).length > 0 ||
+    !hasChanges ||
     updateLoading;
 
   // Show loading state while profile is loading
   // Requirements: 6.1
   if (profileLoading) {
     return (
-      <div className="min-h-screen bg-background dark:bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
         <LoadingSpinner message="Loading profile..." size="lg" />
       </div>
     );
@@ -403,8 +403,8 @@ export function EditProfile() {
   // Show error if profile failed to load
   if (profileError) {
     return (
-      <div className="min-h-screen bg-background dark:bg-gray-900 flex items-center justify-center">
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-8 shadow-xl max-w-md">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
+        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl p-8 shadow-xl max-w-md border border-white/20 dark:border-gray-700/50">
           <div className="text-red-600 dark:text-red-400 mb-4">
             <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -424,7 +424,7 @@ export function EditProfile() {
   }
 
   return (
-    <div className="min-h-screen bg-background dark:bg-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Navigation Bar */}
       <nav className="bg-primary/90 dark:bg-primary-dark/90 backdrop-blur-md border-b border-white/20 dark:border-gray-700/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -452,7 +452,7 @@ export function EditProfile() {
 
       {/* Main Content */}
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 border-2 border-border dark:border-gray-700 animate-scaleIn">
+        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl shadow-xl p-8 border border-white/20 dark:border-gray-700/50 animate-scaleIn">
           {/* Header */}
           <div className="mb-8">
             <h2 className="text-3xl font-bold text-primary dark:text-primary-light mb-2">
@@ -518,9 +518,8 @@ export function EditProfile() {
                 id="firstName"
                 value={firstName}
                 onChange={handleFirstNameChange}
-                className={`w-full px-4 py-2 border-2 rounded-md bg-white dark:bg-gray-700 text-text dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-accent ${
-                  validationErrors.firstName ? 'border-red-500' : 'border-border dark:border-gray-600'
-                }`}
+                className={`w-full px-4 py-2 border-2 rounded-md bg-white dark:bg-gray-700 text-text dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-accent ${validationErrors.firstName ? 'border-red-500' : 'border-border dark:border-gray-600'
+                  }`}
                 placeholder="Enter your first name"
               />
               {validationErrors.firstName && (
@@ -538,9 +537,8 @@ export function EditProfile() {
                 id="lastName"
                 value={lastName}
                 onChange={handleLastNameChange}
-                className={`w-full px-4 py-2 border-2 rounded-md bg-white dark:bg-gray-700 text-text dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-accent ${
-                  validationErrors.lastName ? 'border-red-500' : 'border-border dark:border-gray-600'
-                }`}
+                className={`w-full px-4 py-2 border-2 rounded-md bg-white dark:bg-gray-700 text-text dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-accent ${validationErrors.lastName ? 'border-red-500' : 'border-border dark:border-gray-600'
+                  }`}
                 placeholder="Enter your last name"
               />
               {validationErrors.lastName && (
@@ -553,7 +551,7 @@ export function EditProfile() {
               <label htmlFor="location" className="block text-sm font-medium text-text dark:text-gray-200 mb-1">
                 Location <span className="text-red-500">*</span>
               </label>
-              
+
               {/* Location Cooldown Warning */}
               {locationCooldownActive && (
                 <div className="mb-2 bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 dark:border-yellow-500 p-3 rounded">
@@ -567,7 +565,7 @@ export function EditProfile() {
                   </div>
                 </div>
               )}
-              
+
               <div className="relative">
                 <input
                   type="text"
@@ -575,9 +573,8 @@ export function EditProfile() {
                   value={location}
                   readOnly
                   disabled={locationCooldownActive}
-                  className={`w-full px-4 py-2 pr-12 border-2 rounded-md bg-white dark:bg-gray-700 text-text dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-accent disabled:bg-gray-50 dark:disabled:bg-gray-700 disabled:text-gray-500 dark:disabled:text-gray-400 disabled:cursor-not-allowed cursor-pointer ${
-                    validationErrors.location ? 'border-red-500' : 'border-border dark:border-gray-600'
-                  }`}
+                  className={`w-full px-4 py-2 pr-12 border-2 rounded-md bg-white dark:bg-gray-700 text-text dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-accent disabled:bg-gray-50 dark:disabled:bg-gray-700 disabled:text-gray-500 dark:disabled:text-gray-400 disabled:cursor-not-allowed cursor-pointer ${validationErrors.location ? 'border-red-500' : 'border-border dark:border-gray-600'
+                    }`}
                   placeholder="Click map icon to select location"
                   onClick={() => !locationCooldownActive && setShowMapPicker(true)}
                 />
@@ -597,7 +594,7 @@ export function EditProfile() {
                 <p className="mt-1 text-sm text-red-600 dark:text-red-400">{validationErrors.location}</p>
               )}
               <p className="mt-1 text-xs text-text-secondary dark:text-gray-400">
-                {locationCooldownActive 
+                {locationCooldownActive
                   ? `Location is locked for ${locationCooldownRemaining}. You can update once every 14 days.`
                   : 'Click the map icon to pick your location on a map. You can update once every 14 days.'
                 }
@@ -623,7 +620,7 @@ export function EditProfile() {
               <button
                 onClick={handleSave}
                 disabled={isSaveDisabled}
-                className="flex-1 bg-accent hover:bg-accent-light disabled:bg-border dark:disabled:bg-gray-600 text-white font-medium py-3 px-6 rounded-md transition-colors disabled:cursor-not-allowed flex items-center justify-center"
+                className="flex-1 bg-gradient-to-r from-primary to-primary-dark hover:from-primary-light hover:to-primary disabled:from-gray-400 disabled:to-gray-500 text-white font-medium py-3 px-6 rounded-xl shadow-md transition-all disabled:cursor-not-allowed transform flex items-center justify-center"
               >
                 {updateLoading ? (
                   <>
@@ -638,7 +635,7 @@ export function EditProfile() {
               <button
                 onClick={handleCancel}
                 disabled={updateLoading}
-                className="flex-1 bg-border hover:bg-border-dark dark:bg-gray-600 dark:hover:bg-gray-500 disabled:bg-border/50 dark:disabled:bg-gray-700 text-text dark:text-gray-100 font-medium py-3 px-6 rounded-md transition-colors disabled:cursor-not-allowed"
+                className="flex-1 bg-white/50 hover:bg-white/80 dark:bg-gray-700/50 dark:hover:bg-gray-600/80 border border-gray-200 dark:border-gray-600 disabled:opacity-50 text-text dark:text-gray-100 font-medium py-3 px-6 rounded-xl transition-all disabled:cursor-not-allowed flex items-center justify-center"
               >
                 Cancel
               </button>

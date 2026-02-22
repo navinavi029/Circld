@@ -5,6 +5,7 @@ import { db } from '../firebase';
 import { ThemeToggle } from '../components/ThemeToggle';
 import { MapPicker } from '../components/MapPicker';
 import { type Coordinates } from '../utils/location';
+import { Button, Input, Alert, Card } from '../components/ui';
 
 export function CompleteProfile() {
   const { user } = useAuth();
@@ -80,12 +81,12 @@ export function CompleteProfile() {
   };
 
   return (
-    <div className="min-h-screen bg-background dark:bg-gray-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-accent/10 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4">
       <div className="absolute top-4 right-4">
         <ThemeToggle />
       </div>
 
-      <div className="relative bg-white dark:bg-gray-800 backdrop-blur-sm rounded-2xl shadow-2xl p-8 max-w-md w-full transform transition-all hover:scale-[1.01] animate-fadeIn">
+      <Card variant="glass" className="max-w-md w-full animate-fadeIn shadow-2xl border-white/20 dark:border-gray-700/50">
         <div className="flex justify-center mb-6">
           <div className="w-16 h-16 bg-primary dark:bg-primary-light rounded-2xl flex items-center justify-center shadow-lg">
             <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -103,71 +104,44 @@ export function CompleteProfile() {
 
         <form className="space-y-5" onSubmit={handleSubmit}>
           {error && (
-            <div className="bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded-xl text-sm flex items-start shadow-sm animate-fadeInFast">
-              <svg className="w-5 h-5 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-              </svg>
-              <span>{error}</span>
-            </div>
+            <Alert variant="error">
+              {error}
+            </Alert>
           )}
 
-          <div className="bg-info-light dark:bg-info-dark/20 border-l-4 border-info dark:border-info-light p-4 rounded">
-            <div className="flex items-start">
-              <svg className="w-5 h-5 text-info-dark dark:text-info-light mr-3 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-              </svg>
-              <div>
-                <p className="text-sm text-info-dark dark:text-info-light">
-                  Your profile information helps us provide a better experience and connect you with others.
-                </p>
-              </div>
-            </div>
-          </div>
+          <Alert variant="info">
+            Your profile information helps us provide a better experience and connect you with others.
+          </Alert>
+
+          <Input
+            type="text"
+            label="First Name"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            placeholder="John"
+            required
+            autoFocus
+          />
+
+          <Input
+            type="text"
+            label="Last Name"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            placeholder="Doe"
+            required
+          />
+
+          <Input
+            type="email"
+            label="Email Address"
+            value={user?.email || ''}
+            disabled
+            helperText="This is your login email and cannot be changed here"
+          />
 
           <div>
-            <label className="block text-sm font-semibold text-text dark:text-gray-200 mb-2">
-              First Name <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              className="w-full px-4 py-3 border-2 border-border dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-text dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-accent transition-all outline-none placeholder:text-text/40 dark:placeholder:text-gray-500"
-              placeholder="John"
-              required
-              autoFocus
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-text dark:text-gray-200 mb-2">
-              Last Name <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              className="w-full px-4 py-3 border-2 border-border dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-text dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-accent transition-all outline-none placeholder:text-text/40 dark:placeholder:text-gray-500"
-              placeholder="Doe"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-text dark:text-gray-200 mb-2">
-              Email Address
-            </label>
-            <input
-              type="email"
-              value={user?.email || ''}
-              disabled
-              className="w-full px-4 py-3 border-2 border-border dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed"
-            />
-            <p className="text-xs text-text-secondary dark:text-gray-400 mt-1">This is your login email and cannot be changed here</p>
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-text dark:text-gray-200 mb-2">
+            <label className="block text-sm font-medium text-text dark:text-gray-200 mb-2">
               Location <span className="text-red-500">*</span>
             </label>
             <div className="relative">
@@ -175,7 +149,7 @@ export function CompleteProfile() {
                 type="text"
                 value={location}
                 readOnly
-                className="w-full px-4 py-3 pr-12 border-2 border-border dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-text dark:text-gray-100 focus:ring-2 focus:ring-accent focus:border-accent transition-all outline-none placeholder:text-text/40 dark:placeholder:text-gray-500 cursor-pointer"
+                className="w-full px-4 py-2.5 rounded-lg border-2 bg-background-light dark:bg-gray-700 text-text dark:text-gray-100 placeholder-text-disabled dark:placeholder-gray-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent cursor-pointer border-border dark:border-gray-600 hover:border-primary dark:hover:border-primary-light"
                 placeholder="Click map icon to select location"
                 onClick={() => setShowMapPicker(true)}
                 required
@@ -197,24 +171,18 @@ export function CompleteProfile() {
           </div>
 
           <div className="pt-2">
-            <button
+            <Button
               type="submit"
-              disabled={isLoading}
-              className="w-full bg-primary hover:bg-primary-light active:bg-primary-dark disabled:bg-border disabled:bg-border/50 text-white font-semibold py-3 rounded-xl transition-colors duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg disabled:cursor-not-allowed flex items-center justify-center"
+              variant="primary"
+              size="lg"
+              isLoading={isLoading}
+              className="w-full"
             >
-              {isLoading ? (
-                <>
-                  <svg className="animate-spin -ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                  </svg>
-                  Creating profile...
-                </>
-              ) : 'Complete Profile'}
-            </button>
+              {isLoading ? 'Creating profile...' : 'Complete Profile'}
+            </Button>
           </div>
         </form>
-      </div>
+      </Card>
 
       {/* Map Picker Modal */}
       {showMapPicker && (

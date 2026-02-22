@@ -12,12 +12,12 @@ export function Profile() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-background dark:bg-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <Navigation />
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <Card variant="elevated" className="animate-fadeIn">
+        <Card variant="glass" className="animate-fadeIn shadow-xl border-white/20 dark:border-gray-700/50">
           {/* Welcome Section */}
           <CardHeader>
             <CardTitle className="text-3xl text-primary dark:text-primary-light">
@@ -31,9 +31,9 @@ export function Profile() {
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center space-x-4">
                 {profile?.photoUrl ? (
-                  <img 
-                    src={profile.photoUrl} 
-                    alt="Profile" 
+                  <img
+                    src={profile.photoUrl}
+                    alt="Profile"
                     className="w-24 h-24 rounded-full object-cover border-4 border-primary/20 dark:border-primary-light/20"
                   />
                 ) : (
@@ -46,7 +46,7 @@ export function Profile() {
                 <div>
                   <h2 className="text-2xl font-bold text-text dark:text-gray-100">
                     {profile ? (
-                      profile.firstName && profile.lastName 
+                      profile.firstName && profile.lastName
                         ? `${profile.firstName} ${profile.lastName}`
                         : (profile as any).name || 'User'
                     ) : 'User'}
@@ -54,7 +54,7 @@ export function Profile() {
                   <p className="text-text-secondary dark:text-gray-400">{user?.email}</p>
                 </div>
               </div>
-              
+
               <Button
                 onClick={() => navigate('/edit-profile')}
                 variant="primary"
@@ -82,7 +82,7 @@ export function Profile() {
               </div>
 
               {/* Theme Preference */}
-              <Card variant="outlined">
+              <Card variant="glass" className="bg-white/50 dark:bg-gray-800/50">
                 <div className="p-4">
                   <h3 className="text-lg font-semibold text-text dark:text-gray-100 mb-4">Preferences</h3>
                   <div className="flex items-center justify-between">
@@ -105,15 +105,14 @@ export function Profile() {
                         </p>
                       </div>
                     </div>
-                    
+
                     <button
                       onClick={toggleTheme}
                       className="relative inline-flex h-8 w-14 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-gray-800 bg-gray-300 dark:bg-primary"
                     >
                       <span
-                        className={`inline-block h-6 w-6 transform rounded-full bg-white shadow-lg transition-transform ${
-                          theme === 'dark' ? 'translate-x-7' : 'translate-x-1'
-                        }`}
+                        className={`inline-block h-6 w-6 transform rounded-full bg-white shadow-lg transition-transform ${theme === 'dark' ? 'translate-x-7' : 'translate-x-1'
+                          }`}
                       />
                     </button>
                   </div>

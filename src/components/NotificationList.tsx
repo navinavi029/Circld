@@ -1,14 +1,19 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Notification, TradeOfferNotificationData } from '../types/swipe-trading';
 import { getUserNotifications, markAsRead } from '../services/notificationService';
+import { acceptTradeOffer } from '../services/tradeOfferService';
+import { createConversation } from '../services/messagingService';
 import { useAuth } from '../contexts/AuthContext';
 import { LoadingSpinner } from './ui/LoadingSpinner';
 
 const NotificationList: React.FC = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [acceptingOfferId, setAcceptingOfferId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -47,6 +52,8 @@ const NotificationList: React.FC = () => {
   };
 
   const handleStartConversation = async (notification: Notification) => {
+    if (!user) return;
+
     // Mark notification as read
     if (!notification.read) {
       try {
@@ -59,9 +66,34 @@ const NotificationList: React.FC = () => {
       }
     }
 
-    // Placeholder for conversation functionality
-    const data = notification.data as TradeOfferNotificationData;
-    alert(`Conversation feature coming soon! You would start a conversation with ${data.offeringUserName}`);
+    // Get trade offer ID from notification
+    const tradeOfferId = notification.tradeOfferId;
+    if (!tradeOfferId) {
+      alert('Error: Trade offer ID not found');
+      return;
+    }
+
+    try {
+      setAcceptingOfferId(tradeOfferId);
+
+      // Accept the trade offer
+      await acceptTradeOffer(tradeOfferId, user.uid);
+
+      // Create conversation for the accepted trade
+      const conversation = await createConversation(tradeOfferId);
+
+      // Navigate to the conversation
+      navigate(`/messages/${conversation.id}`);
+    } catch (err) {
+      console.error('Error accepting trade offer or creating conversation:', err);
+      alert(
+        err instanceof Error 
+          ? err.message 
+          : 'Failed to start conversation. Please try again.'
+      );
+    } finally {
+      setAcceptingOfferId(null);
+    }
   };
 
   if (loading) {
@@ -149,9 +181,10 @@ const NotificationList: React.FC = () => {
               </button>
               <button
                 onClick={() => handleStartConversation(notification)}
-                className="flex-1 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+                disabled={acceptingOfferId === notification.tradeOfferId}
+                className="flex-1 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Start Conversation
+                {acceptingOfferId === notification.tradeOfferId ? 'Starting...' : 'Start Conversation'}
               </button>
             </div>
           </div>

@@ -47,17 +47,17 @@ export const TradeAnchorSelector: React.FC<TradeAnchorSelectorProps> = ({
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {availableItems.map((item) => {
           const isSelected = item.id === selectedItemId;
-          
+
           return (
             <div
               key={item.id}
               onClick={() => onSelect(item)}
               className={`
-                group bg-white dark:bg-gray-800 rounded-lg border overflow-hidden 
-                hover:shadow-lg transition-all duration-200 cursor-pointer flex flex-col relative
-                ${isSelected 
-                  ? 'border-accent dark:border-primary-light ring-2 ring-accent dark:ring-primary-light shadow-lg' 
-                  : 'border-gray-200 dark:border-gray-700 hover:border-accent dark:hover:border-primary-light'
+                group bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl border overflow-hidden 
+                hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col relative
+                ${isSelected
+                  ? 'border-accent dark:border-primary-light ring-2 ring-accent dark:ring-primary-light shadow-lg scale-[1.02]'
+                  : 'border-gray-200/50 dark:border-gray-700/50 hover:border-accent/50 dark:hover:border-primary-light/50'
                 }
               `}
               role="button"
@@ -96,7 +96,7 @@ export const TradeAnchorSelector: React.FC<TradeAnchorSelectorProps> = ({
                     </svg>
                   </div>
                 )}
-                
+
                 {/* Image count indicator */}
                 {item.images.length > 1 && (
                   <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/60 backdrop-blur-sm text-white text-xs rounded-md flex items-center gap-1">
@@ -106,7 +106,7 @@ export const TradeAnchorSelector: React.FC<TradeAnchorSelectorProps> = ({
                     {item.images.length}
                   </div>
                 )}
-                
+
                 <div className="absolute top-2 left-2">
                   <span className="px-2 py-1 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm text-xs font-medium text-gray-900 dark:text-gray-100 rounded-md shadow capitalize">
                     {item.condition.replace('-', ' ')}
@@ -121,17 +121,17 @@ export const TradeAnchorSelector: React.FC<TradeAnchorSelectorProps> = ({
                     {item.category}
                   </span>
                 </div>
-                
+
                 <h3 className={`
                   text-base font-semibold mb-2 line-clamp-1 transition-colors
-                  ${isSelected 
-                    ? 'text-accent dark:text-primary-light' 
+                  ${isSelected
+                    ? 'text-accent dark:text-primary-light'
                     : 'text-gray-900 dark:text-gray-100 group-hover:text-accent dark:group-hover:text-primary-light'
                   }
                 `}>
                   {item.title}
                 </h3>
-                
+
                 <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-2 flex-grow">
                   {item.description}
                 </p>

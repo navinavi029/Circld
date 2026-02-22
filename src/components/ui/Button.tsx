@@ -8,14 +8,14 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ variant = 'primary', size = 'md', isLoading, children, className = '', disabled, ...props }, ref) => {
-    const baseStyles = 'font-semibold rounded-lg transition-all duration-200 inline-flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2';
+    const baseStyles = 'font-semibold rounded-lg transition-all duration-300 inline-flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2 active:scale-95';
     
     const variants = {
-      primary: 'bg-primary hover:bg-primary-dark text-white shadow-md hover:shadow-lg focus:ring-primary',
-      secondary: 'bg-accent hover:bg-accent-dark text-white shadow-md hover:shadow-lg focus:ring-accent',
-      outline: 'border-2 border-primary text-primary hover:bg-primary hover:text-white dark:border-primary-light dark:text-primary-light dark:hover:bg-primary-light dark:hover:text-white focus:ring-primary',
-      ghost: 'text-primary hover:bg-primary/10 dark:text-primary-light dark:hover:bg-primary-light/10 focus:ring-primary',
-      danger: 'bg-error hover:bg-error-dark text-white shadow-md hover:shadow-lg focus:ring-error',
+      primary: 'bg-gradient-to-r from-primary to-primary-light hover:from-primary-dark hover:to-primary text-white shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/40 hover:-translate-y-0.5 focus:ring-primary',
+      secondary: 'bg-gradient-to-r from-accent to-accent-light hover:from-accent-dark hover:to-accent text-white shadow-lg shadow-accent/20 hover:shadow-xl hover:shadow-accent/40 hover:-translate-y-0.5 focus:ring-accent',
+      outline: 'border-2 border-primary text-primary hover:bg-primary hover:text-white dark:border-primary-light dark:text-primary-light dark:hover:bg-primary-light dark:hover:text-white focus:ring-primary hover:-translate-y-0.5 shadow-sm hover:shadow-md',
+      ghost: 'text-primary hover:bg-primary/10 dark:text-primary-light dark:hover:bg-primary-light/10 focus:ring-primary transition-colors',
+      danger: 'bg-gradient-to-r from-error to-error-light hover:from-error-dark hover:to-error text-white shadow-lg shadow-error/20 hover:shadow-xl hover:shadow-error/40 hover:-translate-y-0.5 focus:ring-error',
     };
     
     const sizes = {

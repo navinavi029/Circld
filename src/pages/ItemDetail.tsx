@@ -12,11 +12,11 @@ export function ItemDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
-  
+
   console.log('ItemDetail component rendered, ID:', id);
   console.log('useParams result:', { id });
   console.log('user:', user);
-  
+
   // Early return test to see if component is mounting
   if (!id) {
     console.error('No ID in params!');
@@ -26,7 +26,7 @@ export function ItemDetail() {
       </div>
     );
   }
-  
+
   const [item, setItem] = useState<Item | null>(null);
   const [owner, setOwner] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -36,7 +36,7 @@ export function ItemDetail() {
   useEffect(() => {
     async function fetchItemAndOwner() {
       console.log('fetchItemAndOwner called with ID:', id);
-      
+
       if (!id) {
         console.error('Item ID is missing');
         setError('Item ID is missing');
@@ -49,9 +49,9 @@ export function ItemDetail() {
       try {
         // Fetch item
         const itemDoc = await getDoc(doc(db, 'items', id));
-        
+
         console.log('Item doc exists:', itemDoc.exists());
-        
+
         if (!itemDoc.exists()) {
           setError('Item not found');
           setLoading(false);
@@ -176,7 +176,7 @@ export function ItemDetail() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Image Gallery - Takes 2 columns on large screens */}
           <div className="lg:col-span-2">
-            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl border border-white/20 dark:border-gray-700/50 shadow-lg overflow-hidden">
               {/* Main Image */}
               <div className="relative aspect-[16/10] bg-gray-100 dark:bg-gray-900">
                 {item.images && item.images.length > 0 ? (
@@ -192,7 +192,7 @@ export function ItemDetail() {
                     </svg>
                   </div>
                 )}
-                
+
                 {/* Image Counter */}
                 {item.images && item.images.length > 0 && (
                   <div className="absolute bottom-4 right-4 px-3 py-1.5 bg-black/70 backdrop-blur-sm text-white rounded-lg text-sm font-medium">
@@ -209,11 +209,10 @@ export function ItemDetail() {
                       <button
                         key={index}
                         onClick={() => setSelectedImageIndex(index)}
-                        className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
-                          selectedImageIndex === index
+                        className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${selectedImageIndex === index
                             ? 'border-accent dark:border-primary-light ring-2 ring-accent/20 dark:ring-primary-light/20'
                             : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
-                        }`}
+                          }`}
                       >
                         <img
                           src={image}
@@ -228,7 +227,7 @@ export function ItemDetail() {
             </div>
 
             {/* Description Card - Below images on mobile/tablet */}
-            <div className="mt-6 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+            <div className="mt-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl border border-white/20 dark:border-gray-700/50 shadow-lg p-6">
               <h2 className="text-lg font-semibold text-text dark:text-gray-100 mb-3 flex items-center">
                 <svg className="w-5 h-5 mr-2 text-accent dark:text-primary-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
@@ -244,7 +243,7 @@ export function ItemDetail() {
           {/* Item Details Sidebar */}
           <div className="lg:col-span-1 space-y-6">
             {/* Main Info Card */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl border border-white/20 dark:border-gray-700/50 shadow-lg p-6">
               {/* Status Badge */}
               <div className="flex items-center justify-between mb-4">
                 <span className={`inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium ${getStatusColor(item.status)}`}>
@@ -347,7 +346,7 @@ export function ItemDetail() {
 
             {/* Owner Info Card */}
             {owner && (
-              <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+              <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl border border-white/20 dark:border-gray-700/50 shadow-lg p-6">
                 <h2 className="text-sm font-semibold text-text-secondary dark:text-gray-400 uppercase tracking-wide mb-4">
                   Listed By
                 </h2>

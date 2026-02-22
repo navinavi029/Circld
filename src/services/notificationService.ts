@@ -12,7 +12,7 @@ import {
   getDoc,
 } from 'firebase/firestore';
 import { db } from '../firebase';
-import { Notification, TradeOffer, TradeOfferNotificationData } from '../types/swipe-trading';
+import { Notification, TradeOffer, TradeOfferNotificationData, MessageNotificationData } from '../types/swipe-trading';
 import { retryWithBackoff } from '../utils/retryWithBackoff';
 
 /**
@@ -60,6 +60,72 @@ export async function createTradeOfferNotification(
       userId: tradeOffer.targetItemOwnerId,
       type: 'trade_offer',
       tradeOfferId: tradeOffer.id,
+      read: false,
+      createdAt: Timestamp.now(),
+      data: notificationData,
+    };
+
+    await setDoc(newNotificationRef, {
+      ...newNotification,
+      createdAt: serverTimestamp(),
+    });
+
+    return {
+      ...newNotification,
+      id: newNotificationRef.id,
+    };
+  });
+}
+
+/**
+ * Creates a notification for a new message in a conversation.
+ * 
+ * @param conversationId - ID of the conversation
+ * @param senderId - ID of the user who sent the message
+ * @param senderName - Name of the user who sent the message
+ * @param messageText - Full text of the message
+ * @param recipientId - ID of the user who should receive the notification
+ * @param tradeAnchorTitle - Title of the trade anchor item
+ * @param targetItemTitle - Title of the target item
+ * @returns The created notification
+ */
+export async function createMessageNotification(
+  conversationId: string,
+  senderId: string,
+  senderName: string,
+  messageText: string,
+  recipientId: string,
+  tradeAnchorTitle: string,
+  targetItemTitle: string
+): Promise<Notification> {
+  // Validate inputs
+  if (!conversationId || !senderId || !recipientId) {
+    throw new Error('Invalid input: conversationId, senderId, and recipientId are required');
+  }
+
+  if (!senderName || !messageText || !tradeAnchorTitle || !targetItemTitle) {
+    throw new Error('Invalid input: senderName, messageText, and item titles are required');
+  }
+
+  return retryWithBackoff(async () => {
+    // Create message preview (first 50 characters)
+    const messagePreview = messageText.length > 50 
+      ? messageText.substring(0, 50) + '...' 
+      : messageText;
+
+    const notificationData: MessageNotificationData = {
+      conversationId,
+      senderId,
+      senderName,
+      messagePreview,
+      tradeAnchorTitle,
+      targetItemTitle,
+    };
+
+    const newNotificationRef = doc(collection(db, 'notifications'));
+    const newNotification: Omit<Notification, 'id'> = {
+      userId: recipientId,
+      type: 'message',
       read: false,
       createdAt: Timestamp.now(),
       data: notificationData,

@@ -8,6 +8,8 @@ import { EditProfile } from './pages/EditProfile';
 import { Listings } from './pages/Listings';
 import { ItemDetail } from './pages/ItemDetail';
 import { SwipeTradingPage } from './pages/SwipeTradingPage';
+import { MessagesPage } from './pages/MessagesPage';
+import { ConversationView } from './components/ConversationView';
 import { ProtectedRoute } from './components/ProtectedRoute';
 
 function App() {
@@ -62,6 +64,22 @@ function App() {
             element={
               <ProtectedRoute>
                 <SwipeTradingPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/messages"
+            element={
+              <ProtectedRoute>
+                <MessagesPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/messages/:conversationId"
+            element={
+              <ProtectedRoute>
+                <ConversationView />
               </ProtectedRoute>
             }
           />

@@ -1,17 +1,18 @@
 import { HTMLAttributes, forwardRef } from 'react';
 
 interface CardProps extends HTMLAttributes<HTMLDivElement> {
-  variant?: 'default' | 'elevated' | 'outlined';
+  variant?: 'default' | 'elevated' | 'outlined' | 'glass';
 }
 
 export const Card = forwardRef<HTMLDivElement, CardProps>(
   ({ variant = 'default', className = '', children, ...props }, ref) => {
     const variants = {
       default: 'bg-background-light dark:bg-gray-800 border-2 border-border dark:border-gray-700',
-      elevated: 'bg-background-light dark:bg-gray-800 shadow-xl border border-border/50 dark:border-gray-700/50',
+      elevated: 'bg-background-light dark:bg-gray-800 shadow-xl shadow-black/5 hover:shadow-2xl hover:shadow-primary/10 border border-border/50 dark:border-gray-700/50 transition-shadow duration-300',
       outlined: 'bg-transparent border-2 border-border dark:border-gray-600',
+      glass: 'backdrop-blur-md bg-white/60 dark:bg-gray-900/60 border border-white/20 dark:border-gray-700/30 shadow-lg',
     };
-    
+
     return (
       <div
         ref={ref}

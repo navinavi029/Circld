@@ -45,7 +45,7 @@ export function Login() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    
+
     if (password !== confirmPassword) {
       setError('Passwords do not match');
       return;
@@ -72,7 +72,7 @@ export function Login() {
       setError('Password must contain at least one special character');
       return;
     }
-    
+
     setIsLoading(true);
     try {
       await register(email, password);
@@ -85,12 +85,12 @@ export function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-background dark:bg-gray-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-accent/10 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4">
       <div className="absolute top-4 right-4">
         <ThemeToggle />
       </div>
 
-      <Card variant="elevated" className="max-w-md w-full animate-fadeIn">
+      <Card variant="glass" className="max-w-md w-full animate-fadeIn shadow-2xl border-white/20 dark:border-gray-700/50">
         <div className="flex justify-center mb-6">
           <div className="w-16 h-16 bg-primary dark:bg-primary-light rounded-2xl flex items-center justify-center shadow-lg">
             <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">

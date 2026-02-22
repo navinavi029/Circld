@@ -58,7 +58,7 @@ export function SwipeInterface({
   // Handle swipe with animation state
   const handleSwipe = (direction: 'left' | 'right') => {
     setIsAnimating(true);
-    
+
     // Trigger animation based on direction
     if (direction === 'right') {
       setShowLikeAnimation(true);
@@ -67,7 +67,7 @@ export function SwipeInterface({
       setShowDislikeAnimation(true);
       setTimeout(() => setShowDislikeAnimation(false), 1000);
     }
-    
+
     // Wait for card animation to complete before updating state
     setTimeout(() => {
       onSwipe(direction);
@@ -87,7 +87,7 @@ export function SwipeInterface({
         {/* Return Button - Fixed at top left */}
         <button
           onClick={() => navigate('/listings')}
-          className="fixed top-6 left-6 z-20 p-3 bg-white dark:bg-gray-800 rounded-full shadow-lg border-2 border-gray-200 dark:border-gray-700 hover:scale-105 transition-transform"
+          className="fixed top-6 left-6 z-20 p-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-full shadow-lg border border-white/20 dark:border-gray-700/50 hover:bg-white dark:hover:bg-gray-700 hover:scale-110 active:scale-95 transition-all duration-300"
           aria-label="Return to listings"
         >
           <svg
@@ -152,7 +152,7 @@ export function SwipeInterface({
         {/* Return Button - Fixed at top left */}
         <button
           onClick={() => navigate('/listings')}
-          className="fixed top-6 left-6 z-20 p-3 bg-white dark:bg-gray-800 rounded-full shadow-lg border-2 border-gray-200 dark:border-gray-700 hover:scale-105 transition-transform"
+          className="fixed top-6 left-6 z-20 p-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-full shadow-lg border border-white/20 dark:border-gray-700/50 hover:bg-white dark:hover:bg-gray-700 hover:scale-110 active:scale-95 transition-all duration-300"
           aria-label="Return to listings"
         >
           <svg
@@ -189,7 +189,7 @@ export function SwipeInterface({
       {/* Return Button - Fixed at top left */}
       <button
         onClick={() => navigate('/listings')}
-        className="fixed top-6 left-6 z-20 p-3 bg-white dark:bg-gray-800 rounded-full shadow-lg border-2 border-gray-200 dark:border-gray-700 hover:scale-105 transition-transform"
+        className="fixed top-6 left-6 z-20 p-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-full shadow-lg border border-white/20 dark:border-gray-700/50 hover:bg-white dark:hover:bg-gray-700 hover:scale-110 active:scale-95 transition-all duration-300"
         aria-label="Return to listings"
       >
         <svg
@@ -210,7 +210,7 @@ export function SwipeInterface({
       {/* Tips Button - Fixed at top right */}
       <button
         onClick={() => setShowTips(!showTips)}
-        className="fixed top-6 right-6 z-20 p-3 bg-white dark:bg-gray-800 rounded-full shadow-lg border-2 border-gray-200 dark:border-gray-700 hover:scale-105 transition-transform"
+        className="fixed top-6 right-6 z-20 p-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-full shadow-lg border border-white/20 dark:border-gray-700/50 hover:bg-white dark:hover:bg-gray-700 hover:scale-110 active:scale-95 transition-all duration-300"
         aria-label="Show tips"
       >
         <svg
@@ -230,7 +230,7 @@ export function SwipeInterface({
 
       {/* Tips Panel */}
       {showTips && (
-        <div className="fixed top-20 right-6 z-20 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border-2 border-accent dark:border-primary-light overflow-hidden animate-slideDown">
+        <div className="fixed top-20 right-6 z-20 w-80 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 dark:border-gray-700/50 overflow-hidden animate-slideDown">
           <div className="bg-gradient-to-r from-accent to-accent-dark dark:from-primary-light dark:to-primary px-4 py-3 flex items-center justify-between">
             <h3 className="text-white font-semibold flex items-center gap-2">
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -260,7 +260,7 @@ export function SwipeInterface({
                 <p className="text-xs text-gray-600 dark:text-gray-400">Send a trade offer for items you're interested in</p>
               </div>
             </div>
-            
+
             <div className="flex gap-3">
               <div className="flex-shrink-0 w-8 h-8 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
                 <svg className="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -343,7 +343,7 @@ export function SwipeInterface({
             onSwipeLeft={() => handleSwipe('left')}
             onSwipeRight={() => handleSwipe('right')}
           />
-          
+
           {/* Loading indicator for next items */}
           {hasMoreItems && (
             <div className="mt-6">
@@ -351,7 +351,7 @@ export function SwipeInterface({
             </div>
           )}
         </div>
-        
+
         {/* Like Animation - Floating Hearts */}
         {showLikeAnimation && (
           <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
@@ -376,7 +376,7 @@ export function SwipeInterface({
             ))}
           </div>
         )}
-        
+
         {/* Dislike Animation - Floating X marks */}
         {showDislikeAnimation && (
           <div className="absolute inset-0 pointer-events-none flex items-center justify-center">

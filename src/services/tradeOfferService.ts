@@ -206,3 +206,51 @@ export async function getTradeOffersForItem(itemId: string): Promise<TradeOffer[
     } as TradeOffer));
   });
 }
+
+/**
+ * Accepts a trade offer by updating its status to 'accepted'.
+ * Only the target item owner can accept a trade offer.
+ *
+ * @param offerId - ID of the trade offer to accept
+ * @param userId - ID of the user accepting the offer (must be target item owner)
+ * @returns The updated trade offer
+ * @throws Error if offer not found or user is not authorized
+ */
+export async function acceptTradeOffer(
+  offerId: string,
+  userId: string
+): Promise<TradeOffer> {
+  if (!offerId || !userId) {
+    throw new Error('Invalid input: Offer ID and User ID are required');
+  }
+
+  return retryWithBackoff(async () => {
+    const offerRef = doc(db, 'tradeOffers', offerId);
+
+    // Verify offer exists and user is authorized
+    const offerDoc = await getDoc(offerRef);
+    if (!offerDoc.exists()) {
+      throw new Error('Trade offer not found');
+    }
+
+    const offerData = offerDoc.data() as TradeOffer;
+
+    // Verify user is the target item owner
+    if (offerData.targetItemOwnerId !== userId) {
+      throw new Error('Only the target item owner can accept this trade offer');
+    }
+
+    // Update status to accepted
+    await updateDoc(offerRef, {
+      status: 'accepted',
+      updatedAt: serverTimestamp(),
+    });
+
+    return {
+      ...offerData,
+      id: offerId,
+      status: 'accepted',
+      updatedAt: Timestamp.now(),
+    };
+  });
+}
