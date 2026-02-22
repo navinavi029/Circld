@@ -2,9 +2,10 @@ import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { getMessages, subscribeToMessages, markConversationAsRead, sendMessage } from '../services/messagingService';
+import { completeTradeOffer } from '../services/tradeOfferService';
 import { getDoc, doc } from 'firebase/firestore';
 import { db } from '../firebase';
-import { Message, Conversation } from '../types/swipe-trading';
+import { Message, Conversation, TradeOffer } from '../types/swipe-trading';
 import { LoadingSpinner } from './ui/LoadingSpinner';
 import { Button } from './ui/Button';
 import { Navigation } from './Navigation';
@@ -24,11 +25,14 @@ export function ConversationView() {
   const [targetItemTitle, setTargetItemTitle] = useState('');
   const [targetItemImage, setTargetItemImage] = useState('');
   const [partnerName, setPartnerName] = useState('');
+  const [tradeOffer, setTradeOffer] = useState<TradeOffer | null>(null);
+  const [offerMakerName, setOfferMakerName] = useState('');
 
   // Message input state
   const [messageText, setMessageText] = useState('');
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState<string | null>(null);
+  const [completingTrade, setCompletingTrade] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const unsubscribeRef = useRef<(() => void) | null>(null);
@@ -109,6 +113,23 @@ export function ConversationView() {
         );
       }
 
+      // Fetch trade offer details
+      if (conversationData.tradeOfferId) {
+        const tradeOfferDoc = await getDoc(doc(db, 'tradeOffers', conversationData.tradeOfferId));
+        if (tradeOfferDoc.exists()) {
+          const offerData = { id: tradeOfferDoc.id, ...tradeOfferDoc.data() } as TradeOffer;
+          setTradeOffer(offerData);
+          // Fetch the name of who made the offer
+          const makerDoc = await getDoc(doc(db, 'users', offerData.offeringUserId));
+          if (makerDoc.exists()) {
+            const makerData = makerDoc.data();
+            setOfferMakerName(
+              `${makerData.firstName || ''} ${makerData.lastName || ''}`.trim() || 'Unknown User'
+            );
+          }
+        }
+      }
+
       // Fetch initial messages
       const initialMessages = await getMessages(conversationId, user.uid);
       setMessages(initialMessages);
@@ -160,6 +181,32 @@ export function ConversationView() {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage(e);
+    }
+  };
+
+  const handleCompleteTrade = async () => {
+    if (!user || !tradeOffer) return;
+
+    const confirmed = window.confirm(
+      'Are you sure you want to mark this trade as completed? This will close the trade offer.'
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setCompletingTrade(true);
+
+      await completeTradeOffer(tradeOffer.id, user.uid);
+
+      // Update local trade offer state
+      setTradeOffer({ ...tradeOffer, status: 'completed' });
+
+      alert('Trade marked as completed successfully!');
+    } catch (err) {
+      console.error('Error completing trade:', err);
+      alert(err instanceof Error ? err.message : 'Failed to complete trade');
+    } finally {
+      setCompletingTrade(false);
     }
   };
 
@@ -277,6 +324,96 @@ export function ConversationView() {
       {/* Messages area */}
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-4xl mx-auto px-4 py-6">
+
+          {/* Offer Request Card */}
+          {tradeOffer && (
+            <div className="mb-6 rounded-2xl border border-primary/30 dark:border-primary-light/30 bg-gradient-to-br from-primary/5 to-primary/10 dark:from-primary-light/10 dark:to-primary/10 shadow-md overflow-hidden">
+              {/* Card header */}
+              <div className="flex items-center gap-2 px-4 py-2.5 bg-primary/10 dark:bg-primary-light/15 border-b border-primary/20 dark:border-primary-light/20">
+                <svg className="w-4 h-4 text-primary dark:text-primary-light flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4" />
+                </svg>
+                <span className="text-sm font-semibold text-primary dark:text-primary-light">
+                  Trade Offer Request
+                </span>
+                <span
+                  className={`ml-auto text-xs font-medium px-2 py-0.5 rounded-full ${
+                    tradeOffer.status === 'completed'
+                      ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300'
+                      : tradeOffer.status === 'accepted'
+                      ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300'
+                      : tradeOffer.status === 'declined'
+                        ? 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300'
+                        : 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300'
+                    }`}
+                >
+                  {tradeOffer.status.charAt(0).toUpperCase() + tradeOffer.status.slice(1)}
+                </span>
+              </div>
+
+              {/* Items being traded */}
+              <div className="flex items-center gap-3 px-4 py-4">
+                {/* Trade anchor (what the offering user is giving) */}
+                <div className="flex-1 flex flex-col items-center text-center gap-1.5">
+                  <img
+                    src={tradeAnchorImage || '/placeholder-item.png'}
+                    alt={tradeAnchorTitle}
+                    className="w-16 h-16 rounded-xl object-cover shadow-sm border-2 border-white dark:border-gray-700"
+                  />
+                  <p className="text-xs font-medium text-text dark:text-gray-100 line-clamp-2">{tradeAnchorTitle}</p>
+                  <p className="text-xs text-text-secondary dark:text-gray-400">Offered by {offerMakerName}</p>
+                </div>
+
+                {/* Swap icon */}
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 dark:bg-primary-light/20 flex items-center justify-center">
+                  <svg className="w-4 h-4 text-primary dark:text-primary-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                  </svg>
+                </div>
+
+                {/* Target item (what they want in return) */}
+                <div className="flex-1 flex flex-col items-center text-center gap-1.5">
+                  <img
+                    src={targetItemImage || '/placeholder-item.png'}
+                    alt={targetItemTitle}
+                    className="w-16 h-16 rounded-xl object-cover shadow-sm border-2 border-white dark:border-gray-700"
+                  />
+                  <p className="text-xs font-medium text-text dark:text-gray-100 line-clamp-2">{targetItemTitle}</p>
+                  <p className="text-xs text-text-secondary dark:text-gray-400">Requested item</p>
+                </div>
+              </div>
+
+              {/* Complete Trade Button */}
+              {tradeOffer.status === 'accepted' && (
+                <div className="px-4 pb-4">
+                  <Button
+                    onClick={handleCompleteTrade}
+                    variant="primary"
+                    className="w-full"
+                    isLoading={completingTrade}
+                    disabled={completingTrade}
+                  >
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Complete Trade
+                  </Button>
+                </div>
+              )}
+
+              {tradeOffer.status === 'completed' && (
+                <div className="px-4 pb-4">
+                  <div className="flex items-center justify-center gap-2 py-2 text-sm text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span className="font-medium">Trade Completed</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           {messages.length === 0 ? (
             <div className="text-center py-12">
               <svg

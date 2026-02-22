@@ -80,7 +80,7 @@ const NotificationList: React.FC = () => {
       await acceptTradeOffer(tradeOfferId, user.uid);
 
       // Create conversation for the accepted trade
-      const conversation = await createConversation(tradeOfferId);
+      const conversation = await createConversation(tradeOfferId, user.uid);
 
       // Navigate to the conversation
       navigate(`/messages/${conversation.id}`);

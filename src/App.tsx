@@ -8,8 +8,11 @@ import { EditProfile } from './pages/EditProfile';
 import { Listings } from './pages/Listings';
 import { ItemDetail } from './pages/ItemDetail';
 import { SwipeTradingPage } from './pages/SwipeTradingPage';
+import { SwipeHistory } from './pages/SwipeHistory';
 import { MessagesPage } from './pages/MessagesPage';
 import { ConversationView } from './components/ConversationView';
+import { TradeOffers } from './pages/TradeOffers';
+import { TradeHistory } from './pages/TradeHistory';
 import { ProtectedRoute } from './components/ProtectedRoute';
 
 function App() {
@@ -68,6 +71,14 @@ function App() {
             }
           />
           <Route
+            path="/swipe-history"
+            element={
+              <ProtectedRoute>
+                <SwipeHistory />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/messages"
             element={
               <ProtectedRoute>
@@ -80,6 +91,22 @@ function App() {
             element={
               <ProtectedRoute>
                 <ConversationView />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/trade-offers"
+            element={
+              <ProtectedRoute>
+                <TradeOffers />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/trade-history"
+            element={
+              <ProtectedRoute>
+                <TradeHistory />
               </ProtectedRoute>
             }
           />

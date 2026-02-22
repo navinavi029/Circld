@@ -151,6 +151,20 @@ export function Navigation() {
               <span className="tracking-wide">Messages</span>
             </button>
 
+            {/* Trade Offers Button */}
+            <button
+              onClick={() => navigate('/trade-offers')}
+              className={`px-4 py-2 rounded-full font-medium transition-all duration-300 outline-none flex items-center space-x-2 w-32 justify-center group ${isActive('/trade-offers')
+                ? 'bg-primary/20 dark:bg-primary/30 text-primary-dark dark:text-primary-light font-bold'
+                : 'text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light hover:bg-gray-100/50 dark:hover:bg-gray-800/50'
+                }`}
+            >
+              <svg className={`w-5 h-5 transition-transform duration-300 ${!isActive('/trade-offers') && 'group-hover:scale-110'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={isActive('/trade-offers') ? 2.5 : 2} d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4" />
+              </svg>
+              <span className="tracking-wide">Offers</span>
+            </button>
+
             {/* Divider */}
             <div className="h-6 w-px bg-gray-300 dark:bg-gray-700 mx-2" />
 
@@ -257,6 +271,42 @@ export function Navigation() {
                         <div>
                           <p className="text-text dark:text-gray-100 font-medium">My Profile</p>
                           <p className="text-xs text-text-secondary dark:text-gray-400">View and edit profile</p>
+                        </div>
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          setIsDropdownOpen(false);
+                          navigate('/swipe-history');
+                        }}
+                        className="w-full px-4 py-3 text-left hover:bg-primary/5 dark:hover:bg-primary-light/10 transition-colors flex items-center space-x-3 group"
+                      >
+                        <div className="w-9 h-9 rounded-lg bg-primary/10 dark:bg-primary-light/20 flex items-center justify-center group-hover:bg-primary/20 dark:group-hover:bg-primary-light/30 transition-colors">
+                          <svg className="w-5 h-5 text-primary dark:text-primary-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                          </svg>
+                        </div>
+                        <div>
+                          <p className="text-text dark:text-gray-100 font-medium">Swipe History</p>
+                          <p className="text-xs text-text-secondary dark:text-gray-400">View your past swipes</p>
+                        </div>
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          setIsDropdownOpen(false);
+                          navigate('/trade-history');
+                        }}
+                        className="w-full px-4 py-3 text-left hover:bg-primary/5 dark:hover:bg-primary-light/10 transition-colors flex items-center space-x-3 group"
+                      >
+                        <div className="w-9 h-9 rounded-lg bg-primary/10 dark:bg-primary-light/20 flex items-center justify-center group-hover:bg-primary/20 dark:group-hover:bg-primary-light/30 transition-colors">
+                          <svg className="w-5 h-5 text-primary dark:text-primary-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        </div>
+                        <div>
+                          <p className="text-text dark:text-gray-100 font-medium">Trade History</p>
+                          <p className="text-xs text-text-secondary dark:text-gray-400">View your trade history</p>
                         </div>
                       </button>
 
@@ -416,6 +466,24 @@ export function Navigation() {
               </button>
 
               <button
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  navigate('/trade-offers');
+                }}
+                className={`w-full p-3.5 sm:p-4 rounded-2xl flex items-center space-x-3.5 sm:space-x-4 transition-all duration-300 outline-none animate-in slide-in-from-left-4 fade-in delay-[225ms] ${isActive('/trade-offers')
+                  ? 'bg-gradient-to-br from-primary to-primary-dark text-white shadow-lg shadow-primary/25 scale-[1.02]'
+                  : 'bg-white/40 dark:bg-gray-800/40 hover:bg-white/60 dark:hover:bg-gray-700/50 text-gray-800 dark:text-gray-100 border border-white/20 dark:border-white/5'
+                  }`}
+              >
+                <div className={`p-2.5 rounded-xl ${isActive('/trade-offers') ? 'bg-white/20' : 'bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light'}`}>
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4" />
+                  </svg>
+                </div>
+                <span className="text-base sm:text-lg font-bold tracking-wide">Trade Offers</span>
+              </button>
+
+              <button
                 onClick={handleProfileClick}
                 className={`w-full p-3.5 sm:p-4 rounded-2xl flex items-center space-x-3.5 sm:space-x-4 transition-all duration-300 outline-none animate-in slide-in-from-left-4 fade-in delay-[250ms] ${isActive('/profile')
                   ? 'bg-gradient-to-br from-primary to-primary-dark text-white shadow-lg shadow-primary/25 scale-[1.02]'
@@ -428,6 +496,42 @@ export function Navigation() {
                   </svg>
                 </div>
                 <span className="text-base sm:text-lg font-bold tracking-wide">My Profile</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  navigate('/swipe-history');
+                }}
+                className={`w-full p-3.5 sm:p-4 rounded-2xl flex items-center space-x-3.5 sm:space-x-4 transition-all duration-300 outline-none animate-in slide-in-from-left-4 fade-in delay-[300ms] ${isActive('/swipe-history')
+                  ? 'bg-gradient-to-br from-primary to-primary-dark text-white shadow-lg shadow-primary/25 scale-[1.02]'
+                  : 'bg-white/40 dark:bg-gray-800/40 hover:bg-white/60 dark:hover:bg-gray-700/50 text-gray-800 dark:text-gray-100 border border-white/20 dark:border-white/5'
+                  }`}
+              >
+                <div className={`p-2.5 rounded-xl ${isActive('/swipe-history') ? 'bg-white/20' : 'bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light'}`}>
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  </svg>
+                </div>
+                <span className="text-base sm:text-lg font-bold tracking-wide">Swipe History</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  navigate('/trade-history');
+                }}
+                className={`w-full p-3.5 sm:p-4 rounded-2xl flex items-center space-x-3.5 sm:space-x-4 transition-all duration-300 outline-none animate-in slide-in-from-left-4 fade-in delay-[325ms] ${isActive('/trade-history')
+                  ? 'bg-gradient-to-br from-primary to-primary-dark text-white shadow-lg shadow-primary/25 scale-[1.02]'
+                  : 'bg-white/40 dark:bg-gray-800/40 hover:bg-white/60 dark:hover:bg-gray-700/50 text-gray-800 dark:text-gray-100 border border-white/20 dark:border-white/5'
+                  }`}
+              >
+                <div className={`p-2.5 rounded-xl ${isActive('/trade-history') ? 'bg-white/20' : 'bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light'}`}>
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <span className="text-base sm:text-lg font-bold tracking-wide">Trade History</span>
               </button>
             </div>
 

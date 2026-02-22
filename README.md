@@ -1,21 +1,35 @@
 # Circl'd
 
-A modern, secure authentication platform built with React, TypeScript, and Firebase.
+A modern swipe-based trading platform where users can discover and trade items through an intuitive Tinder-style interface. Built with React, TypeScript, and Firebase.
 
 ![Circl'd](https://img.shields.io/badge/version-0.0.0-blue)
 ![React](https://img.shields.io/badge/React-19.2.4-61dafb)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.9.3-3178c6)
 ![Tailwind](https://img.shields.io/badge/Tailwind-4.1.18-38bdf8)
+![Firebase](https://img.shields.io/badge/Firebase-12.9.0-orange)
 
 ## ✨ Features
 
-- 🔐 Secure Firebase Authentication
-- 🎨 Beautiful gradient UI with glassmorphism effects
-- 📱 Fully responsive design
-- ⚡ Lightning-fast with Vite
-- 🎭 Smooth animations and transitions
-- 🔄 Real-time auth state management
-- 💪 Built with TypeScript for type safety
+### Core Trading Experience
+- 🔄 **Swipe Trading** - Tinder-style interface for discovering items to trade
+- 🎯 **Trade Anchors** - Select your item and swipe through potential matches
+- 💬 **Real-time Messaging** - Chat with trade partners after accepting offers
+- 📊 **Trade Management** - Track offers, history, and active conversations
+- 🔔 **Smart Notifications** - Get notified of new offers and messages
+
+### Item Management
+- 📝 **Item Listings** - Create and manage your tradeable items
+- 📸 **Image Gallery** - Multiple photos with Cloudinary integration
+- 🏷️ **Categories & Conditions** - Organize items by type and quality
+- 📍 **Location-based** - Find items near you with map integration
+- 📈 **Item Analytics** - View counts, favorites, and swipe interest
+
+### User Experience
+- 🔐 **Secure Authentication** - Firebase auth with profile management
+- 🎨 **Dark/Light Themes** - Toggle between themes with smooth transitions
+- 📱 **Fully Responsive** - Optimized for mobile, tablet, and desktop
+- ⚡ **Offline Support** - Local caching for seamless experience
+- 🎭 **Smooth Animations** - Card swipes, transitions, and micro-interactions
 
 ## 🚀 Quick Start
 
@@ -26,7 +40,10 @@ npm install
 # Copy environment variables
 cp .env.example .env
 
-# Add your Firebase config to .env
+# Configure your environment variables:
+# - Firebase config (auth, firestore, storage)
+# - Cloudinary credentials
+# - Google Maps API key
 
 # Start development server
 npm run dev
@@ -34,69 +51,169 @@ npm run dev
 
 Visit `http://localhost:5173` to see your app!
 
-## 📚 Documentation
-
-For detailed documentation, see [DOCUMENTATION.md](./DOCUMENTATION.md)
-
 ## 🛠️ Tech Stack
 
-- **React** - UI library
-- **TypeScript** - Type safety
-- **Vite** - Build tool
-- **Tailwind CSS** - Styling
-- **Firebase** - Authentication
-- **React Context** - State management
+### Frontend
+- **React 19** - UI library with latest features
+- **TypeScript** - Type-safe development
+- **Vite** - Lightning-fast build tool
+- **Tailwind CSS 4** - Utility-first styling
+- **React Router** - Client-side routing
+
+### Backend & Services
+- **Firebase Auth** - User authentication
+- **Firestore** - Real-time database
+- **Firebase Storage** - File storage
+- **Cloudinary** - Image optimization and delivery
+- **Leaflet** - Interactive maps
+
+### Testing
+- **Vitest** - Unit and integration testing
+- **Testing Library** - Component testing
+- **Fast-check** - Property-based testing
 
 ## 📦 Project Structure
 
 ```
 circld/
 ├── src/
-│   ├── contexts/       # React contexts
-│   ├── App.tsx         # Main component
-│   ├── firebase.ts     # Firebase config
-│   └── main.tsx        # Entry point
-├── public/             # Static assets
-└── index.html          # HTML template
+│   ├── components/          # Reusable UI components
+│   │   ├── ui/             # Base UI components (Button, Card, etc.)
+│   │   ├── SwipeInterface.tsx
+│   │   ├── ConversationView.tsx
+│   │   └── ...
+│   ├── pages/              # Route pages
+│   │   ├── SwipeTradingPage.tsx
+│   │   ├── MessagesPage.tsx
+│   │   ├── TradeOffers.tsx
+│   │   └── ...
+│   ├── services/           # Business logic
+│   │   ├── itemPoolService.ts
+│   │   ├── messagingService.ts
+│   │   ├── tradeOfferService.ts
+│   │   └── ...
+│   ├── contexts/           # React contexts
+│   │   ├── AuthContext.tsx
+│   │   ├── ProfileContext.tsx
+│   │   └── ThemeContext.tsx
+│   ├── hooks/              # Custom React hooks
+│   ├── types/              # TypeScript definitions
+│   ├── utils/              # Helper functions
+│   └── firebase.ts         # Firebase configuration
+├── .kiro/
+│   └── specs/              # Feature specifications
+├── firestore.rules         # Firestore security rules
+├── storage.rules           # Storage security rules
+└── vite.config.ts          # Build configuration
 ```
 
 ## 🔧 Configuration
 
+### Firebase Setup
 1. Create a Firebase project at [Firebase Console](https://console.firebase.google.com/)
 2. Enable Email/Password authentication
-3. Copy your Firebase config to `.env`
-4. Start building!
+3. Create Firestore database
+4. Enable Firebase Storage
+5. Copy configuration to `.env`:
+
+```env
+VITE_FIREBASE_API_KEY=your_api_key
+VITE_FIREBASE_AUTH_DOMAIN=your_auth_domain
+VITE_FIREBASE_PROJECT_ID=your_project_id
+VITE_FIREBASE_STORAGE_BUCKET=your_storage_bucket
+VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+VITE_FIREBASE_APP_ID=your_app_id
+```
+
+### Cloudinary Setup
+1. Create account at [Cloudinary](https://cloudinary.com/)
+2. Get your cloud name and upload preset
+3. Add to `.env`:
+
+```env
+VITE_CLOUDINARY_CLOUD_NAME=your_cloud_name
+VITE_CLOUDINARY_UPLOAD_PRESET=your_upload_preset
+```
+
+### Deploy Firestore Rules
+```bash
+firebase deploy --only firestore:rules
+firebase deploy --only storage:rules
+```
 
 ## 📝 Available Scripts
 
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
 - `npm run preview` - Preview production build
+- `npm test` - Run tests once
+- `npm run test:watch` - Run tests in watch mode
 
-## 🎨 Design Features
+## 🎯 Key Features Explained
 
-- Vibrant gradient backgrounds (indigo → purple → pink)
-- Glassmorphism card effects
-- Smooth fade-in animations
-- Interactive hover states
-- Professional form styling
-- Error handling UI
+### Swipe Trading
+Users select a "trade anchor" (their item) and swipe through available items:
+- **Swipe Right** - Express interest in trading
+- **Swipe Left** - Pass on the item
+- **Filters** - Distance, category, and condition filters
+- **Session Management** - Persistent swipe sessions with history
+
+### Trade Offers
+When you swipe right:
+1. A trade offer is created and sent to the item owner
+2. Owner receives a notification
+3. Owner can accept or decline
+4. Accepted offers unlock messaging
+
+### Messaging System
+Real-time chat for accepted trades:
+- Conversation per accepted trade
+- Message notifications
+- Unread message badges
+- Conversation history
+- Participant validation
+
+### Item Discovery
+- Location-based search with map picker
+- Category filtering
+- Condition-based filtering
+- Related items suggestions
+- View tracking and analytics
 
 ## 🔒 Security
 
-- Environment variables for sensitive data
-- Firebase security rules
-- HTTPS in production
-- Input validation
+- **Firestore Security Rules** - Row-level security for all data
+- **Storage Rules** - Secure file uploads
+- **Environment Variables** - Sensitive data protection
+- **Input Validation** - Client and server-side validation
+- **Authentication Required** - Protected routes and API calls
+
+## 🎨 Design System
+
+- **Color Themes** - Light and dark mode support
+- **Responsive Grid** - Mobile-first design
+- **Card Components** - Consistent card styling
+- **Loading States** - Skeleton screens and spinners
+- **Error Handling** - User-friendly error messages
+- **Accessibility** - ARIA labels and keyboard navigation
+
+## 🧪 Testing
+
+The project uses a comprehensive testing strategy:
+- **Unit Tests** - Component and service testing
+- **Property-Based Tests** - Correctness validation with fast-check
+- **Integration Tests** - End-to-end user flows
+- **Test Coverage** - Critical paths covered
+
+Run tests with:
+```bash
+npm test
+```
 
 ## 📄 License
 
 Private and proprietary.
 
-## 🤝 Contributing
-
-Contributions are welcome! Please read the contributing guidelines in [DOCUMENTATION.md](./DOCUMENTATION.md)
-
 ---
 
-Built with ❤️ using React and Firebase
+Built with ❤️ by the Circl'd team

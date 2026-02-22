@@ -31,8 +31,20 @@ export function MessagesPage() {
       setLoading(true);
       setError(null);
 
+      console.log('[MessagesPage] Loading conversations for user:', user.uid);
+
       // Fetch user conversations with enriched details
       const enrichedConversations = await getUserConversationsWithDetails(user.uid);
+
+      console.log('[MessagesPage] Loaded conversations:', {
+        count: enrichedConversations.length,
+        conversations: enrichedConversations.map(c => ({
+          id: c.conversation.id,
+          tradeOfferId: c.conversation.tradeOfferId,
+          participantIds: c.conversation.participantIds,
+          lastMessageText: c.conversation.lastMessageText,
+        })),
+      });
 
       setConversations(enrichedConversations);
 
@@ -40,7 +52,7 @@ export function MessagesPage() {
       const totalUnread = calculateTotalUnreadCountFromSummaries(enrichedConversations);
       setTotalUnreadCount(totalUnread);
     } catch (err) {
-      console.error('Error loading conversations:', err);
+      console.error('[MessagesPage] Error loading conversations:', err);
       setError(
         err instanceof Error ? err.message : 'Failed to load conversations'
       );

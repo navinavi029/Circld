@@ -33,7 +33,7 @@ export interface TradeOffer {
   offeringUserId: string;
   createdAt: Timestamp;
   updatedAt: Timestamp;
-  status: 'pending' | 'read' | 'accepted' | 'declined';
+  status: 'pending' | 'read' | 'accepted' | 'declined' | 'completed';
 }
 
 /**

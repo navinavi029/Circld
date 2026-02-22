@@ -254,3 +254,57 @@ export async function acceptTradeOffer(
     };
   });
 }
+
+/**
+ * Marks a trade offer as completed.
+ * Either participant can mark the trade as completed.
+ * Note: This does NOT change the items' status. Items remain as-is for record keeping.
+ *
+ * @param offerId - ID of the trade offer to complete
+ * @param userId - ID of the user completing the trade (must be a participant)
+ * @returns The updated trade offer
+ * @throws Error if offer not found or user is not authorized
+ */
+export async function completeTradeOffer(
+  offerId: string,
+  userId: string
+): Promise<TradeOffer> {
+  if (!offerId || !userId) {
+    throw new Error('Invalid input: Offer ID and User ID are required');
+  }
+
+  return retryWithBackoff(async () => {
+    const offerRef = doc(db, 'tradeOffers', offerId);
+
+    // Verify offer exists and user is authorized
+    const offerDoc = await getDoc(offerRef);
+    if (!offerDoc.exists()) {
+      throw new Error('Trade offer not found');
+    }
+
+    const offerData = offerDoc.data() as TradeOffer;
+
+    // Verify user is a participant (either offering user or target item owner)
+    if (offerData.offeringUserId !== userId && offerData.targetItemOwnerId !== userId) {
+      throw new Error('Only trade participants can complete this trade');
+    }
+
+    // Verify trade is accepted before completing
+    if (offerData.status !== 'accepted') {
+      throw new Error('Trade must be accepted before it can be completed');
+    }
+
+    // Update trade offer status to completed
+    await updateDoc(offerRef, {
+      status: 'completed',
+      updatedAt: serverTimestamp(),
+    });
+
+    return {
+      ...offerData,
+      id: offerId,
+      status: 'completed',
+      updatedAt: Timestamp.now(),
+    };
+  });
+}

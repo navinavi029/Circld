@@ -13,14 +13,15 @@ import { Navigation } from '../components/Navigation';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 import { buildItemPool } from '../services/itemPoolService';
 import { createTradeOffer } from '../services/tradeOfferService';
-import { 
-  recordSwipe, 
-  createSwipeSession, 
+import {
+  recordSwipe,
+  createSwipeSession,
   getSwipeHistory,
   syncPendingSwipes,
   restoreSessionFromCache,
 } from '../services/swipeHistoryService';
 import { createTradeOfferNotification } from '../services/notificationService';
+import { createConversation } from '../services/messagingService';
 import { hasPendingSwipes, clearCachedSessionState } from '../utils/localStorageCache';
 
 /**
@@ -141,7 +142,7 @@ export function SwipeTradingPage() {
     try {
       setLoading(true);
       setError(null);
-      
+
       const itemsRef = collection(db, 'items');
       const q = query(itemsRef, where('ownerId', '==', user.uid));
       const snapshot = await getDocs(q);
@@ -160,9 +161,9 @@ export function SwipeTradingPage() {
         userId: user.uid,
         error: err instanceof Error ? err.message : 'Unknown error',
       });
-      
+
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
-      
+
       if (errorMessage.includes('permission') || errorMessage.includes('unauthorized')) {
         setError('You do not have permission to view items. Please sign in again.');
       } else if (errorMessage.includes('network') || errorMessage.includes('failed after')) {
@@ -184,7 +185,7 @@ export function SwipeTradingPage() {
    */
   const loadTradeAnchorFromSession = async (tradeAnchorId: string, cachedSession: SwipeSession) => {
     if (!user) return;
-    
+
     console.log('[SwipeTradingPage] Restoring session from cache:', {
       timestamp: new Date().toISOString(),
       component: 'SwipeTradingPage',
@@ -194,16 +195,16 @@ export function SwipeTradingPage() {
       tradeAnchorId,
       phase: 'starting-restoration',
     });
-    
+
     try {
       setLoading(true);
       setError(null);
       setLoadingPhase('loading-items');
-      
+
       // Validate trade anchor still exists (Requirement 6.1)
       const itemRef = doc(db, 'items', tradeAnchorId);
       const itemDoc = await getDoc(itemRef);
-      
+
       if (!itemDoc.exists()) {
         // Trade anchor no longer exists - clear cache (Requirement 6.2)
         console.warn('[SwipeTradingPage] Cached trade anchor no longer exists, clearing cache:', {
@@ -215,7 +216,7 @@ export function SwipeTradingPage() {
           tradeAnchorId,
           phase: 'anchor-not-found',
         });
-        
+
         clearCachedSessionState();
         setError('Your previous trade anchor is no longer available. Please select a new item.');
         setShowNewSessionOption(true);
@@ -223,9 +224,9 @@ export function SwipeTradingPage() {
         setLoadingPhase('error');
         return;
       }
-      
+
       const itemData = itemDoc.data();
-      
+
       // Validate trade anchor is still available
       if (itemData.status !== 'available') {
         console.warn('[SwipeTradingPage] Cached trade anchor no longer available, clearing cache:', {
@@ -238,7 +239,7 @@ export function SwipeTradingPage() {
           status: itemData.status,
           phase: 'anchor-unavailable',
         });
-        
+
         clearCachedSessionState();
         setError('Your previous trade anchor is no longer available. Please select a new item.');
         setShowNewSessionOption(true);
@@ -246,11 +247,11 @@ export function SwipeTradingPage() {
         setLoadingPhase('error');
         return;
       }
-      
+
       const item = { id: itemDoc.id, ...itemDoc.data() } as Item;
       setTradeAnchor(item);
       setSession(cachedSession);
-      
+
       // Load item pool with same error handling as new sessions (Requirement 6.3)
       try {
         console.log('[SwipeTradingPage] Loading item pool for restored session:', {
@@ -262,23 +263,23 @@ export function SwipeTradingPage() {
           tradeAnchorId,
           phase: 'loading-item-pool',
         });
-        
+
         const swipeHistory = await getSwipeHistory(cachedSession.id, user.uid);
         console.log('[SwipeTradingPage] Swipe history loaded for restored session:', {
           sessionId: cachedSession.id,
           historyCount: swipeHistory.length,
           phase: 'history-loaded',
         });
-        
+
         const items = await buildItemPool(
-          user.uid, 
-          swipeHistory, 
-          20, 
-          undefined, 
+          user.uid,
+          swipeHistory,
+          20,
+          undefined,
           filterPreferences,
           profile?.coordinates || null
         );
-        
+
         // Log successful restoration (Requirement 6.5)
         console.log('[SwipeTradingPage] Session restored successfully:', {
           timestamp: new Date().toISOString(),
@@ -290,15 +291,15 @@ export function SwipeTradingPage() {
           itemCount: items.length,
           phase: 'restoration-complete',
         });
-        
+
         setItemPool(items);
-        
+
         // Load owner profiles for the items
         if (items.length > 0) {
           const profiles = await loadOwnerProfiles(items);
           setOwnerProfiles(profiles);
         }
-        
+
         setIsSwipeMode(true);
         setLoadingPhase('complete');
       } catch (err) {
@@ -313,7 +314,7 @@ export function SwipeTradingPage() {
           error: err instanceof Error ? err.message : 'Unknown error',
           phase: 'restoration-failed-clearing-cache',
         });
-        
+
         // Clear the cached session and let user start fresh
         clearCachedSessionState();
         setSession(null);
@@ -333,7 +334,7 @@ export function SwipeTradingPage() {
         error: err instanceof Error ? err.message : 'Unknown error',
         phase: 'restoration-failed-clearing-cache',
       });
-      
+
       // Clear the cached session and let user start fresh
       clearCachedSessionState();
       setSession(null);
@@ -379,20 +380,20 @@ export function SwipeTradingPage() {
     try {
       setLoading(true);
       setError(null);
-      
+
       const swipeHistory = await getSwipeHistory(session.id, user.uid);
       const items = await buildItemPool(
-        user.uid, 
-        swipeHistory, 
-        20, 
-        undefined, 
+        user.uid,
+        swipeHistory,
+        20,
+        undefined,
         filterPreferences,
         profile?.coordinates || null
       );
-      
+
       // Empty pool is a valid state, not an error
       setItemPool(items);
-      
+
       // Load owner profiles for the items
       if (items.length > 0) {
         const profiles = await loadOwnerProfiles(items);
@@ -407,9 +408,9 @@ export function SwipeTradingPage() {
         userId: user?.uid,
         error: err instanceof Error ? err.message : 'Unknown error',
       });
-      
+
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
-      
+
       if (errorMessage.includes('session not found')) {
         setError('Your swipe session has expired. Please select a trade anchor again.');
         setIsSwipeMode(false);
@@ -472,10 +473,10 @@ export function SwipeTradingPage() {
    */
   const loadOwnerProfiles = async (items: Item[]): Promise<Map<string, UserProfile>> => {
     const profiles = new Map<string, UserProfile>();
-    
+
     // Get unique owner IDs to avoid duplicate requests
     const uniqueOwnerIds = [...new Set(items.map(item => item.ownerId))];
-    
+
     // Load all profiles in parallel
     await Promise.all(
       uniqueOwnerIds.map(async (ownerId) => {
@@ -493,7 +494,7 @@ export function SwipeTradingPage() {
         }
       })
     );
-    
+
     return profiles;
   };
 
@@ -505,7 +506,7 @@ export function SwipeTradingPage() {
    */
   const handleLoadingError = (err: unknown, anchorId?: string) => {
     const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
-    
+
     // Comprehensive error logging with context
     console.error('[SwipeTradingPage] Loading error details:', {
       timestamp: new Date().toISOString(),
@@ -518,7 +519,7 @@ export function SwipeTradingPage() {
       tradeAnchorId: anchorId || tradeAnchor?.id,
       stack: err instanceof Error ? err.stack : undefined,
     });
-    
+
     // Classify error and set specific user-friendly message
     if (errorMessage.includes('session creation failed') || errorMessage.includes('Failed to create session')) {
       setError('Failed to create swipe session. Please try again.');
@@ -542,7 +543,7 @@ export function SwipeTradingPage() {
     } else {
       setError('Failed to load items. Please try again.');
     }
-    
+
     // Reset loading state to allow retry
     setLoadingPhase('error');
     setIsSwipeMode(false);
@@ -574,7 +575,7 @@ export function SwipeTradingPage() {
       // Validate item is still available
       const itemRef = doc(db, 'items', item.id);
       const itemDoc = await getDoc(itemRef);
-      
+
       if (!itemDoc.exists()) {
         setError('This item no longer exists. Please select another item.');
         setLoading(false);
@@ -597,19 +598,19 @@ export function SwipeTradingPage() {
         anchorId: item.id,
         phase: 'creating-session'
       });
-      
+
       const newSession = await createSwipeSession(user.uid, item.id);
-      
+
       console.log('[SwipeTradingPage] Session created:', {
         sessionId: newSession.id,
         userId: user.uid,
         anchorId: item.id,
         phase: 'session-created'
       });
-      
+
       setSession(newSession);
       setTradeAnchor(item);
-      
+
       // Phase 2: Load item pool (sequential - only after session is created)
       setLoadingPhase('loading-items');
       console.log('[SwipeTradingPage] Loading item pool:', {
@@ -618,19 +619,19 @@ export function SwipeTradingPage() {
         anchorId: item.id,
         phase: 'loading-items'
       });
-      
+
       const swipeHistory = await getSwipeHistory(newSession.id, user.uid);
       console.log('[SwipeTradingPage] Swipe history loaded:', {
         sessionId: newSession.id,
         historyCount: swipeHistory.length,
         phase: 'history-loaded'
       });
-      
+
       const items = await buildItemPool(
-        user.uid, 
-        swipeHistory, 
-        20, 
-        undefined, 
+        user.uid,
+        swipeHistory,
+        20,
+        undefined,
         filterPreferences,
         profile?.coordinates || null
       );
@@ -639,19 +640,19 @@ export function SwipeTradingPage() {
         itemCount: items.length,
         phase: 'items-loaded'
       });
-      
+
       // Phase 3: Load owner profiles and complete transition to swipe mode
       setItemPool(items);
-      
+
       // Load owner profiles for the items
       if (items.length > 0) {
         const profiles = await loadOwnerProfiles(items);
         setOwnerProfiles(profiles);
       }
-      
+
       setIsSwipeMode(true);
       setLoadingPhase('complete');
-      
+
       console.log('[SwipeTradingPage] Sequential loading complete:', {
         sessionId: newSession.id,
         userId: user.uid,
@@ -672,25 +673,25 @@ export function SwipeTradingPage() {
     // Save to localStorage
     localStorage.setItem('swipeFilterPreferences', JSON.stringify(filters));
     setFilterPreferences(filters);
-    
+
     // If we're in swipe mode, reload the item pool with new filters
     if (isSwipeMode && session && user) {
       try {
         setLoading(true);
         setError(null);
-        
+
         const swipeHistory = await getSwipeHistory(session.id, user.uid);
         const items = await buildItemPool(
-          user.uid, 
-          swipeHistory, 
-          20, 
-          undefined, 
+          user.uid,
+          swipeHistory,
+          20,
+          undefined,
           filters,
           profile?.coordinates || null
         );
-        
+
         setItemPool(items);
-        
+
         // Load owner profiles for the items
         if (items.length > 0) {
           const profiles = await loadOwnerProfiles(items);
@@ -711,7 +712,7 @@ export function SwipeTradingPage() {
    */
   const handleCreateNewSession = async () => {
     if (!user || !tradeAnchor) return;
-    
+
     console.log('[SwipeTradingPage] Creating new session after restoration failure:', {
       timestamp: new Date().toISOString(),
       component: 'SwipeTradingPage',
@@ -719,11 +720,11 @@ export function SwipeTradingPage() {
       userId: user.uid,
       tradeAnchorId: tradeAnchor.id,
     });
-    
+
     // Clear error and new session option
     setError(null);
     setShowNewSessionOption(false);
-    
+
     // Use the same flow as selecting a new anchor
     await handleTradeAnchorSelect(tradeAnchor);
   };
@@ -763,7 +764,7 @@ export function SwipeTradingPage() {
       // Validate session is still valid (check if trade anchor still exists and is available)
       const anchorRef = doc(db, 'items', tradeAnchor.id);
       const anchorDoc = await getDoc(anchorRef);
-      
+
       if (!anchorDoc.exists() || anchorDoc.data().status !== 'available') {
         console.warn('[SwipeTradingPage] Trade anchor no longer available during swipe:', {
           timestamp: new Date().toISOString(),
@@ -775,7 +776,7 @@ export function SwipeTradingPage() {
           exists: anchorDoc.exists(),
           status: anchorDoc.exists() ? anchorDoc.data().status : 'N/A',
         });
-        
+
         // Clear session and show error
         clearCachedSessionState();
         setSession(null);
@@ -783,7 +784,7 @@ export function SwipeTradingPage() {
         setIsSwipeMode(false);
         return;
       }
-      
+
       // Record swipe in history
       await recordSwipe(session.id, user.uid, itemId, direction);
 
@@ -810,10 +811,10 @@ export function SwipeTradingPage() {
         itemId: itemId,
         error: err instanceof Error ? err.message : 'Unknown error',
       });
-      
+
       // Determine user-friendly error message
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
-      
+
       if (errorMessage.includes('not found') || errorMessage.includes('no longer available')) {
         setError('This item is no longer available. Moving to the next item.');
         // Still remove item from pool
@@ -832,20 +833,38 @@ export function SwipeTradingPage() {
 
   /**
    * Handles right swipe (interested)
-   * Creates trade offer and sends notification to target item owner
+   * Creates trade offer, sends notification to target item owner, and initiates conversation
    * Handles errors gracefully without blocking the swipe flow
    */
   const handleRightSwipe = async (targetItem: Item) => {
-    if (!user || !tradeAnchor || !profile) return;
+    // NOTE: profile is intentionally NOT required here — we fetch user name inline as a fallback
+    // so that a missing/slow-loading profile does NOT silently abort the offer creation.
+    if (!user || !tradeAnchor) return;
 
     try {
       // Validate target item is still available
       const targetItemRef = doc(db, 'items', targetItem.id);
       const targetItemDoc = await getDoc(targetItemRef);
-      
+
       if (!targetItemDoc.exists() || targetItemDoc.data().status !== 'available') {
         console.warn('Target item is no longer available');
         return; // Silently skip - item was removed or sold
+      }
+
+      // Resolve the offering user's display name — prefer loaded profile, fall back to Firestore
+      let offeringUserName = 'A user';
+      if (profile?.firstName && profile?.lastName) {
+        offeringUserName = `${profile.firstName} ${profile.lastName}`;
+      } else {
+        try {
+          const userDoc = await getDoc(doc(db, 'users', user.uid));
+          if (userDoc.exists()) {
+            const d = userDoc.data();
+            offeringUserName = `${d.firstName || ''} ${d.lastName || ''}`.trim() || user.email || 'A user';
+          }
+        } catch {
+          // Non-fatal — notification will just use the fallback name
+        }
       }
 
       // Create trade offer
@@ -862,14 +881,38 @@ export function SwipeTradingPage() {
         tradeAnchor.images[0] || '',
         targetItem.title,
         targetItem.images[0] || '',
-        `${profile.firstName} ${profile.lastName}`
+        offeringUserName
       );
+
+      // Create conversation/message thread immediately after trade offer
+      try {
+        console.log('[SwipeTradingPage] Creating conversation for trade offer:', {
+          tradeOfferId: tradeOffer.id,
+          offeringUserId: user.uid,
+          targetItemOwnerId: targetItem.ownerId,
+        });
+
+        const conversation = await createConversation(tradeOffer.id, user.uid, true); // allowPending = true
+
+        console.log('[SwipeTradingPage] Conversation created successfully:', {
+          conversationId: conversation.id,
+          tradeOfferId: tradeOffer.id,
+          participantIds: conversation.participantIds,
+          targetItemOwnerId: targetItem.ownerId,
+          offeringUserId: user.uid,
+        });
+        // The trade offer card in ConversationView already shows all item details visually —
+        // no need to send a redundant auto-generated text message here.
+      } catch (messageErr) {
+        console.error('[SwipeTradingPage] Error creating conversation:', messageErr);
+        // Don't block the swipe flow - trade offer and notification were still created
+      }
     } catch (err) {
       console.error('Error creating trade offer:', err);
-      
+
       // Log but don't throw - we still want to record the swipe
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-      
+
       if (errorMessage.includes('no longer available')) {
         // Item became unavailable during swipe - this is expected
         console.warn('Item became unavailable during swipe');
@@ -890,21 +933,21 @@ export function SwipeTradingPage() {
       setLoadingError(null); // Clear any previous loading errors
       const swipeHistory = await getSwipeHistory(session.id, user.uid);
       const moreItems = await buildItemPool(
-        user.uid, 
-        swipeHistory, 
-        20, 
-        undefined, 
+        user.uid,
+        swipeHistory,
+        20,
+        undefined,
         filterPreferences,
         profile?.coordinates || null
       );
-      
+
       // Add new items that aren't already in the pool
       const existingIds = new Set(itemPool.map(item => item.id));
       const newItems = moreItems.filter(item => !existingIds.has(item.id));
-      
+
       if (newItems.length > 0) {
         setItemPool(prev => [...prev, ...newItems]);
-        
+
         // Load owner profiles for new items
         const newProfiles = await loadOwnerProfiles(newItems);
         setOwnerProfiles(prev => new Map([...prev, ...newProfiles]));
@@ -912,7 +955,7 @@ export function SwipeTradingPage() {
     } catch (err) {
       console.error('Error preloading items:', err);
       setLoadingError('Failed to load more cards. They will retry automatically.');
-      
+
       // Clear the error after 5 seconds
       setTimeout(() => setLoadingError(null), 5000);
     }
@@ -984,8 +1027,8 @@ export function SwipeTradingPage() {
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <Navigation />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <SwipeFilters 
-            onApply={handleFilterChange} 
+          <SwipeFilters
+            onApply={handleFilterChange}
             initialFilters={filterPreferences}
           />
           <TradeAnchorSelector
