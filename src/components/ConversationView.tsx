@@ -186,8 +186,16 @@ export function ConversationView() {
   const handleCompleteTrade = async () => {
     if (!user || !tradeOffer) return;
 
+    // Check if user has already confirmed
+    const hasConfirmed = tradeOffer.completedBy?.includes(user.uid);
+    
+    if (hasConfirmed) {
+      alert('You have already confirmed completion of this trade. Waiting for the other party to confirm.');
+      return;
+    }
+
     const confirmed = window.confirm(
-      'Are you sure you want to mark this trade as completed? This will close the trade offer.'
+      'Are you sure you want to confirm this trade as completed? Both parties must confirm before the trade is marked as complete.'
     );
 
     if (!confirmed) return;
@@ -195,12 +203,16 @@ export function ConversationView() {
     try {
       setCompletingTrade(true);
 
-      await completeTradeOffer(tradeOffer.id, user.uid);
+      const updatedOffer = await completeTradeOffer(tradeOffer.id, user.uid);
 
       // Update local trade offer state
-      setTradeOffer({ ...tradeOffer, status: 'completed' });
+      setTradeOffer(updatedOffer);
 
-      alert('Trade marked as completed successfully!');
+      if (updatedOffer.status === 'completed') {
+        alert('Trade completed successfully! Both parties have confirmed.');
+      } else {
+        alert('Your confirmation has been recorded. Waiting for the other party to confirm completion.');
+      }
     } catch (err) {
       console.error('Error completing trade:', err);
       alert(err instanceof Error ? err.message : 'Failed to complete trade');
@@ -294,13 +306,21 @@ export function ConversationView() {
             <div className="flex-1 flex items-center space-x-3">
               <div className="flex -space-x-2">
                 <img
-                  src={tradeAnchorImage}
+                  src={tradeAnchorImage || '/placeholder-item.png'}
                   alt={tradeAnchorTitle}
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = '/placeholder-item.png';
+                  }}
                   className="w-10 h-10 rounded-lg object-cover border-2 border-white dark:border-gray-800 shadow-sm"
                 />
                 <img
-                  src={targetItemImage}
+                  src={targetItemImage || '/placeholder-item.png'}
                   alt={targetItemTitle}
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = '/placeholder-item.png';
+                  }}
                   className="w-10 h-10 rounded-lg object-cover border-2 border-white dark:border-gray-800 shadow-sm"
                 />
               </div>
@@ -353,6 +373,10 @@ export function ConversationView() {
                   <img
                     src={tradeAnchorImage || '/placeholder-item.png'}
                     alt={tradeAnchorTitle}
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = '/placeholder-item.png';
+                    }}
                     className="w-16 h-16 rounded-xl object-cover shadow-sm border-2 border-white dark:border-gray-700"
                   />
                   <p className="text-xs font-medium text-text dark:text-gray-100 line-clamp-2">{tradeAnchorTitle}</p>
@@ -371,6 +395,10 @@ export function ConversationView() {
                   <img
                     src={targetItemImage || '/placeholder-item.png'}
                     alt={targetItemTitle}
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = '/placeholder-item.png';
+                    }}
                     className="w-16 h-16 rounded-xl object-cover shadow-sm border-2 border-white dark:border-gray-700"
                   />
                   <p className="text-xs font-medium text-text dark:text-gray-100 line-clamp-2">{targetItemTitle}</p>
@@ -381,17 +409,40 @@ export function ConversationView() {
               {/* Complete Trade Button */}
               {tradeOffer.status === 'accepted' && (
                 <div className="px-4 pb-4">
+                  {/* Show confirmation status if anyone has confirmed */}
+                  {tradeOffer.completedBy && tradeOffer.completedBy.length > 0 && (
+                    <div className="mb-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                      <div className="flex items-start gap-2">
+                        <svg className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                            {tradeOffer.completedBy.includes(user?.uid || '') 
+                              ? 'You have confirmed completion. Waiting for the other party.'
+                              : 'The other party has confirmed completion. Please confirm to finalize.'}
+                          </p>
+                          <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
+                            {tradeOffer.completedBy.length} of 2 confirmations received
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
                   <Button
                     onClick={handleCompleteTrade}
                     variant="primary"
                     className="w-full"
                     isLoading={completingTrade}
-                    disabled={completingTrade}
+                    disabled={completingTrade || tradeOffer.completedBy?.includes(user?.uid || '')}
                   >
                     <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    Complete Trade
+                    {tradeOffer.completedBy?.includes(user?.uid || '') 
+                      ? 'Completion Confirmed'
+                      : 'Confirm Trade Completion'}
                   </Button>
                 </div>
               )}

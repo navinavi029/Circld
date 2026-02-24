@@ -34,6 +34,7 @@ export interface TradeOffer {
   createdAt: Timestamp;
   updatedAt: Timestamp;
   status: 'pending' | 'read' | 'accepted' | 'declined' | 'completed';
+  completedBy?: string[]; // Array of user IDs who have confirmed completion
 }
 
 /**

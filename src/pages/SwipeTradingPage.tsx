@@ -8,8 +8,8 @@ import { UserProfile } from '../types/user';
 import { SwipeSession, SwipeFilterPreferences } from '../types/swipe-trading';
 import { TradeAnchorSelector } from '../components/TradeAnchorSelector';
 import { SwipeInterface } from '../components/SwipeInterface';
-import { SwipeFilters } from '../components/SwipeFilters';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
+import { PageTransition } from '../components/PageTransition';
 import { buildItemPool } from '../services/itemPoolService';
 import { createTradeOffer } from '../services/tradeOfferService';
 import {
@@ -552,19 +552,24 @@ export function SwipeTradingPage() {
   };
 
   /**
-   * Handles trade anchor selection
+   * Handles trade anchor selection with swipe filter preferences
    * Creates a new swipe session and transitions to swipe mode
    * Validates the item is still available before starting
    * Implements sequential loading to prevent race conditions
    */
-  const handleTradeAnchorSelect = async (item: Item) => {
+  const handleTradeAnchorSelect = async (item: Item, filters: SwipeFilterPreferences) => {
     if (!user) return;
 
     console.log('[SwipeTradingPage] Trade anchor selected:', {
       itemId: item.id,
       userId: user.uid,
+      filters,
       phase: 'starting'
     });
+
+    // Update filter preferences
+    setFilterPreferences(filters);
+    localStorage.setItem('swipeFilterPreferences', JSON.stringify(filters));
 
     try {
       setLoading(true);
@@ -667,7 +672,9 @@ export function SwipeTradingPage() {
   };
   /**
    * Handles filter changes and reloads the item pool
+   * Note: Currently not used in UI but kept for future filter functionality
    */
+  // @ts-expect-error - Function reserved for future filter functionality
   const handleFilterChange = async (filters: SwipeFilterPreferences) => {
     // Save to localStorage
     localStorage.setItem('swipeFilterPreferences', JSON.stringify(filters));
@@ -724,8 +731,8 @@ export function SwipeTradingPage() {
     setError(null);
     setShowNewSessionOption(false);
 
-    // Use the same flow as selecting a new anchor
-    await handleTradeAnchorSelect(tradeAnchor);
+    // Use the same flow as selecting a new anchor with current filter preferences
+    await handleTradeAnchorSelect(tradeAnchor, filterPreferences);
   };
 
   /**
@@ -960,78 +967,92 @@ export function SwipeTradingPage() {
     }
   };
 
-  // Loading state
+  // Loading state - show when creating session or loading items after anchor selection
+  if (loading && (loadingPhase === 'creating-session' || loadingPhase === 'loading-items')) {
+    return (
+      <PageTransition variant="page">
+        <div className="flex-1 w-full flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 relative z-0">
+          <LoadingSpinner message="Starting swipe session..." size="lg" />
+          {showExtendedLoadingMessage && (
+            <p className="mt-4 text-gray-600 dark:text-gray-400">
+              This is taking longer than usual. Please wait...
+            </p>
+          )}
+        </div>
+      </PageTransition>
+    );
+  }
+
+  // Loading state - initial load
   if (loading && !tradeAnchor) {
     return (
-      <div className="flex-1 w-full flex flex-col items-center justify-center pt-20">
-        <LoadingSpinner />
-        {showExtendedLoadingMessage && (
-          <p className="mt-4 text-gray-600 dark:text-gray-400">
-            This is taking longer than usual. Please wait...
-          </p>
-        )}
-      </div>
+      <PageTransition variant="page">
+        <div className="flex-1 w-full flex flex-col items-center justify-center min-h-[50vh] relative z-0">
+          <LoadingSpinner message="Loading swipe session..." size="lg" />
+          {showExtendedLoadingMessage && (
+            <p className="mt-4 text-gray-600 dark:text-gray-400">
+              This is taking longer than usual. Please wait...
+            </p>
+          )}
+        </div>
+      </PageTransition>
     );
   }
 
   // Error state
   if (error) {
     return (
-      <div className="flex-1 w-full bg-gray-50 dark:bg-gray-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-            <p className="text-red-800 dark:text-red-200">{error}</p>
-            <div className="mt-2 flex gap-2">
-              <button
-                onClick={() => {
-                  setError(null);
-                  setShowNewSessionOption(false);
-                  setLoadingPhase('idle'); // Reset loading phase for retry
-                  if (!tradeAnchor) {
-                    loadUserItems();
-                  } else if (session && user) {
-                    loadItemPool();
-                  } else {
-                    // If no session, go back to anchor selection
-                    setIsSwipeMode(false);
-                    setTradeAnchor(null);
-                  }
-                }}
-                className="px-4 py-2 bg-red-600 dark:bg-red-700 text-white rounded-md hover:bg-red-700 dark:hover:bg-red-800 transition-colors"
-              >
-                Retry
-              </button>
-              {showNewSessionOption && tradeAnchor && (
+      <PageTransition variant="page">
+        <div className="flex-1 w-full relative z-0">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+              <p className="text-red-800 dark:text-red-200">{error}</p>
+              <div className="mt-2 flex gap-2">
                 <button
-                  onClick={handleCreateNewSession}
-                  className="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-800 transition-colors"
+                  onClick={() => {
+                    setError(null);
+                    setShowNewSessionOption(false);
+                    setLoadingPhase('idle'); // Reset loading phase for retry
+                    if (!tradeAnchor) {
+                      loadUserItems();
+                    } else if (session && user) {
+                      loadItemPool();
+                    } else {
+                      // If no session, go back to anchor selection
+                      setIsSwipeMode(false);
+                      setTradeAnchor(null);
+                    }
+                  }}
+                  className="px-4 py-2 bg-red-600 dark:bg-red-700 text-white rounded-md hover:bg-red-700 dark:hover:bg-red-800 transition-colors"
                 >
-                  Create New Session
+                  Retry
                 </button>
-              )}
+                {showNewSessionOption && tradeAnchor && (
+                  <button
+                    onClick={handleCreateNewSession}
+                    className="px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-800 transition-colors"
+                  >
+                    Create New Session
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </PageTransition>
     );
   }
 
-  // Trade anchor selection view
+  // Trade anchor selection view - TradeAnchorSelector now handles its own full-page layout
   if (!isSwipeMode || !tradeAnchor) {
     return (
-      <div className="flex-1 w-full bg-gray-50 dark:bg-gray-900 flex flex-col">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
-          <SwipeFilters
-            onApply={handleFilterChange}
-            initialFilters={filterPreferences}
-          />
-          <TradeAnchorSelector
-            userItems={userItems}
-            onSelect={handleTradeAnchorSelect}
-            selectedItemId={tradeAnchor?.id || null}
-          />
-        </div>
-      </div>
+      <PageTransition variant="page">
+        <TradeAnchorSelector
+          userItems={userItems}
+          onSelect={handleTradeAnchorSelect}
+          isLoading={loading && loadingPhase !== 'idle'}
+        />
+      </PageTransition>
     );
   }
 
@@ -1040,19 +1061,23 @@ export function SwipeTradingPage() {
   const currentOwnerProfile = currentItem ? ownerProfiles.get(currentItem.ownerId) || null : null;
 
   return (
-    <SwipeInterface
-      tradeAnchor={tradeAnchor}
-      currentItem={currentItem}
-      ownerProfile={currentOwnerProfile}
-      onSwipe={(direction) => {
-        if (currentItem) {
-          handleSwipe(currentItem.id, direction);
-        }
-      }}
-      onChangeAnchor={handleChangeAnchor}
-      hasMoreItems={itemPool.length > 1}
-      loading={loading}
-      syncStatus={syncStatus}
-    />
+    <PageTransition variant="page">
+      <div className="flex-1 w-full relative z-0">
+        <SwipeInterface
+          tradeAnchor={tradeAnchor}
+          currentItem={currentItem}
+          ownerProfile={currentOwnerProfile}
+          onSwipe={(direction) => {
+            if (currentItem) {
+              handleSwipe(currentItem.id, direction);
+            }
+          }}
+          onChangeAnchor={handleChangeAnchor}
+          hasMoreItems={itemPool.length > 1}
+          loading={loading}
+          syncStatus={syncStatus}
+        />
+      </div>
+    </PageTransition>
   );
 }

@@ -16,6 +16,7 @@ import { TradeOffers } from './pages/TradeOffers';
 import { TradeHistory } from './pages/TradeHistory';
 import { Home } from './pages/Home';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { PublicRoute } from './components/PublicRoute';
 import { MainLayout } from './components/MainLayout';
 
 /**
@@ -39,8 +40,22 @@ function AppRoutes() {
       {isAuthPath && (
         <AnimatePresence mode="wait">
           <Routes location={location} key={location.pathname}>
-            <Route path="/login" element={<Login />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route
+              path="/login"
+              element={
+                <PublicRoute>
+                  <Login />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="/forgot-password"
+              element={
+                <PublicRoute>
+                  <ForgotPassword />
+                </PublicRoute>
+              }
+            />
             <Route
               path="/complete-profile"
               element={

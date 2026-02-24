@@ -80,7 +80,7 @@ export function SwipeInterface({
   // Empty state when no items available
   if (!loading && !currentItem && !hasMoreItems) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
+      <div className="flex-1 flex flex-col">
         {/* Trade Anchor Display */}
         <TradeAnchorDisplay item={tradeAnchor} onChangeClick={onChangeAnchor} />
 
@@ -124,15 +124,15 @@ export function SwipeInterface({
                 />
               </svg>
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+            <h2 className="text-2xl font-bold text-text dark:text-gray-100 mb-3">
               No Matches Found
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
+            <p className="text-text-secondary dark:text-gray-400 mb-6">
               There are no available items to trade right now. Check back later for new listings, or try changing your trade anchor.
             </p>
             <button
               onClick={onChangeAnchor}
-              className="px-6 py-3 bg-accent dark:bg-primary-light text-white rounded-lg font-medium hover:bg-accent-dark dark:hover:bg-primary transition-colors"
+              className="px-6 py-3 bg-gradient-to-r from-accent to-accent-dark dark:from-primary-light dark:to-primary text-white rounded-lg font-medium hover:shadow-lg hover:shadow-accent/30 dark:hover:shadow-primary/30 transition-all"
             >
               Change Trade Anchor
             </button>
@@ -145,7 +145,7 @@ export function SwipeInterface({
   // Loading state
   if (loading || !displayItem || !displayProfile) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
+      <div className="flex-1 flex flex-col">
         {/* Trade Anchor Display */}
         <TradeAnchorDisplay item={tradeAnchor} onChangeClick={onChangeAnchor} />
 
@@ -172,24 +172,21 @@ export function SwipeInterface({
 
         {/* Loading State */}
         <div className="flex-1 flex items-center justify-center px-4 py-8">
-          <div className="text-center">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-gray-300 dark:border-gray-600 border-t-accent dark:border-t-primary-light mb-4"></div>
-            <p className="text-gray-600 dark:text-gray-400">Loading items...</p>
-          </div>
+          <LoadingSpinner size="lg" message="Loading items..." />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex flex-col">
+    <div className="flex-1 flex flex-col">
       {/* Trade Anchor Display - Fixed at bottom left */}
       <TradeAnchorDisplay item={tradeAnchor} onChangeClick={onChangeAnchor} />
 
       {/* Return Button - Fixed at top left */}
       <button
         onClick={() => navigate('/listings')}
-        className="fixed top-6 left-6 z-20 p-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-full shadow-lg border border-white/20 dark:border-gray-700/50 hover:bg-white dark:hover:bg-gray-700 hover:scale-110 active:scale-95 transition-all duration-300"
+        className="fixed top-6 left-6 z-20 p-3 bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-full shadow-xl border-2 border-gray-200/60 dark:border-gray-700/60 hover:bg-white dark:hover:bg-gray-700 hover:scale-110 hover:shadow-2xl active:scale-95 transition-all duration-300"
         aria-label="Return to listings"
       >
         <svg
@@ -201,7 +198,7 @@ export function SwipeInterface({
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
-            strokeWidth={2}
+            strokeWidth={2.5}
             d="M10 19l-7-7m0 0l7-7m-7 7h18"
           />
         </svg>
@@ -210,11 +207,11 @@ export function SwipeInterface({
       {/* Tips Button - Fixed at top right */}
       <button
         onClick={() => setShowTips(!showTips)}
-        className="fixed top-6 right-6 z-20 p-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-full shadow-lg border border-white/20 dark:border-gray-700/50 hover:bg-white dark:hover:bg-gray-700 hover:scale-110 active:scale-95 transition-all duration-300"
+        className="fixed top-6 right-6 z-20 p-3 bg-gradient-to-br from-accent/95 to-accent-dark/95 dark:from-primary-light/95 dark:to-primary/95 backdrop-blur-xl rounded-full shadow-xl border-2 border-white/40 dark:border-gray-700/60 hover:scale-110 hover:shadow-2xl active:scale-95 transition-all duration-300"
         aria-label="Show tips"
       >
         <svg
-          className="w-5 h-5 text-accent dark:text-primary-light"
+          className="w-5 h-5 text-white"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -222,7 +219,7 @@ export function SwipeInterface({
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
-            strokeWidth={2}
+            strokeWidth={2.5}
             d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
           />
         </svg>
@@ -335,7 +332,10 @@ export function SwipeInterface({
 
       {/* Main Swipe Area */}
       <div className="flex-1 flex items-center justify-center px-4 py-8 relative overflow-y-auto">
-        <div className="w-full max-w-md">
+        {/* Background decoration */}
+        <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-primary/5 dark:from-primary-light/5 dark:to-accent/5 pointer-events-none" />
+        
+        <div className="w-full max-w-md relative z-10">
           <SwipeCard
             key={displayItem.id}
             item={displayItem}
@@ -343,6 +343,50 @@ export function SwipeInterface({
             onSwipeLeft={() => handleSwipe('left')}
             onSwipeRight={() => handleSwipe('right')}
           />
+
+          {/* Swipe Action Buttons - Below Card */}
+          <div className="flex items-center justify-center gap-6 mt-8">
+            <button
+              onClick={() => handleSwipe('left')}
+              className="group relative w-16 h-16 bg-white dark:bg-gray-800 rounded-full shadow-xl border-2 border-red-200 dark:border-red-900/50 hover:border-red-400 dark:hover:border-red-600 hover:scale-110 hover:shadow-2xl hover:shadow-red-500/30 active:scale-95 transition-all duration-300"
+              aria-label="Pass on this item"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-red-500/0 to-red-600/0 group-hover:from-red-500/10 group-hover:to-red-600/10 rounded-full transition-all duration-300" />
+              <svg
+                className="w-8 h-8 text-red-500 dark:text-red-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 group-hover:scale-110 transition-transform"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            <button
+              onClick={() => handleSwipe('right')}
+              className="group relative w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-600 dark:from-green-600 dark:to-emerald-700 rounded-full shadow-2xl shadow-green-500/40 hover:shadow-green-500/60 hover:scale-110 active:scale-95 transition-all duration-300 border-2 border-white/30"
+              aria-label="Like this item"
+            >
+              <svg
+                className="w-10 h-10 text-white absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 group-hover:scale-110 transition-transform drop-shadow-lg"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Keyboard Shortcuts Hint */}
+          <div className="mt-6 text-center">
+            <p className="text-xs text-text-secondary dark:text-gray-500 flex items-center justify-center gap-2">
+              <kbd className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-[10px] font-mono border border-gray-300 dark:border-gray-700">←</kbd>
+              <span>Pass</span>
+              <span className="text-gray-400">•</span>
+              <kbd className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-[10px] font-mono border border-gray-300 dark:border-gray-700">→</kbd>
+              <span>Like</span>
+            </p>
+          </div>
 
           {/* Loading indicator for next items */}
           {hasMoreItems && (
@@ -354,21 +398,24 @@ export function SwipeInterface({
 
         {/* Like Animation - Floating Hearts */}
         {showLikeAnimation && (
-          <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-            {[...Array(8)].map((_, i) => (
+          <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-50">
+            {[...Array(12)].map((_, i) => (
               <div
                 key={i}
                 className="absolute animate-floatHeart"
                 style={{
-                  left: `${50 + (Math.random() - 0.5) * 40}%`,
-                  animationDelay: `${i * 0.1}s`,
-                  animationDuration: `${0.8 + Math.random() * 0.4}s`,
+                  left: `${50 + (Math.random() - 0.5) * 50}%`,
+                  animationDelay: `${i * 0.08}s`,
+                  animationDuration: `${1 + Math.random() * 0.5}s`,
                 }}
               >
                 <svg
-                  className="w-12 h-12 text-red-500"
+                  className="w-10 h-10 text-red-500 drop-shadow-lg"
                   fill="currentColor"
                   viewBox="0 0 24 24"
+                  style={{
+                    filter: 'drop-shadow(0 0 8px rgba(239, 68, 68, 0.5))',
+                  }}
                 >
                   <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                 </svg>
@@ -379,23 +426,26 @@ export function SwipeInterface({
 
         {/* Dislike Animation - Floating X marks */}
         {showDislikeAnimation && (
-          <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-            {[...Array(6)].map((_, i) => (
+          <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-50">
+            {[...Array(8)].map((_, i) => (
               <div
                 key={i}
                 className="absolute animate-floatX"
                 style={{
-                  left: `${50 + (Math.random() - 0.5) * 40}%`,
-                  animationDelay: `${i * 0.1}s`,
-                  animationDuration: `${0.8 + Math.random() * 0.4}s`,
+                  left: `${50 + (Math.random() - 0.5) * 50}%`,
+                  animationDelay: `${i * 0.08}s`,
+                  animationDuration: `${1 + Math.random() * 0.5}s`,
                 }}
               >
                 <svg
-                  className="w-10 h-10 text-red-600"
+                  className="w-8 h-8 text-red-600 drop-shadow-lg"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
-                  strokeWidth={3}
+                  strokeWidth={3.5}
+                  style={{
+                    filter: 'drop-shadow(0 0 6px rgba(220, 38, 38, 0.5))',
+                  }}
                 >
                   <path
                     strokeLinecap="round"

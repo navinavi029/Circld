@@ -48,7 +48,7 @@ export const SwipeCard = memo(function SwipeCard({ item, ownerProfile, onSwipeLe
   const deltaX = dragState.currentX - dragState.startX;
   const deltaY = dragState.currentY - dragState.startY;
   const rotation = deltaX * ROTATION_FACTOR;
-  
+
   // Calculate opacity with fade-out effect
   let opacity = 1;
   if (isAnimatingOut) {
@@ -81,7 +81,7 @@ export const SwipeCard = memo(function SwipeCard({ item, ownerProfile, onSwipeLe
   const handleTouchStart = (e: React.TouchEvent) => {
     // Prevent multiple simultaneous drags
     if (dragState.isDragging) return;
-    
+
     const touch = e.touches[0];
     setDragState({
       isDragging: true,
@@ -110,7 +110,7 @@ export const SwipeCard = memo(function SwipeCard({ item, ownerProfile, onSwipeLe
   const handleTouchCancel = () => {
     // Handle interrupted touch gesture
     if (!dragState.isDragging) return;
-    
+
     console.log('Touch gesture interrupted, resetting card position');
     setDragState(prev => ({
       ...prev,
@@ -124,7 +124,7 @@ export const SwipeCard = memo(function SwipeCard({ item, ownerProfile, onSwipeLe
   const handleMouseDown = (e: React.MouseEvent) => {
     // Prevent multiple simultaneous drags
     if (dragState.isDragging) return;
-    
+
     setDragState({
       isDragging: true,
       startX: e.clientX,
@@ -150,7 +150,7 @@ export const SwipeCard = memo(function SwipeCard({ item, ownerProfile, onSwipeLe
   // Handle swipe completion
   const handleSwipeEnd = () => {
     const swipeDistance = deltaX;
-    
+
     if (Math.abs(swipeDistance) >= SWIPE_THRESHOLD) {
       // Swipe threshold met
       if (swipeDistance > 0) {
@@ -172,7 +172,7 @@ export const SwipeCard = memo(function SwipeCard({ item, ownerProfile, onSwipeLe
   // Animate card off screen and trigger callback
   const animateSwipe = (direction: 'left' | 'right') => {
     const targetX = direction === 'right' ? window.innerWidth * 1.5 : -window.innerWidth * 1.5;
-    
+
     setIsAnimatingOut(true);
     setDragState(prev => ({
       ...prev,
@@ -204,23 +204,23 @@ export const SwipeCard = memo(function SwipeCard({ item, ownerProfile, onSwipeLe
     const handleUp = () => {
       setDragState(prev => {
         if (!prev.isDragging) return prev;
-        
+
         const swipeDistance = prev.currentX - prev.startX;
-        
+
         if (Math.abs(swipeDistance) >= SWIPE_THRESHOLD) {
           // Swipe threshold met - animate off screen
           const direction = swipeDistance > 0 ? 'right' : 'left';
           const targetX = direction === 'right' ? window.innerWidth * 1.5 : -window.innerWidth * 1.5;
-          
+
           setIsAnimatingOut(true);
-          
+
           // Trigger callback immediately - parent will handle timing
           if (direction === 'right') {
             onSwipeRight();
           } else {
             onSwipeLeft();
           }
-          
+
           return {
             ...prev,
             isDragging: false,
@@ -242,10 +242,10 @@ export const SwipeCard = memo(function SwipeCard({ item, ownerProfile, onSwipeLe
       // Handle interrupted mouse gesture when cursor leaves window
       setDragState(prev => {
         if (!prev.isDragging) return prev;
-        
+
         // Check if mouse actually left the window (not just the card)
-        if (e.clientX <= 0 || e.clientX >= window.innerWidth || 
-            e.clientY <= 0 || e.clientY >= window.innerHeight) {
+        if (e.clientX <= 0 || e.clientX >= window.innerWidth ||
+          e.clientY <= 0 || e.clientY >= window.innerHeight) {
           console.log('Mouse left window during drag, resetting card position');
           return {
             ...prev,
@@ -271,13 +271,13 @@ export const SwipeCard = memo(function SwipeCard({ item, ownerProfile, onSwipeLe
   }, [dragState.isDragging, onSwipeLeft, onSwipeRight]);
 
   const cardStyle: React.CSSProperties = {
-    transform: `translate(${deltaX}px, ${deltaY}px) rotate(${rotation}deg) scale(${isAnimatingOut ? 0.9 : 1}) translateZ(0)`,
+    transform: `translate(${deltaX}px, ${deltaY}px) rotate(${rotation}deg) scale(${isAnimatingOut ? 0.95 : 1}) translateZ(0)`,
     opacity,
-    transition: dragState.isDragging 
-      ? 'none' 
-      : isAnimatingOut 
-        ? 'transform 0.4s cubic-bezier(0.4, 0, 1, 1), opacity 0.4s cubic-bezier(0.4, 0, 1, 1), scale 0.4s cubic-bezier(0.4, 0, 1, 1)'
-        : 'transform 0.3s ease-out, opacity 0.3s ease-out',
+    transition: dragState.isDragging
+      ? 'none'
+      : isAnimatingOut
+        ? 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s ease-out'
+        : 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease-out',
     cursor: dragState.isDragging ? 'grabbing' : 'grab',
     willChange: dragState.isDragging || isAnimatingOut ? 'transform, opacity' : 'auto',
   };
@@ -298,7 +298,7 @@ export const SwipeCard = memo(function SwipeCard({ item, ownerProfile, onSwipeLe
       aria-label={`Swipe card for ${item.title}. Press left arrow to pass, right arrow to like.`}
     >
       {/* Card Container */}
-      <div className={`bg-white dark:bg-gray-800 rounded-3xl shadow-2xl overflow-hidden border-2 border-gray-100 dark:border-gray-700 ${compact ? 'rounded-2xl' : 'rounded-3xl'}`}>
+      <div className={`bg-white dark:bg-gray-800 shadow-2xl overflow-hidden border-2 border-gray-100 dark:border-gray-700 ${compact ? 'rounded-2xl' : 'rounded-3xl'} ${dragState.isDragging ? 'shadow-3xl scale-[1.02]' : ''} transition-shadow duration-200`}>
         {/* Image Section */}
         <div className="relative aspect-[4/3] bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800">
           {item.images && item.images.length > 0 ? (
@@ -310,7 +310,7 @@ export const SwipeCard = memo(function SwipeCard({ item, ownerProfile, onSwipeLe
                 draggable={false}
                 loading="lazy"
               />
-              
+
               {/* Image Navigation Buttons */}
               {item.images.length > 1 && (
                 <>
@@ -338,7 +338,7 @@ export const SwipeCard = memo(function SwipeCard({ item, ownerProfile, onSwipeLe
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                     </svg>
                   </button>
-                  
+
                   {/* Image Dots Indicator */}
                   <div className={`absolute left-1/2 -translate-x-1/2 flex gap-1.5 z-10 ${compact ? 'bottom-2' : 'bottom-4'}`}>
                     {item.images.map((_, idx) => (
@@ -348,11 +348,10 @@ export const SwipeCard = memo(function SwipeCard({ item, ownerProfile, onSwipeLe
                           e.stopPropagation();
                           setCurrentImageIndex(idx);
                         }}
-                        className={`w-2 h-2 rounded-full transition-all ${
-                          idx === currentImageIndex
+                        className={`w-2 h-2 rounded-full transition-all ${idx === currentImageIndex
                             ? 'bg-white w-6'
                             : 'bg-white/50 hover:bg-white/75'
-                        }`}
+                          }`}
                         aria-label={`Go to image ${idx + 1}`}
                       />
                     ))}
@@ -362,18 +361,18 @@ export const SwipeCard = memo(function SwipeCard({ item, ownerProfile, onSwipeLe
             </>
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <svg 
-                className="w-24 h-24 text-gray-300 dark:text-gray-600" 
-                fill="none" 
-                stroke="currentColor" 
+              <svg
+                className="w-24 h-24 text-gray-300 dark:text-gray-600"
+                fill="none"
+                stroke="currentColor"
                 viewBox="0 0 24 24"
                 aria-hidden="true"
               >
-                <path 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  strokeWidth={2} 
-                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" 
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
                 />
               </svg>
             </div>
@@ -381,17 +380,17 @@ export const SwipeCard = memo(function SwipeCard({ item, ownerProfile, onSwipeLe
 
           {/* Green Overlay (Right Swipe) - LIKE */}
           {showGreenOverlay && (
-            <div 
-              className="absolute inset-0 bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center pointer-events-none"
-              style={{ opacity: overlayOpacity * 0.85 }}
+            <div
+              className="absolute inset-0 bg-gradient-to-br from-green-400/90 to-emerald-600/90 flex items-center justify-center pointer-events-none backdrop-blur-sm"
+              style={{ opacity: overlayOpacity * 0.9 }}
             >
-              <div className="transform rotate-12 scale-110">
-                <div className="bg-white rounded-2xl px-8 py-4 shadow-2xl">
+              <div className="transform rotate-12 scale-110 animate-bounce">
+                <div className="bg-white dark:bg-gray-900 rounded-2xl px-8 py-4 shadow-2xl border-4 border-green-500">
                   <div className="flex items-center gap-3">
-                    <svg className="w-12 h-12 text-green-500" fill="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-12 h-12 text-green-500 animate-pulse" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                     </svg>
-                    <span className="text-3xl font-black text-green-500">LIKE</span>
+                    <span className="text-3xl font-black text-green-500 tracking-wider">LIKE</span>
                   </div>
                 </div>
               </div>
@@ -400,17 +399,17 @@ export const SwipeCard = memo(function SwipeCard({ item, ownerProfile, onSwipeLe
 
           {/* Red Overlay (Left Swipe) - PASS */}
           {showRedOverlay && (
-            <div 
-              className="absolute inset-0 bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center pointer-events-none"
-              style={{ opacity: overlayOpacity * 0.85 }}
+            <div
+              className="absolute inset-0 bg-gradient-to-br from-red-400/90 to-rose-600/90 flex items-center justify-center pointer-events-none backdrop-blur-sm"
+              style={{ opacity: overlayOpacity * 0.9 }}
             >
-              <div className="transform -rotate-12 scale-110">
-                <div className="bg-white rounded-2xl px-8 py-4 shadow-2xl">
+              <div className="transform -rotate-12 scale-110 animate-bounce">
+                <div className="bg-white dark:bg-gray-900 rounded-2xl px-8 py-4 shadow-2xl border-4 border-red-500">
                   <div className="flex items-center gap-3">
-                    <svg className="w-12 h-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-12 h-12 text-red-500 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M6 18L18 6M6 6l12 12" />
                     </svg>
-                    <span className="text-3xl font-black text-red-500">PASS</span>
+                    <span className="text-3xl font-black text-red-500 tracking-wider">PASS</span>
                   </div>
                 </div>
               </div>
@@ -433,7 +432,7 @@ export const SwipeCard = memo(function SwipeCard({ item, ownerProfile, onSwipeLe
         </div>
 
         {/* Item Details Section */}
-        <div className={`space-y-4 bg-gradient-to-b from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 ${compact ? 'p-4 space-y-3' : 'p-6 space-y-4'}`}>
+        <div className={`space-y-4 bg-gradient-to-b from-white via-gray-50/50 to-gray-50 dark:from-gray-800 dark:via-gray-850/50 dark:to-gray-900 ${compact ? 'p-4 space-y-3' : 'p-6 space-y-4'}`}>
           {/* Title */}
           <h2 className={`font-bold text-gray-900 dark:text-white leading-tight ${compact ? 'text-xl' : 'text-2xl'}`}>
             {item.title}

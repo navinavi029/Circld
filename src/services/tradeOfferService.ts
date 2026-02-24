@@ -257,8 +257,9 @@ export async function acceptTradeOffer(
 
 /**
  * Marks a trade offer as completed.
- * Either participant can mark the trade as completed.
- * Note: This does NOT change the items' status. Items remain as-is for record keeping.
+ * Both participants must confirm completion before the trade is marked as completed.
+ * The first user to confirm will mark their confirmation, and when the second user confirms,
+ * the trade status will be updated to 'completed'.
  *
  * @param offerId - ID of the trade offer to complete
  * @param userId - ID of the user completing the trade (must be a participant)
@@ -290,20 +291,36 @@ export async function completeTradeOffer(
     }
 
     // Verify trade is accepted before completing
-    if (offerData.status !== 'accepted') {
+    if (offerData.status !== 'accepted' && offerData.status !== 'completed') {
       throw new Error('Trade must be accepted before it can be completed');
     }
 
-    // Update trade offer status to completed
+    // Check if user has already confirmed
+    const completedBy = offerData.completedBy || [];
+    if (completedBy.includes(userId)) {
+      throw new Error('You have already confirmed completion of this trade');
+    }
+
+    // Add user to completedBy array
+    const updatedCompletedBy = [...completedBy, userId];
+
+    // Check if both users have now confirmed
+    const bothConfirmed = 
+      updatedCompletedBy.includes(offerData.offeringUserId) &&
+      updatedCompletedBy.includes(offerData.targetItemOwnerId);
+
+    // Update trade offer
     await updateDoc(offerRef, {
-      status: 'completed',
+      completedBy: updatedCompletedBy,
+      status: bothConfirmed ? 'completed' : 'accepted',
       updatedAt: serverTimestamp(),
     });
 
     return {
       ...offerData,
       id: offerId,
-      status: 'completed',
+      completedBy: updatedCompletedBy,
+      status: bothConfirmed ? 'completed' : 'accepted',
       updatedAt: Timestamp.now(),
     };
   });

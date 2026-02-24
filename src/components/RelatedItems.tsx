@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Item, EnhancedItem } from '../types/item';
 import { findRelatedItems } from '../utils/relatedItems';
+import { LoadingSpinner } from './ui/LoadingSpinner';
 
 interface RelatedItemsProps {
   currentItem: Item;
@@ -42,10 +43,10 @@ export const RelatedItems: React.FC<RelatedItemsProps> = ({ currentItem, maxItem
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
       <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Related Items</h3>
-      
+
       {loading ? (
         <div className="flex items-center justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary dark:border-primary-light"></div>
+          <LoadingSpinner size="md" message="Loading related items..." />
         </div>
       ) : (
         <div className="overflow-x-auto">

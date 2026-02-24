@@ -96,27 +96,27 @@ export function SwipeFilters({ onApply, initialFilters }: SwipeFiltersProps) {
   ].filter(Boolean).length;
 
   return (
-    <div className="mb-6">
+    <div className="mb-5">
       <button
         onClick={() => setShowFilters(!showFilters)}
-        className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+        className="flex items-center gap-2 px-4 py-2.5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200/60 dark:border-gray-700/60 rounded-xl shadow-sm hover:bg-white dark:hover:bg-gray-700 hover:shadow-md transition-all text-text dark:text-gray-100 font-medium"
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
         </svg>
         <span>Filters</span>
         {activeFilterCount > 0 && (
-          <span className="px-2 py-0.5 text-xs bg-blue-600 text-white rounded-full">
+          <span className="px-2 py-0.5 text-xs bg-gradient-to-r from-accent to-accent-dark dark:from-primary-light dark:to-primary text-white rounded-full font-semibold">
             {activeFilterCount}
           </span>
         )}
       </button>
 
       {showFilters && (
-        <div className="mt-4 p-6 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg space-y-6">
+        <div className="mt-4 p-5 md:p-6 bg-white/60 dark:bg-gray-800/60 backdrop-blur-lg rounded-2xl shadow-sm border border-white/20 dark:border-gray-700/50 space-y-6 animate-slideDown">
           {/* Distance Filter */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-semibold text-text dark:text-gray-200 mb-2.5">
               Maximum Distance
             </label>
             <Select
@@ -134,7 +134,7 @@ export function SwipeFilters({ onApply, initialFilters }: SwipeFiltersProps) {
 
           {/* Category Filter */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-semibold text-text dark:text-gray-200 mb-2.5">
               Categories
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -142,26 +142,25 @@ export function SwipeFilters({ onApply, initialFilters }: SwipeFiltersProps) {
                 <button
                   key={category}
                   onClick={() => handleCategoryToggle(category)}
-                  className={`px-3 py-2 text-sm rounded-md border transition-colors ${
-                    selectedCategories.includes(category)
-                      ? 'bg-blue-600 text-white border-blue-600'
-                      : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'
-                  }`}
+                  className={`px-3 py-2 text-sm rounded-lg border transition-all font-medium ${selectedCategories.includes(category)
+                      ? 'bg-gradient-to-r from-accent to-accent-dark dark:from-primary-light dark:to-primary text-white border-transparent shadow-sm'
+                      : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 hover:border-accent dark:hover:border-primary-light'
+                    }`}
                 >
                   {category}
                 </button>
               ))}
             </div>
             {selectedCategories.length > 0 && (
-              <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                {selectedCategories.length} selected
+              <p className="mt-2.5 text-xs text-text-secondary dark:text-gray-400 font-medium">
+                {selectedCategories.length} {selectedCategories.length === 1 ? 'category' : 'categories'} selected
               </p>
             )}
           </div>
 
           {/* Condition Filter */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-semibold text-text dark:text-gray-200 mb-2.5">
               Condition
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -169,26 +168,28 @@ export function SwipeFilters({ onApply, initialFilters }: SwipeFiltersProps) {
                 <button
                   key={condition.value}
                   onClick={() => handleConditionToggle(condition.value)}
-                  className={`px-3 py-2 text-sm rounded-md border transition-colors ${
-                    selectedConditions.includes(condition.value)
-                      ? 'bg-blue-600 text-white border-blue-600'
-                      : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'
-                  }`}
+                  className={`px-3 py-2 text-sm rounded-lg border transition-all font-medium ${selectedConditions.includes(condition.value)
+                      ? 'bg-gradient-to-r from-accent to-accent-dark dark:from-primary-light dark:to-primary text-white border-transparent shadow-sm'
+                      : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 hover:border-accent dark:hover:border-primary-light'
+                    }`}
                 >
                   {condition.label}
                 </button>
               ))}
             </div>
             {selectedConditions.length > 0 && (
-              <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                {selectedConditions.length} selected
+              <p className="mt-2.5 text-xs text-text-secondary dark:text-gray-400 font-medium">
+                {selectedConditions.length} {selectedConditions.length === 1 ? 'condition' : 'conditions'} selected
               </p>
             )}
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-            <Button onClick={handleApply} className="flex-1">
+          <div className="flex gap-3 pt-4 border-t border-gray-200/60 dark:border-gray-700/60">
+            <Button 
+              onClick={handleApply} 
+              className="flex-1 !bg-gradient-to-r !from-accent !to-accent-dark dark:!from-primary-light dark:!to-primary hover:shadow-lg hover:shadow-accent/30 dark:hover:shadow-primary/30 transition-shadow"
+            >
               Apply Filters
             </Button>
             <Button onClick={handleReset} variant="outline" className="flex-1">

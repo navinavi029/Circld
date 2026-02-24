@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { getUserConversationsWithDetails } from '../services/messagingService';
 import { ConversationSummary } from '../types/swipe-trading';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
+import { Pagination } from '../components/ui/Pagination';
 import { calculateTotalUnreadCountFromSummaries } from '../utils/messagingUtils';
 import { PageTransition } from '../components/PageTransition';
 
@@ -14,6 +15,9 @@ export function MessagesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [totalUnreadCount, setTotalUnreadCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const PAGE_SIZE = 10;
 
   useEffect(() => {
     if (!user) {
@@ -168,13 +172,18 @@ export function MessagesPage() {
   return (
     <PageTransition variant="page">
       <div className="flex-1 w-full flex flex-col">
-        <div className="max-w-4xl mx-auto px-4 py-8 w-full">
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl sm:text-3xl font-bold text-text dark:text-gray-100">
-              Messages
-            </h1>
+        <div className="container mx-auto px-4 py-6 max-w-7xl">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+            <div>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-accent via-accent-dark to-primary bg-clip-text text-transparent dark:from-primary-light dark:via-primary dark:to-accent-dark leading-tight pb-0.5">
+                Messages
+              </h1>
+              <p className="text-xs sm:text-sm text-text-secondary dark:text-gray-400 mt-1">
+                Your trade conversations
+              </p>
+            </div>
             {totalUnreadCount > 0 && (
-              <div className="flex items-center space-x-2 px-4 py-2 bg-primary/10 dark:bg-primary-light/20 rounded-lg">
+              <div className="flex items-center gap-2 px-4 py-2 bg-primary/10 dark:bg-primary-light/20 rounded-xl border border-primary/20 dark:border-primary-light/30">
                 <div className="w-2 h-2 bg-primary dark:bg-primary-light rounded-full animate-pulse" />
                 <span className="text-xs sm:text-sm font-semibold text-primary dark:text-primary-light">
                   {totalUnreadCount} unread {totalUnreadCount === 1 ? 'message' : 'messages'}
@@ -183,24 +192,32 @@ export function MessagesPage() {
             )}
           </div>
 
-          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl shadow-lg border border-white/20 dark:border-gray-700/50 divide-y divide-gray-100 dark:divide-gray-700/50 overflow-hidden">
-            {conversations.map((summary) => (
+          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-lg divide-y divide-gray-100 dark:divide-gray-700/50 overflow-hidden">
+            {conversations.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE).map((summary) => (
               <button
                 key={summary.conversation.id}
                 onClick={() => handleConversationClick(summary.conversation.id)}
-                className="w-full p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors text-left flex items-center space-x-4"
+                className="w-full p-4 hover:bg-gray-50/80 dark:hover:bg-gray-700/50 transition-colors text-left flex items-center gap-4"
               >
                 {/* Trade Item Images */}
                 <div className="flex-shrink-0 relative">
                   <div className="flex -space-x-2">
                     <img
-                      src={summary.tradeAnchorImage}
+                      src={summary.tradeAnchorImage || '/placeholder-item.png'}
                       alt={summary.tradeAnchorTitle}
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = '/placeholder-item.png';
+                      }}
                       className="w-12 h-12 rounded-lg object-cover border-2 border-white dark:border-gray-800 shadow-sm"
                     />
                     <img
-                      src={summary.targetItemImage}
+                      src={summary.targetItemImage || '/placeholder-item.png'}
                       alt={summary.targetItemTitle}
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = '/placeholder-item.png';
+                      }}
                       className="w-12 h-12 rounded-lg object-cover border-2 border-white dark:border-gray-800 shadow-sm"
                     />
                   </div>
@@ -238,6 +255,16 @@ export function MessagesPage() {
               </button>
             ))}
           </div>
+
+          {conversations.length > PAGE_SIZE && (
+            <div className="mt-8 flex justify-center">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={Math.ceil(conversations.length / PAGE_SIZE)}
+                onPageChange={setCurrentPage}
+              />
+            </div>
+          )}
         </div>
       </div>
     </PageTransition>

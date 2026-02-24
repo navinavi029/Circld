@@ -2,6 +2,7 @@ import { Item } from '../types/item';
 import { UserProfile } from '../types/user';
 import { SwipeCard } from './SwipeCard';
 import { useRef, useEffect, useState, memo } from 'react';
+import { LoadingSpinner } from './ui/LoadingSpinner';
 
 interface CardGridProps {
   items: Item[];
@@ -12,10 +13,10 @@ interface CardGridProps {
   loadingError?: string | null;
 }
 
-export const CardGrid = memo(function CardGrid({ 
-  items, 
-  ownerProfiles, 
-  onSwipe, 
+export const CardGrid = memo(function CardGrid({
+  items,
+  ownerProfiles,
+  onSwipe,
   animatingCards,
   loadingSlots,
   loadingError = null
@@ -30,12 +31,12 @@ export const CardGrid = memo(function CardGrid({
       if (items.length === 0) return;
 
       // Arrow key navigation between cards
-      if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || 
-          e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-        
+      if (e.key === 'ArrowUp' || e.key === 'ArrowDown' ||
+        e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+
         // Check if we're already focused on a card
         const activeElement = document.activeElement;
-        const isCardFocused = cardRefs.current.some(ref => 
+        const isCardFocused = cardRefs.current.some(ref =>
           ref && (ref === activeElement || ref.contains(activeElement))
         );
 
@@ -80,7 +81,7 @@ export const CardGrid = memo(function CardGrid({
         if (newIndex !== focusedCardIndex) {
           setFocusedCardIndex(newIndex);
           cardRefs.current[newIndex]?.focus();
-          
+
           // Announce card navigation to screen readers
           const item = items[newIndex];
           setAnnouncement(`Focused on card ${newIndex + 1} of ${items.length}: ${item.title}`);
@@ -156,27 +157,27 @@ export const CardGrid = memo(function CardGrid({
           <div className="aspect-[4/3] bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 relative">
             {/* Loading spinner overlay */}
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-12 h-12 border-4 border-gray-300 dark:border-gray-600 border-t-accent dark:border-t-primary-light rounded-full animate-spin" />
+              <LoadingSpinner size="lg" message="" />
             </div>
           </div>
-          
+
           {/* Content skeleton */}
           <div className="p-6 space-y-4">
             {/* Title skeleton */}
             <div className="h-7 bg-gray-200 dark:bg-gray-700 rounded-lg w-3/4" />
-            
+
             {/* Description skeleton */}
             <div className="space-y-2">
               <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full" />
               <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6" />
             </div>
-            
+
             {/* Badges skeleton */}
             <div className="flex gap-2">
               <div className="h-6 w-20 bg-gray-200 dark:bg-gray-700 rounded-full" />
               <div className="h-6 w-24 bg-gray-200 dark:bg-gray-700 rounded-full" />
             </div>
-            
+
             {/* Owner skeleton */}
             <div className="pt-4 border-t-2 border-gray-200 dark:border-gray-700">
               <div className="flex items-center gap-4">
@@ -188,7 +189,7 @@ export const CardGrid = memo(function CardGrid({
               </div>
             </div>
           </div>
-          
+
           {/* Loading text */}
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
             <span className="sr-only">Loading card...</span>
@@ -201,16 +202,16 @@ export const CardGrid = memo(function CardGrid({
   return (
     <div className="card-grid-container">
       {/* Screen reader announcements */}
-      <div 
-        className="sr-only" 
-        role="status" 
-        aria-live="polite" 
+      <div
+        className="sr-only"
+        role="status"
+        aria-live="polite"
         aria-atomic="true"
       >
         {announcement}
       </div>
 
-      <div 
+      <div
         className="card-grid"
         role="group"
         aria-label="Swipeable item cards"
@@ -247,7 +248,7 @@ export const CardGrid = memo(function CardGrid({
         })}
 
         {/* Render loading placeholders */}
-        {Array.from({ length: loadingSlots }).map((_, index) => 
+        {Array.from({ length: loadingSlots }).map((_, index) =>
           renderLoadingPlaceholder(index)
         )}
       </div>

@@ -4,6 +4,7 @@ import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firesto
 import { db } from '../firebase';
 import { useAuth } from '../contexts/AuthContext';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
+import { Pagination } from '../components/ui/Pagination';
 import { PageTransition } from '../components/PageTransition';
 import { SwipeSession, SwipeRecord } from '../types/swipe-trading';
 import { Item } from '../types/item';
@@ -21,6 +22,9 @@ export function SwipeHistory() {
   const [swipeHistory, setSwipeHistory] = useState<SwipeHistoryItem[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<'all' | 'left' | 'right'>('all');
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const PAGE_SIZE = 10;
 
   useEffect(() => {
     if (user) {
@@ -113,22 +117,22 @@ export function SwipeHistory() {
 
   if (loading) {
     return (
-      <div className="flex-1 w-full bg-gray-50 dark:bg-gray-900 flex items-center justify-center pt-20">
-        <LoadingSpinner />
+      <div className="flex-1 w-full bg-gray-50 dark:bg-gray-900 flex flex-col items-center justify-center min-h-[50vh]">
+        <LoadingSpinner message="Loading swipe history..." size="lg" />
       </div>
     );
   }
 
   return (
     <PageTransition variant="page">
-      <div className="flex-1 w-full bg-gray-50 dark:bg-gray-900">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="flex-1 w-full flex flex-col">
+        <div className="container mx-auto px-4 py-6 max-w-7xl">
           {/* Header */}
           <div className="mb-6">
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-1.5">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-accent via-accent-dark to-primary bg-clip-text text-transparent dark:from-primary-light dark:via-primary dark:to-accent-dark leading-tight pb-0.5">
               Swipe History
             </h1>
-            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-xs sm:text-sm text-text-secondary dark:text-gray-400 mt-1">
               View all your past swipes and interactions
             </p>
           </div>
@@ -136,19 +140,19 @@ export function SwipeHistory() {
           {/* Filter Buttons */}
           <div className="flex gap-2 mb-6">
             <button
-              onClick={() => setFilter('all')}
-              className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors ${filter === 'all'
-                ? 'bg-primary text-white'
-                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+              onClick={() => { setFilter('all'); setCurrentPage(1); }}
+              className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all ${filter === 'all'
+                ? 'bg-gradient-to-r from-accent to-accent-dark dark:from-primary-light dark:to-primary text-white shadow-md'
+                : 'bg-white/80 dark:bg-gray-800/80 text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700'
                 }`}
             >
               All ({swipeHistory.length})
             </button>
             <button
-              onClick={() => setFilter('right')}
-              className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors flex items-center gap-1.5 sm:gap-2 ${filter === 'right'
-                ? 'bg-green-600 text-white'
-                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+              onClick={() => { setFilter('right'); setCurrentPage(1); }}
+              className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 sm:gap-2 ${filter === 'right'
+                ? 'bg-green-600 text-white shadow-md'
+                : 'bg-white/80 dark:bg-gray-800/80 text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700'
                 }`}
             >
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -157,10 +161,10 @@ export function SwipeHistory() {
               Interested ({swipeHistory.filter(s => s.direction === 'right').length})
             </button>
             <button
-              onClick={() => setFilter('left')}
-              className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors flex items-center gap-1.5 sm:gap-2 ${filter === 'left'
-                ? 'bg-gray-600 text-white'
-                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+              onClick={() => { setFilter('left'); setCurrentPage(1); }}
+              className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 sm:gap-2 ${filter === 'left'
+                ? 'bg-gray-600 text-white shadow-md'
+                : 'bg-white/80 dark:bg-gray-800/80 text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700'
                 }`}
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -216,10 +220,10 @@ export function SwipeHistory() {
 
           {/* Swipe History List */}
           <div className="space-y-4">
-            {filteredHistory.map((swipe, index) => (
+            {filteredHistory.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE).map((swipe, index) => (
               <div
                 key={`${swipe.itemId}-${swipe.timestamp.toMillis()}-${index}`}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-shadow"
+                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl border border-gray-200/50 dark:border-gray-700/50 p-4 hover:shadow-xl hover:shadow-primary/10 hover:border-accent/40 dark:hover:border-primary-light/40 transition-all duration-300"
               >
                 <div className="flex items-start gap-4">
                   {/* Item Image */}
@@ -293,6 +297,16 @@ export function SwipeHistory() {
               </div>
             ))}
           </div>
+
+          {filteredHistory.length > PAGE_SIZE && (
+            <div className="mt-8 flex justify-center">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={Math.ceil(filteredHistory.length / PAGE_SIZE)}
+                onPageChange={setCurrentPage}
+              />
+            </div>
+          )}
         </div>
       </div>
     </PageTransition>

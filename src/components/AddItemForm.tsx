@@ -62,7 +62,7 @@ export function AddItemForm({ onSuccess }: AddItemFormProps = {}) {
     }
 
     setImages(prev => [...prev, ...files]);
-    
+
     files.forEach(file => {
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -81,13 +81,18 @@ export function AddItemForm({ onSuccess }: AddItemFormProps = {}) {
     e.preventDefault();
     if (!user) return;
 
+    if (images.length === 0) {
+      setError('Please add at least 1 photo of your item.');
+      return;
+    }
+
     setLoading(true);
     setError('');
     setSuccess(false);
 
     try {
       const imageUrls: string[] = [];
-      
+
       for (const image of images) {
         const result = await uploadToCloudinary(image);
         imageUrls.push(result.url);
@@ -108,7 +113,7 @@ export function AddItemForm({ onSuccess }: AddItemFormProps = {}) {
       setFormData({ title: '', description: '', category: '', condition: 'good' });
       setImages([]);
       setPreviews([]);
-      
+
       if (onSuccess) {
         setTimeout(() => onSuccess(), 1500);
       }
@@ -183,7 +188,7 @@ export function AddItemForm({ onSuccess }: AddItemFormProps = {}) {
 
         <div>
           <label htmlFor="images" className="block text-sm font-medium mb-2 text-text dark:text-gray-200">
-            Images <span className="text-text-secondary dark:text-gray-400 text-xs font-normal">(Max 5)</span>
+            Images <span className="text-error dark:text-error-light">*</span> <span className="text-text-secondary dark:text-gray-400 text-xs font-normal">(Max 5)</span>
           </label>
           <div className="relative">
             <input
@@ -201,8 +206,8 @@ export function AddItemForm({ onSuccess }: AddItemFormProps = {}) {
                 flex flex-col items-center justify-center w-full h-32 
                 border-2 border-dashed rounded-lg cursor-pointer
                 transition-all duration-200
-                ${images.length >= 5 
-                  ? 'border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 cursor-not-allowed opacity-50' 
+                ${images.length >= 5
+                  ? 'border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 cursor-not-allowed opacity-50'
                   : 'border-gray-300 dark:border-gray-600 hover:border-accent dark:hover:border-primary-light bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700'
                 }
               `}
@@ -220,7 +225,7 @@ export function AddItemForm({ onSuccess }: AddItemFormProps = {}) {
               </div>
             </label>
           </div>
-          
+
           {previews.length > 0 && (
             <div className="grid grid-cols-3 sm:grid-cols-5 gap-3 mt-4">
               {previews.map((preview, index) => (

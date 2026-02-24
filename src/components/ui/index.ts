@@ -5,3 +5,4 @@ export { Checkbox } from './Checkbox';
 export { Alert } from './Alert';
 export { LoadingSpinner } from './LoadingSpinner';
 export { Select } from './Select';
+export { Pagination } from './Pagination';

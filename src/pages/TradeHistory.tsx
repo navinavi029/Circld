@@ -4,6 +4,7 @@ import { collection, query, where, getDocs, doc, getDoc, or } from 'firebase/fir
 import { db } from '../firebase';
 import { useAuth } from '../contexts/AuthContext';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
+import { Pagination } from '../components/ui/Pagination';
 import { PageTransition } from '../components/PageTransition';
 import { TradeOffer } from '../types/swipe-trading';
 import { Item } from '../types/item';
@@ -24,6 +25,9 @@ export function TradeHistory() {
   const [tradeHistory, setTradeHistory] = useState<EnrichedTradeHistory[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<'all' | 'accepted' | 'completed' | 'declined'>('all');
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const PAGE_SIZE = 10;
 
   useEffect(() => {
     if (user) {
@@ -157,8 +161,8 @@ export function TradeHistory() {
   if (loading) {
     return (
       <div className="flex-1 w-full bg-gray-50 dark:bg-gray-900">
-        <div className="flex items-center justify-center pt-20">
-          <LoadingSpinner />
+        <div className="flex items-center justify-center min-h-[50vh]">
+          <LoadingSpinner message="Loading trade history..." size="lg" />
         </div>
       </div>
     );
@@ -166,14 +170,14 @@ export function TradeHistory() {
 
   return (
     <PageTransition variant="page">
-      <div className="flex-1 w-full bg-gray-50 dark:bg-gray-900 flex flex-col">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex-1">
+      <div className="flex-1 w-full flex flex-col">
+        <div className="container mx-auto px-4 py-6 max-w-7xl flex-1">
           {/* Header */}
           <div className="mb-6">
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-1.5">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-accent via-accent-dark to-primary bg-clip-text text-transparent dark:from-primary-light dark:via-primary dark:to-accent-dark leading-tight pb-0.5">
               Trade History
             </h1>
-            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-xs sm:text-sm text-text-secondary dark:text-gray-400 mt-1">
               View all your past and current trades
             </p>
           </div>
@@ -181,37 +185,37 @@ export function TradeHistory() {
           {/* Filter Buttons */}
           <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
             <button
-              onClick={() => setFilter('all')}
-              className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${filter === 'all'
-                ? 'bg-primary text-white'
-                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+              onClick={() => { setFilter('all'); setCurrentPage(1); }}
+              className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all whitespace-nowrap ${filter === 'all'
+                ? 'bg-gradient-to-r from-accent to-accent-dark dark:from-primary-light dark:to-primary text-white shadow-md'
+                : 'bg-white/80 dark:bg-gray-800/80 text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700'
                 }`}
             >
               All ({tradeHistory.length})
             </button>
             <button
-              onClick={() => setFilter('accepted')}
-              className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${filter === 'accepted'
-                ? 'bg-green-600 text-white'
-                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+              onClick={() => { setFilter('accepted'); setCurrentPage(1); }}
+              className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all whitespace-nowrap ${filter === 'accepted'
+                ? 'bg-green-600 text-white shadow-md'
+                : 'bg-white/80 dark:bg-gray-800/80 text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700'
                 }`}
             >
               Accepted ({tradeHistory.filter(t => t.status === 'accepted').length})
             </button>
             <button
-              onClick={() => setFilter('completed')}
-              className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${filter === 'completed'
-                ? 'bg-blue-600 text-white'
-                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+              onClick={() => { setFilter('completed'); setCurrentPage(1); }}
+              className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all whitespace-nowrap ${filter === 'completed'
+                ? 'bg-blue-600 text-white shadow-md'
+                : 'bg-white/80 dark:bg-gray-800/80 text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700'
                 }`}
             >
               Completed ({tradeHistory.filter(t => t.status === 'completed').length})
             </button>
             <button
-              onClick={() => setFilter('declined')}
-              className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${filter === 'declined'
-                ? 'bg-red-600 text-white'
-                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+              onClick={() => { setFilter('declined'); setCurrentPage(1); }}
+              className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all whitespace-nowrap ${filter === 'declined'
+                ? 'bg-red-600 text-white shadow-md'
+                : 'bg-white/80 dark:bg-gray-800/80 text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700'
                 }`}
             >
               Declined ({tradeHistory.filter(t => t.status === 'declined').length})
@@ -264,10 +268,10 @@ export function TradeHistory() {
 
           {/* Trade History List */}
           <div className="space-y-4">
-            {filteredHistory.map((trade) => (
+            {filteredHistory.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE).map((trade) => (
               <div
                 key={trade.id}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-shadow"
+                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl border border-gray-200/50 dark:border-gray-700/50 p-4 hover:shadow-xl hover:shadow-primary/10 hover:border-accent/40 dark:hover:border-primary-light/40 transition-all duration-300"
               >
                 <div className="flex items-start gap-4">
                   {/* Trade Direction Indicator */}
@@ -388,6 +392,16 @@ export function TradeHistory() {
               </div>
             ))}
           </div>
+
+          {filteredHistory.length > PAGE_SIZE && (
+            <div className="mt-8 flex justify-center">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={Math.ceil(filteredHistory.length / PAGE_SIZE)}
+                onPageChange={setCurrentPage}
+              />
+            </div>
+          )}
         </div>
       </div>
     </PageTransition>

@@ -127,7 +127,7 @@ service cloud.firestore {
         && request.resource.data.offeringUserId != request.resource.data.targetItemOwnerId
         && isValidStatus(request.resource.data.status, ['pending', 'read', 'accepted', 'declined', 'completed']);
 
-      // Either party can update (accept / decline / mark read)
+      // Either party can update (accept / decline / mark read / complete)
       allow update: if isAuth()
         && (resource.data.offeringUserId == request.auth.uid
             || resource.data.targetItemOwnerId == request.auth.uid)
@@ -142,12 +142,21 @@ service cloud.firestore {
           // Target owner can accept or decline
           (request.auth.uid == resource.data.targetItemOwnerId 
             && request.resource.data.status in ['read', 'accepted', 'declined'])
-          // Offering user can mark as read or completed
+          // Offering user can mark as read
           || (request.auth.uid == resource.data.offeringUserId 
-            && request.resource.data.status in ['read', 'completed'])
-          // Either can mark as completed if already accepted
-          || (resource.data.status == 'accepted' 
-            && request.resource.data.status == 'completed')
+            && request.resource.data.status in ['read'])
+          // Either can add themselves to completedBy array when status is accepted
+          || (resource.data.status == 'accepted'
+            && (!resource.data.keys().hasAny(['completedBy']) 
+                || request.auth.uid in request.resource.data.get('completedBy', []))
+            && request.resource.data.get('completedBy', []) is list
+            && request.resource.data.get('completedBy', []).size() <= 2)
+          // Status can be completed when both users are in completedBy
+          || (resource.data.status == 'accepted'
+            && request.resource.data.status == 'completed'
+            && request.resource.data.get('completedBy', []).size() == 2
+            && resource.data.offeringUserId in request.resource.data.get('completedBy', [])
+            && resource.data.targetItemOwnerId in request.resource.data.get('completedBy', []))
         );
 
       allow delete: if false; // Trade offers should not be deleted

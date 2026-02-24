@@ -191,15 +191,15 @@ export function MultiCardSwipeInterface({
                 />
               </svg>
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+            <h2 className="text-2xl font-bold text-text dark:text-gray-100 mb-3">
               No Matches Found
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
+            <p className="text-text-secondary dark:text-gray-400 mb-6">
               There are no available items to trade right now. Check back later for new listings, or try changing your trade anchor.
             </p>
             <button
               onClick={onChangeAnchor}
-              className="px-6 py-3 bg-accent dark:bg-primary-light text-white rounded-lg font-medium hover:bg-accent-dark dark:hover:bg-primary transition-colors"
+              className="px-6 py-3 bg-gradient-to-r from-accent to-accent-dark dark:from-primary-light dark:to-primary text-white rounded-lg font-medium hover:shadow-lg hover:shadow-accent/30 dark:hover:shadow-primary/30 transition-all"
             >
               Change Trade Anchor
             </button>
@@ -217,7 +217,7 @@ export function MultiCardSwipeInterface({
       {/* Tips Button - Fixed at top right */}
       <button
         onClick={() => setShowTips(!showTips)}
-        className="fixed top-6 right-6 z-20 p-3 bg-white dark:bg-gray-800 rounded-full shadow-lg border-2 border-gray-200 dark:border-gray-700 hover:scale-105 transition-transform"
+        className="fixed top-6 right-6 z-20 p-3 bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg rounded-full shadow-lg border border-gray-200/60 dark:border-gray-700/60 hover:bg-white dark:hover:bg-gray-700 hover:scale-110 active:scale-95 transition-all duration-300"
         aria-label="Show tips"
       >
         <svg
@@ -237,7 +237,7 @@ export function MultiCardSwipeInterface({
 
       {/* Tips Panel */}
       {showTips && (
-        <div className="fixed top-20 right-6 z-20 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border-2 border-accent dark:border-primary-light overflow-hidden animate-slideDown">
+        <div className="fixed top-20 right-6 z-20 w-80 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 dark:border-gray-700/50 overflow-hidden animate-slideDown">
           <div className="bg-gradient-to-r from-accent to-accent-dark dark:from-primary-light dark:to-primary px-4 py-3 flex items-center justify-between">
             <h3 className="text-white font-semibold flex items-center gap-2">
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
