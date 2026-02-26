@@ -5,6 +5,7 @@ import { UserProfile } from '../types/user';
 import { SwipeCard } from './SwipeCard';
 import { TradeAnchorDisplay } from './TradeAnchorDisplay';
 import { LoadingSpinner } from './ui/LoadingSpinner';
+import { SwipeCardSkeleton } from './SwipeCardSkeleton';
 
 interface SwipeInterfaceProps {
   tradeAnchor: Item;
@@ -49,11 +50,20 @@ export function SwipeInterface({
 
   // Update display item when not animating
   useEffect(() => {
-    if (!isAnimating && currentItem) {
-      setDisplayItem(currentItem);
-      setDisplayProfile(ownerProfile);
+    if (!isAnimating) {
+      if (currentItem) {
+        setDisplayItem(currentItem);
+        setDisplayProfile(ownerProfile);
+      } else if (hasMoreItems) {
+        // Keep showing the previous item while loading next one
+        // This prevents empty state flash
+      } else {
+        // No more items - clear display
+        setDisplayItem(null);
+        setDisplayProfile(null);
+      }
     }
-  }, [currentItem, ownerProfile, isAnimating]);
+  }, [currentItem, ownerProfile, isAnimating, hasMoreItems]);
 
   // Handle swipe with animation state
   const handleSwipe = (direction: 'left' | 'right') => {
@@ -170,9 +180,19 @@ export function SwipeInterface({
           </svg>
         </button>
 
-        {/* Loading State */}
+        {/* Loading State with Skeleton */}
         <div className="flex-1 flex items-center justify-center px-4 py-8">
-          <LoadingSpinner size="lg" message="Loading items..." />
+          <div className="w-full max-w-md space-y-6">
+            <SwipeCardSkeleton />
+            <div className="flex justify-center">
+              <LoadingSpinner 
+                size="md" 
+                message="Loading items" 
+                showDots={true}
+                subtitle="Finding the best matches for you"
+              />
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -225,98 +245,101 @@ export function SwipeInterface({
         </svg>
       </button>
 
-      {/* Tips Panel */}
+      {/* Backdrop - only visible when tips are shown */}
       {showTips && (
-        <div className="fixed top-20 right-6 z-20 w-80 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 dark:border-gray-700/50 overflow-hidden animate-slideDown">
-          <div className="bg-gradient-to-r from-accent to-accent-dark dark:from-primary-light dark:to-primary px-4 py-3 flex items-center justify-between">
-            <h3 className="text-white font-semibold flex items-center gap-2">
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+        <div
+          className="fixed inset-0 z-10 transition-opacity duration-300"
+          onClick={() => setShowTips(false)}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Tips Panel */}
+      <div 
+        className={`fixed top-20 right-6 z-20 w-80 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 dark:border-gray-700/50 overflow-hidden transition-all duration-300 ease-out ${
+          showTips ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'
+        }`}
+      >
+        <div className="bg-gradient-to-r from-accent to-accent-dark dark:from-primary-light dark:to-primary px-4 py-3 flex items-center justify-between">
+          <h3 className="text-white font-semibold flex items-center gap-2">
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            </svg>
+            Swipe Tips
+          </h3>
+          <button
+            onClick={() => setShowTips(false)}
+            className="text-white hover:bg-white/20 rounded-full p-1 transition-colors"
+            aria-label="Close tips"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div className="p-4 space-y-3 max-h-96 overflow-y-auto">
+          <div className="flex gap-3">
+            <div className="flex-shrink-0 w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
+              <svg className="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
               </svg>
-              Swipe Tips
-            </h3>
-            <button
-              onClick={() => setShowTips(false)}
-              className="text-white hover:bg-white/20 rounded-full p-1 transition-colors"
-              aria-label="Close tips"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-900 dark:text-white">Swipe Right to Like</p>
+              <p className="text-xs text-gray-600 dark:text-gray-400">Send a trade offer for items you're interested in</p>
+            </div>
           </div>
-          <div className="p-4 space-y-3 max-h-96 overflow-y-auto">
-            <div className="flex gap-3">
-              <div className="flex-shrink-0 w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
-                <svg className="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">Swipe Right to Like</p>
-                <p className="text-xs text-gray-600 dark:text-gray-400">Send a trade offer for items you're interested in</p>
-              </div>
-            </div>
 
-            <div className="flex gap-3">
-              <div className="flex-shrink-0 w-8 h-8 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
-                <svg className="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">Swipe Left to Pass</p>
-                <p className="text-xs text-gray-600 dark:text-gray-400">Skip items that don't interest you</p>
-              </div>
+          <div className="flex gap-3">
+            <div className="flex-shrink-0 w-8 h-8 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
+              <svg className="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
             </div>
-
-            <div className="flex gap-3">
-              <div className="flex-shrink-0 w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
-                <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">Review Item Details</p>
-                <p className="text-xs text-gray-600 dark:text-gray-400">Tap the card to see full description and photos</p>
-              </div>
+            <div>
+              <p className="text-sm font-medium text-gray-900 dark:text-white">Swipe Left to Pass</p>
+              <p className="text-xs text-gray-600 dark:text-gray-400">Skip items that don't interest you</p>
             </div>
+          </div>
 
-            <div className="flex gap-3">
-              <div className="flex-shrink-0 w-8 h-8 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center">
-                <svg className="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">Change Your Item</p>
-                <p className="text-xs text-gray-600 dark:text-gray-400">Click the card in the bottom-left to trade a different item</p>
-              </div>
+          <div className="flex gap-3">
+            <div className="flex-shrink-0 w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+              <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
             </div>
+            <div>
+              <p className="text-sm font-medium text-gray-900 dark:text-white">Review Item Details</p>
+              <p className="text-xs text-gray-600 dark:text-gray-400">Tap the card to see full description and photos</p>
+            </div>
+          </div>
 
-            <div className="flex gap-3">
-              <div className="flex-shrink-0 w-8 h-8 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center">
-                <svg className="w-5 h-5 text-yellow-600 dark:text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">Quick Swiping</p>
-                <p className="text-xs text-gray-600 dark:text-gray-400">Swipe fast to browse more items quickly</p>
-              </div>
+          <div className="flex gap-3">
+            <div className="flex-shrink-0 w-8 h-8 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center">
+              <svg className="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-900 dark:text-white">Change Your Item</p>
+              <p className="text-xs text-gray-600 dark:text-gray-400">Click the card in the bottom-left to trade a different item</p>
+            </div>
+          </div>
+
+          <div className="flex gap-3">
+            <div className="flex-shrink-0 w-8 h-8 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center">
+              <svg className="w-5 h-5 text-yellow-600 dark:text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-900 dark:text-white">Quick Swiping</p>
+              <p className="text-xs text-gray-600 dark:text-gray-400">Swipe fast to browse more items quickly</p>
             </div>
           </div>
         </div>
-      )}
-
-      {/* Backdrop for tips panel */}
-      {showTips && (
-        <div
-          className="fixed inset-0 bg-black/20 z-10"
-          onClick={() => setShowTips(false)}
-        />
-      )}
+      </div>
 
       {/* Sync Status Banner */}
       {syncStatus && (
@@ -336,19 +359,50 @@ export function SwipeInterface({
         <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-primary/5 dark:from-primary-light/5 dark:to-accent/5 pointer-events-none" />
         
         <div className="w-full max-w-md relative z-10">
-          <SwipeCard
-            key={displayItem.id}
-            item={displayItem}
-            ownerProfile={displayProfile}
-            onSwipeLeft={() => handleSwipe('left')}
-            onSwipeRight={() => handleSwipe('right')}
-          />
+          {/* Main Card */}
+          <div className="relative">
+            <SwipeCard
+              key={displayItem.id}
+              item={displayItem}
+              ownerProfile={displayProfile}
+              onSwipeLeft={() => handleSwipe('left')}
+              onSwipeRight={() => handleSwipe('right')}
+            />
+
+            {/* Loading Overlay - Shows when next item is being loaded */}
+            {!currentItem && hasMoreItems && displayItem && (
+              <div className="absolute inset-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md rounded-3xl flex items-center justify-center z-20 animate-fadeIn">
+                <div className="text-center space-y-4">
+                  <div className="relative">
+                    {/* Animated spinner */}
+                    <div className="w-16 h-16 border-4 border-primary/30 dark:border-primary-light/30 border-t-primary dark:border-t-primary-light rounded-full animate-spin mx-auto" />
+                    {/* Pulsing ring */}
+                    <div className="absolute inset-0 w-16 h-16 border-4 border-primary/20 dark:border-primary-light/20 rounded-full animate-ping mx-auto" />
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm font-semibold text-text dark:text-gray-100">
+                      Loading next card
+                      <span className="inline-flex ml-1">
+                        <span className="animate-bounce" style={{ animationDelay: '0ms' }}>.</span>
+                        <span className="animate-bounce" style={{ animationDelay: '150ms' }}>.</span>
+                        <span className="animate-bounce" style={{ animationDelay: '300ms' }}>.</span>
+                      </span>
+                    </p>
+                    <p className="text-xs text-text-secondary dark:text-gray-400">
+                      Finding your next match
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* Swipe Action Buttons - Below Card */}
           <div className="flex items-center justify-center gap-6 mt-8">
             <button
               onClick={() => handleSwipe('left')}
-              className="group relative w-16 h-16 bg-white dark:bg-gray-800 rounded-full shadow-xl border-2 border-red-200 dark:border-red-900/50 hover:border-red-400 dark:hover:border-red-600 hover:scale-110 hover:shadow-2xl hover:shadow-red-500/30 active:scale-95 transition-all duration-300"
+              disabled={isAnimating || (!currentItem && hasMoreItems)}
+              className="group relative w-16 h-16 bg-white dark:bg-gray-800 rounded-full shadow-xl border-2 border-red-200 dark:border-red-900/50 hover:border-red-400 dark:hover:border-red-600 hover:scale-110 hover:shadow-2xl hover:shadow-red-500/30 active:scale-95 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               aria-label="Pass on this item"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-red-500/0 to-red-600/0 group-hover:from-red-500/10 group-hover:to-red-600/10 rounded-full transition-all duration-300" />
@@ -364,7 +418,8 @@ export function SwipeInterface({
 
             <button
               onClick={() => handleSwipe('right')}
-              className="group relative w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-600 dark:from-green-600 dark:to-emerald-700 rounded-full shadow-2xl shadow-green-500/40 hover:shadow-green-500/60 hover:scale-110 active:scale-95 transition-all duration-300 border-2 border-white/30"
+              disabled={isAnimating || (!currentItem && hasMoreItems)}
+              className="group relative w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-600 dark:from-green-600 dark:to-emerald-700 rounded-full shadow-2xl shadow-green-500/40 hover:shadow-green-500/60 hover:scale-110 active:scale-95 transition-all duration-300 border-2 border-white/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               aria-label="Like this item"
             >
               <svg
@@ -388,10 +443,32 @@ export function SwipeInterface({
             </p>
           </div>
 
-          {/* Loading indicator for next items */}
-          {hasMoreItems && (
-            <div className="mt-6">
-              <LoadingSpinner size="sm" message="Loading more items..." />
+          {/* Loading indicator for next items - Enhanced */}
+          {hasMoreItems && currentItem && (
+            <div className="mt-6 flex flex-col items-center gap-3">
+              <div className="flex items-center gap-3 px-5 py-2.5 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 dark:from-primary-light/10 dark:via-accent-light/10 dark:to-primary-light/10 backdrop-blur-md rounded-full shadow-lg border border-primary/20 dark:border-primary-light/20">
+                <div className="relative">
+                  <div className="w-2.5 h-2.5 bg-primary dark:bg-primary-light rounded-full animate-pulse" />
+                  <div className="absolute inset-0 w-2.5 h-2.5 bg-primary/50 dark:bg-primary-light/50 rounded-full animate-ping" />
+                </div>
+                <span className="text-xs font-semibold text-primary dark:text-primary-light">
+                  Preparing next cards
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* Loading indicator when no current item but more are coming */}
+          {!currentItem && hasMoreItems && !displayItem && (
+            <div className="mt-6 flex justify-center">
+              <div className="px-6 py-3 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md rounded-2xl shadow-xl border-2 border-primary/30 dark:border-primary-light/30">
+                <div className="flex items-center gap-3">
+                  <div className="w-5 h-5 border-3 border-primary/30 dark:border-primary-light/30 border-t-primary dark:border-t-primary-light rounded-full animate-spin" />
+                  <span className="text-sm font-bold text-text dark:text-gray-100">
+                    Loading cards...
+                  </span>
+                </div>
+              </div>
             </div>
           )}
         </div>

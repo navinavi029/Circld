@@ -4,11 +4,20 @@ import { useProfile } from '../contexts/ProfileContext';
 import { useProfileUpdate } from '../hooks/useProfileUpdate';
 import { ProfilePhotoUpload } from '../components/ProfilePhotoUpload';
 import { PageTransition } from '../components/PageTransition';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 import { MapPicker } from '../components/MapPicker';
 import { type Coordinates } from '../utils/location';
 import { uploadToCloudinary, deleteFromCloudinary } from '../utils/cloudinary';
+import { 
+  getPageBackgroundClasses, 
+  getPageTitleClasses, 
+  typography, 
+  getCardClasses, 
+  getPrimaryButtonClasses,
+  getPageContainerClasses 
+} from '../styles/designSystem';
 
 /**
  * EditProfile Page Component
@@ -28,6 +37,7 @@ import { uploadToCloudinary, deleteFromCloudinary } from '../utils/cloudinary';
  * Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 6.1, 6.2, 7.1, 7.2, 7.3, 7.4
  */
 export function EditProfile() {
+  usePageTitle('Edit Profile');
   const navigate = useNavigate();
   const { profile, loading: profileLoading, error: profileError } = useProfile();
   const { updateProfile, loading: updateLoading, error: updateError, success } = useProfileUpdate();
@@ -395,7 +405,7 @@ export function EditProfile() {
   // Requirements: 6.1
   if (profileLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
+      <div className={getPageBackgroundClasses() + " flex items-center justify-center"}>
         <LoadingSpinner message="Loading profile..." size="lg" />
       </div>
     );
@@ -404,18 +414,18 @@ export function EditProfile() {
   // Show error if profile failed to load
   if (profileError) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
-        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl p-8 shadow-xl max-w-md border border-white/20 dark:border-gray-700/50">
+      <div className={getPageBackgroundClasses() + " flex items-center justify-center"}>
+        <div className={getCardClasses('standard', 'large') + " max-w-md"}>
           <div className="text-red-600 dark:text-red-400 mb-4">
             <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
           <h2 className="text-xl font-bold text-text dark:text-gray-100 text-center mb-2">Error Loading Profile</h2>
-          <p className="text-text-secondary dark:text-gray-400 text-center mb-4">{profileError}</p>
+          <p className={typography.subtitle + " text-center mb-4"}>{profileError}</p>
           <button
             onClick={handleCancel}
-            className="w-full bg-primary hover:bg-primary-light dark:bg-primary-light dark:hover:bg-primary text-white font-medium py-2 px-4 rounded-md transition-colors"
+            className={getPrimaryButtonClasses() + " w-full text-white font-medium py-2 px-4 rounded-md"}
           >
             Return to Dashboard
           </button>
@@ -426,16 +436,16 @@ export function EditProfile() {
 
   return (
     <PageTransition variant="page">
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <div className={getPageBackgroundClasses()}>
         {/* Main Content */}
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl shadow-xl p-8 border border-white/20 dark:border-gray-700/50 animate-scaleIn">
+        <div className={getPageContainerClasses('sm', 'large')}>
+          <div className={getCardClasses('standard', 'large') + " animate-scaleIn"}>
             {/* Header */}
             <div className="mb-8">
-              <h2 className="text-3xl font-bold text-primary dark:text-primary-light mb-2">
+              <h2 className={getPageTitleClasses() + " mb-2"}>
                 Edit Profile
               </h2>
-              <p className="text-text dark:text-gray-300">Update your profile information</p>
+              <p className={typography.subtitle}>Update your profile information</p>
             </div>
 
             {/* Success Message */}
@@ -597,7 +607,7 @@ export function EditProfile() {
                 <button
                   onClick={handleSave}
                   disabled={isSaveDisabled}
-                  className="flex-1 bg-gradient-to-r from-primary to-primary-dark hover:from-primary-light hover:to-primary disabled:from-gray-400 disabled:to-gray-500 text-white font-medium py-3 px-6 rounded-xl shadow-md transition-all disabled:cursor-not-allowed transform flex items-center justify-center"
+                  className={getPrimaryButtonClasses() + " flex-1 text-white font-medium py-3 px-6 rounded-xl shadow-md disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed transform flex items-center justify-center"}
                 >
                   {updateLoading ? (
                     <>

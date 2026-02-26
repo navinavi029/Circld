@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Button } from './ui/Button';
-import { Select } from './ui/Select';
+import { Dropdown } from './ui/Dropdown';
 import { SwipeFilterPreferences } from '../types/swipe-trading';
 
 interface SwipeFiltersProps {
@@ -116,20 +116,14 @@ export function SwipeFilters({ onApply, initialFilters }: SwipeFiltersProps) {
         <div className="mt-4 p-5 md:p-6 bg-white/60 dark:bg-gray-800/60 backdrop-blur-lg rounded-2xl shadow-sm border border-white/20 dark:border-gray-700/50 space-y-6 animate-slideDown">
           {/* Distance Filter */}
           <div>
-            <label className="block text-sm font-semibold text-text dark:text-gray-200 mb-2.5">
-              Maximum Distance
-            </label>
-            <Select
-              value={maxDistance}
-              onChange={(e) => setMaxDistance(e.target.value)}
-              className="w-full"
-            >
-              {DISTANCE_OPTIONS.map(option => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </Select>
+            <div className="w-full">
+              <Dropdown
+                label="Maximum Distance"
+                value={maxDistance}
+                onChange={setMaxDistance}
+                options={DISTANCE_OPTIONS}
+              />
+            </div>
           </div>
 
           {/* Category Filter */}

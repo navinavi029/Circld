@@ -4,8 +4,11 @@ import { useAuth } from '../contexts/AuthContext';
 import { Button, Input, Alert, Card } from '../components/ui';
 import { ThemeToggle } from '../components/ThemeToggle';
 import { PageTransition } from '../components/PageTransition';
+import { getPageBackgroundClasses, getCardClasses, getPrimaryButtonClasses } from '../styles/designSystem';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 export function Login() {
+  usePageTitle('Login');
   const { login, register } = useAuth();
   const navigate = useNavigate();
   const [isRegistering, setIsRegistering] = useState(false);
@@ -91,7 +94,7 @@ export function Login() {
 
   return (
     <PageTransition variant="auth">
-      <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-accent/10 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4 sm:p-6">
+      <div className={`${getPageBackgroundClasses()} flex items-center justify-center p-4 sm:p-6`}>
         <div className="absolute top-4 right-4">
           <ThemeToggle />
         </div>
@@ -99,24 +102,12 @@ export function Login() {
         {/* Card — polished entrance with blur + scale + slide */}
         <Card
           variant="glass"
-          className="max-w-md w-full animate-authCardIn shadow-2xl border-white/20 dark:border-gray-700/50"
+          className={`max-w-md w-full animate-authCardIn ${getCardClasses('glass', 'normal')}`}
         >
           {/* Logo icon */}
           <div className="flex justify-center mb-4 sm:mb-5 animate-fadeUp delay-75">
-            <div className="w-12 h-12 xs:w-14 xs:h-14 sm:w-16 sm:h-16 bg-primary dark:bg-primary-light rounded-2xl flex items-center justify-center shadow-lg">
-              <svg
-                className="w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                />
-              </svg>
+            <div className="w-12 h-12 xs:w-14 xs:h-14 sm:w-16 sm:h-16 bg-primary dark:bg-primary-light rounded-2xl flex items-center justify-center shadow-lg p-2">
+              <img src="/logo.svg" alt="Circl'd Logo" className="w-full h-full object-contain invert" />
             </div>
           </div>
 
@@ -269,7 +260,7 @@ export function Login() {
                 variant="primary"
                 size="lg"
                 isLoading={isLoading}
-                className="w-full text-sm sm:text-base"
+                className={`w-full text-sm sm:text-base ${getPrimaryButtonClasses(true)}`}
               >
                 {isRegistering ? 'Create Account' : 'Sign In'}
               </Button>

@@ -25,7 +25,7 @@ let queryExecutionCounter = 0;
  * Filters applied:
  * - Only items with status="available"
  * - Excludes items owned by the current user
- * - Excludes items already swiped on in the current session
+ * - Excludes items already swiped on (across all sessions)
  * - Optional: Distance filter (requires user coordinates)
  * - Optional: Category filter
  * - Optional: Condition filter (new, like-new, good, fair, poor)
@@ -78,15 +78,28 @@ export async function buildItemPool(
     const startTime = Date.now();
     const itemsRef = collection(db, 'items');
     
-    // Extract item IDs from swipe history to exclude
-    const swipedItemIds = swipeHistory.map(swipe => swipe.itemId);
-    console.log('[itemPoolService] Excluding swiped items:', swipedItemIds.length);
+    // Extract item IDs from current session swipe history
+    const sessionSwipedItemIds = swipeHistory.map(swipe => swipe.itemId);
+    
+    // Fetch all historical swipes for this user across all sessions
+    const allSwipedItemIds = await getAllSwipedItemIds(currentUserId);
+    
+    // Combine session and historical swipes
+    const swipedItemIds = [...new Set([...sessionSwipedItemIds, ...allSwipedItemIds])];
+    
+    console.log('[itemPoolService] Excluding swiped items:', {
+      sessionSwipes: sessionSwipedItemIds.length,
+      historicalSwipes: allSwipedItemIds.length,
+      totalExcluded: swipedItemIds.length,
+    });
     
     // Build query constraints
     // Note: We need to fetch more items than the limit because we'll filter by swipe history and other filters
     // Fetch 3x the limit to account for filtering
     const fetchLimit = Math.min(limit * 3, 100);
     
+    // CRITICAL: Only include items with status='available'
+    // This explicitly excludes 'pending' and 'unavailable' items per Requirements 2.1, 2.2, 2.3
     const constraints: QueryConstraint[] = [
       where('status', '==', 'available'),
       where('ownerId', '!=', currentUserId),
@@ -104,6 +117,15 @@ export async function buildItemPool(
     // because Firestore has limitations on compound queries
     
     const q = query(itemsRef, ...constraints);
+    
+    // Log query constraints for verification
+    console.log('[itemPoolService] Query constraints:', {
+      queryId,
+      statusFilter: 'available',
+      excludedStatuses: ['pending', 'unavailable'],
+      excludedOwnerId: currentUserId,
+      fetchLimit,
+    });
     
     // Log before query execution
     console.log('[itemPoolService] Executing Firestore query...');
@@ -123,6 +145,31 @@ export async function buildItemPool(
       id: doc.id,
       ...doc.data(),
     } as Item));
+    
+    // Verify and log item status distribution (should all be 'available')
+    const statusCounts = allItems.reduce((acc, item) => {
+      const status = item.status || 'unknown';
+      acc[status] = (acc[status] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+    
+    console.log('[itemPoolService] Item status verification:', {
+      queryId,
+      statusDistribution: statusCounts,
+      allAvailable: statusCounts['available'] === allItems.length,
+      hasPending: (statusCounts['pending'] || 0) > 0,
+      hasUnavailable: (statusCounts['unavailable'] || 0) > 0,
+    });
+    
+    // Log warning if any non-available items were returned (should never happen)
+    if (statusCounts['pending'] || statusCounts['unavailable']) {
+      console.warn('[itemPoolService] WARNING: Query returned non-available items!', {
+        queryId,
+        pendingCount: statusCounts['pending'] || 0,
+        unavailableCount: statusCounts['unavailable'] || 0,
+        statusDistribution: statusCounts,
+      });
+    }
     
     // Apply filters
     let filteredItems = allItems.filter(item => !swipedItemIds.includes(item.id));
@@ -265,6 +312,44 @@ export async function getLastDocument(
   });
 
   return queryQueue;
+}
+
+/**
+ * Fetches all item IDs that a user has ever swiped on (across all sessions)
+ * This ensures users don't see the same items again in new sessions
+ * 
+ * @param userId - ID of the user
+ * @returns Array of item IDs that have been swiped on
+ */
+async function getAllSwipedItemIds(userId: string): Promise<string[]> {
+  try {
+    const sessionsRef = collection(db, 'swipeSessions');
+    const q = query(sessionsRef, where('userId', '==', userId));
+    const snapshot = await getDocs(q);
+    
+    const allSwipedIds = new Set<string>();
+    
+    snapshot.docs.forEach(doc => {
+      const sessionData = doc.data();
+      if (sessionData.swipes && Array.isArray(sessionData.swipes)) {
+        sessionData.swipes.forEach((swipe: SwipeRecord) => {
+          allSwipedIds.add(swipe.itemId);
+        });
+      }
+    });
+    
+    console.log('[itemPoolService] Loaded historical swipes:', {
+      userId,
+      sessionCount: snapshot.docs.length,
+      uniqueSwipedItems: allSwipedIds.size,
+    });
+    
+    return Array.from(allSwipedIds);
+  } catch (err) {
+    console.error('[itemPoolService] Error fetching historical swipes:', err);
+    // Return empty array on error - don't block the item pool loading
+    return [];
+  }
 }
 
 /**

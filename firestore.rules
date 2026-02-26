@@ -204,9 +204,10 @@ service cloud.firestore {
              'createdAt', 'lastMessageAt', 'lastMessageText', 'unreadCount'
            ])
         && request.resource.data.unreadCount is map
-        && request.resource.data.lastMessageText is string;
+        && request.resource.data.lastMessageText is string
+        && (!request.resource.data.keys().hasAny(['status']) || isValidStatus(request.resource.data.status, ['active', 'disabled']));
 
-      // Only participants can update (unread counts, last message preview, etc.)
+      // Only participants can update (unread counts, last message preview, status, etc.)
       allow update: if isParticipant(resource.data.participantIds)
         && request.resource.data.participantIds == resource.data.participantIds
         && request.resource.data.tradeOfferId == resource.data.tradeOfferId
@@ -214,7 +215,8 @@ service cloud.firestore {
         && request.resource.data.targetItemId == resource.data.targetItemId
         && request.resource.data.createdAt == resource.data.createdAt
         && request.resource.data.unreadCount is map
-        && request.resource.data.lastMessageText is string;
+        && request.resource.data.lastMessageText is string
+        && (!request.resource.data.keys().hasAny(['status']) || isValidStatus(request.resource.data.status, ['active', 'disabled']));
 
       // Conversations cannot be deleted (for record keeping)
       allow delete: if false;

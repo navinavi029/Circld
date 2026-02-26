@@ -79,8 +79,8 @@ export const SwipeCard = memo(function SwipeCard({ item, ownerProfile, onSwipeLe
 
   // Touch event handlers
   const handleTouchStart = (e: React.TouchEvent) => {
-    // Prevent multiple simultaneous drags
-    if (dragState.isDragging) return;
+    // Prevent multiple simultaneous drags or swiping after animation started
+    if (dragState.isDragging || isAnimatingOut) return;
 
     const touch = e.touches[0];
     setDragState({
@@ -122,8 +122,8 @@ export const SwipeCard = memo(function SwipeCard({ item, ownerProfile, onSwipeLe
 
   // Mouse event handlers
   const handleMouseDown = (e: React.MouseEvent) => {
-    // Prevent multiple simultaneous drags
-    if (dragState.isDragging) return;
+    // Prevent multiple simultaneous drags or swiping after animation started
+    if (dragState.isDragging || isAnimatingOut) return;
 
     setDragState({
       isDragging: true,
@@ -138,6 +138,9 @@ export const SwipeCard = memo(function SwipeCard({ item, ownerProfile, onSwipeLe
 
   // Keyboard handlers for accessibility
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    // Prevent swiping if already animating out
+    if (isAnimatingOut) return;
+    
     if (e.key === 'ArrowLeft') {
       e.preventDefault();
       animateSwipe('left');
@@ -171,6 +174,9 @@ export const SwipeCard = memo(function SwipeCard({ item, ownerProfile, onSwipeLe
 
   // Animate card off screen and trigger callback
   const animateSwipe = (direction: 'left' | 'right') => {
+    // Prevent duplicate swipes
+    if (isAnimatingOut) return;
+    
     const targetX = direction === 'right' ? window.innerWidth * 1.5 : -window.innerWidth * 1.5;
 
     setIsAnimatingOut(true);
@@ -203,7 +209,7 @@ export const SwipeCard = memo(function SwipeCard({ item, ownerProfile, onSwipeLe
 
     const handleUp = () => {
       setDragState(prev => {
-        if (!prev.isDragging) return prev;
+        if (!prev.isDragging || isAnimatingOut) return prev;
 
         const swipeDistance = prev.currentX - prev.startX;
 
@@ -285,7 +291,7 @@ export const SwipeCard = memo(function SwipeCard({ item, ownerProfile, onSwipeLe
   return (
     <div
       ref={cardRef}
-      className="relative w-full max-w-md mx-auto select-none"
+      className="relative w-full max-w-md mx-auto select-none animate-scaleIn"
       style={cardStyle}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}

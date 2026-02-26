@@ -3,6 +3,7 @@ import { Item } from '../types/item';
 import { UserProfile } from '../types/user';
 import { CardGrid } from './CardGrid';
 import { TradeAnchorDisplay } from './TradeAnchorDisplay';
+import { MultiCardSkeleton } from './SwipeCardSkeleton';
 
 interface MultiCardSwipeInterfaceProps {
   tradeAnchor: Item;
@@ -42,6 +43,7 @@ export function MultiCardSwipeInterface({
   const [showTips, setShowTips] = useState(false);
   const [animatingCards, setAnimatingCards] = useState<Set<string>>(new Set());
   const animationTimeoutsRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
+  const processedSwipesRef = useRef<Set<string>>(new Set());
 
   // Determine visible card count based on viewport size
   useEffect(() => {
@@ -102,47 +104,64 @@ export function MultiCardSwipeInterface({
 
   // Handle card swipe with animation and timeout
   const handleCardSwipe = (itemId: string, direction: 'left' | 'right') => {
+    // Prevent duplicate swipe processing
+    if (processedSwipesRef.current.has(itemId)) {
+      console.log(`Swipe for card ${itemId} already processed, skipping duplicate`);
+      return;
+    }
+    
+    // Mark this swipe as processed immediately
+    processedSwipesRef.current.add(itemId);
+    
     // Add card to animating set
     setAnimatingCards(prev => new Set(prev).add(itemId));
 
-    // Set animation timeout (600ms max as per design spec)
+    // Set animation timeout (600ms max as per design spec) - fallback only
     const timeoutId = setTimeout(() => {
       console.log(`Animation timeout for card ${itemId}, forcing completion`);
       
-      // Force complete animation
-      onSwipe(itemId, direction);
-      
-      // Remove from animating set
-      setAnimatingCards(prev => {
-        const next = new Set(prev);
-        next.delete(itemId);
-        return next;
-      });
-      
-      // Clean up timeout reference
-      animationTimeoutsRef.current.delete(itemId);
+      // Check if already processed by the normal flow
+      if (animationTimeoutsRef.current.has(itemId)) {
+        // Call onSwipe as fallback
+        onSwipe(itemId, direction);
+        
+        // Remove from animating set
+        setAnimatingCards(prev => {
+          const next = new Set(prev);
+          next.delete(itemId);
+          return next;
+        });
+        
+        // Clean up
+        animationTimeoutsRef.current.delete(itemId);
+        processedSwipesRef.current.delete(itemId);
+      }
     }, 600);
     
     // Store timeout reference
     animationTimeoutsRef.current.set(itemId, timeoutId);
 
-    // Wait for animation to complete before calling parent callback
+    // Wait for animation to complete before calling parent callback (normal flow)
     setTimeout(() => {
-      // Clear the timeout if animation completes normally
+      // Clear the fallback timeout if animation completes normally
       const timeout = animationTimeoutsRef.current.get(itemId);
       if (timeout) {
         clearTimeout(timeout);
         animationTimeoutsRef.current.delete(itemId);
+        
+        // Call onSwipe - this is the primary/normal path
+        onSwipe(itemId, direction);
+        
+        // Remove from animating set after callback
+        setAnimatingCards(prev => {
+          const next = new Set(prev);
+          next.delete(itemId);
+          return next;
+        });
+        
+        // Clean up processed swipe tracking
+        processedSwipesRef.current.delete(itemId);
       }
-      
-      onSwipe(itemId, direction);
-      
-      // Remove from animating set after callback
-      setAnimatingCards(prev => {
-        const next = new Set(prev);
-        next.delete(itemId);
-        return next;
-      });
     }, 400); // Match card exit animation duration
   };
 
@@ -168,13 +187,13 @@ export function MultiCardSwipeInterface({
   // Empty state when no items available
   if (!loading && itemPool.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex flex-col">
         {/* Trade Anchor Display */}
         <TradeAnchorDisplay item={tradeAnchor} onChangeClick={onChangeAnchor} />
 
         {/* Empty State */}
         <div className="flex-1 flex items-center justify-center px-4 py-8">
-          <div className="text-center max-w-md">
+          <div className="text-center max-w-md animate-fadeIn">
             <div className="mb-6">
               <svg
                 className="w-24 h-24 mx-auto text-gray-300 dark:text-gray-600"
@@ -199,10 +218,27 @@ export function MultiCardSwipeInterface({
             </p>
             <button
               onClick={onChangeAnchor}
-              className="px-6 py-3 bg-gradient-to-r from-accent to-accent-dark dark:from-primary-light dark:to-primary text-white rounded-lg font-medium hover:shadow-lg hover:shadow-accent/30 dark:hover:shadow-primary/30 transition-all"
+              className="px-6 py-3 bg-gradient-to-r from-accent to-accent-dark dark:from-primary-light dark:to-primary text-white rounded-lg font-medium hover:shadow-lg hover:shadow-accent/30 dark:hover:shadow-primary/30 transition-all hover:scale-105 active:scale-95"
             >
               Change Trade Anchor
             </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Initial loading state - show skeleton cards
+  if (loading && itemPool.length === 0) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex flex-col">
+        {/* Trade Anchor Display */}
+        <TradeAnchorDisplay item={tradeAnchor} onChangeClick={onChangeAnchor} />
+
+        {/* Loading State with Skeletons */}
+        <div className="flex-1 flex items-center justify-center px-4 py-8">
+          <div className="w-full">
+            <MultiCardSkeleton count={visibleCardCount} />
           </div>
         </div>
       </div>

@@ -2,10 +2,13 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useProfile } from '../contexts/ProfileContext';
 import { useTheme } from '../contexts/ThemeContext';
-import { Button, Card, CardHeader, CardTitle, CardDescription, CardContent } from '../components/ui';
+import { Button } from '../components/ui';
 import { PageTransition } from '../components/PageTransition';
+import { getPageTitleClasses, typography, getCardClasses, getPrimaryButtonClasses, getPageContainerClasses } from '../styles/designSystem';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 export function Profile() {
+  usePageTitle('Profile');
   const { user } = useAuth();
   const { profile } = useProfile();
   const { theme, toggleTheme } = useTheme();
@@ -14,19 +17,19 @@ export function Profile() {
   return (
     <PageTransition variant="page">
       <div className="flex-1 w-full">
-        <div className="container mx-auto px-4 py-6 max-w-7xl">
+        <div className={getPageContainerClasses()}>
           {/* Header */}
           <div className="mb-6">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-accent via-accent-dark to-primary bg-clip-text text-transparent dark:from-primary-light dark:via-primary dark:to-accent-dark leading-tight pb-0.5">
+            <h1 className={getPageTitleClasses()}>
               My Profile
             </h1>
-            <p className="text-xs sm:text-sm text-text-secondary dark:text-gray-400 mt-1">
+            <p className={`${typography.subtitle} mt-1`}>
               Manage your account information and preferences
             </p>
           </div>
 
           {/* Profile Card */}
-          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-lg p-6 mb-6">
+          <div className={`${getCardClasses()} mb-6`}>
             {/* Profile Header */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 pb-6 border-b border-gray-100 dark:border-gray-700">
               <div className="flex items-center gap-4">
@@ -57,7 +60,7 @@ export function Profile() {
 
               <Button
                 onClick={() => navigate('/edit-profile')}
-                className="!bg-gradient-to-r !from-accent !to-accent-dark dark:!from-primary-light dark:!to-primary hover:shadow-lg hover:shadow-accent/30 dark:hover:shadow-primary/30 transition-shadow"
+                className={getPrimaryButtonClasses(true)}
               >
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />

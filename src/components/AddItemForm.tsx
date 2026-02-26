@@ -5,8 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { Button } from './ui/Button';
 import { Input } from './ui/Input';
 import { Alert } from './ui/Alert';
-import { LoadingSpinner } from './ui/LoadingSpinner';
-import { Select } from './ui/Select';
+import { Dropdown } from './ui/Dropdown';
 import { uploadToCloudinary } from '../utils/cloudinary';
 
 interface ItemFormData {
@@ -33,6 +32,19 @@ const CATEGORIES = [
   'Other'
 ];
 
+const CATEGORY_OPTIONS = [
+  { value: '', label: 'Select a category' },
+  ...CATEGORIES.map(cat => ({ value: cat, label: cat }))
+];
+
+const CONDITION_OPTIONS = [
+  { value: 'new', label: 'New - Never used, in original packaging' },
+  { value: 'like-new', label: 'Like New - Barely used, excellent condition' },
+  { value: 'good', label: 'Good - Used with minor wear' },
+  { value: 'fair', label: 'Fair - Used with noticeable wear' },
+  { value: 'poor', label: 'Poor - Heavily used, may need repairs' },
+];
+
 export function AddItemForm({ onSuccess }: AddItemFormProps = {}) {
   const { user } = useAuth();
   const [formData, setFormData] = useState<ItemFormData>({
@@ -45,7 +57,7 @@ export function AddItemForm({ onSuccess }: AddItemFormProps = {}) {
   const [previews, setPreviews] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData(prev => ({
@@ -88,7 +100,6 @@ export function AddItemForm({ onSuccess }: AddItemFormProps = {}) {
 
     setLoading(true);
     setError('');
-    setSuccess(false);
 
     try {
       const imageUrls: string[] = [];
@@ -109,13 +120,13 @@ export function AddItemForm({ onSuccess }: AddItemFormProps = {}) {
         createdAt: serverTimestamp()
       });
 
-      setSuccess(true);
       setFormData({ title: '', description: '', category: '', condition: 'good' });
       setImages([]);
       setPreviews([]);
+      setShowSuccessModal(true);
 
       if (onSuccess) {
-        setTimeout(() => onSuccess(), 1500);
+        onSuccess();
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to add item');
@@ -124,12 +135,16 @@ export function AddItemForm({ onSuccess }: AddItemFormProps = {}) {
     }
   };
 
-  return (
-    <div>
-      {error && <Alert variant="error" className="mb-4 animate-fadeInFast">{error}</Alert>}
-      {success && <Alert variant="success" className="mb-4 animate-fadeInFast">Item added successfully!</Alert>}
+  const handleSuccessModalClose = () => {
+    setShowSuccessModal(false);
+  };
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+  return (
+    <>
+      <div>
+        {error && <Alert variant="error" className="mb-4 animate-fadeInFast">{error}</Alert>}
+
+        <form onSubmit={handleSubmit} className="space-y-5">
         <Input
           label="Title"
           id="title"
@@ -156,35 +171,27 @@ export function AddItemForm({ onSuccess }: AddItemFormProps = {}) {
           />
         </div>
 
-        <Select
-          label="Category"
-          id="category"
-          name="category"
-          value={formData.category}
-          onChange={handleInputChange}
-          required
-        >
-          <option value="">Select a category</option>
-          {CATEGORIES.map(category => (
-            <option key={category} value={category}>{category}</option>
-          ))}
-        </Select>
+        <div className="w-full">
+          <Dropdown
+            label="Category"
+            value={formData.category}
+            onChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
+            options={CATEGORY_OPTIONS}
+            required
+            placeholder="Select a category"
+          />
+        </div>
 
-        <Select
-          label="Condition"
-          id="condition"
-          name="condition"
-          value={formData.condition}
-          onChange={handleInputChange}
-          required
-          helperText="Be honest about the item's condition"
-        >
-          <option value="new">New - Never used, in original packaging</option>
-          <option value="like-new">Like New - Barely used, excellent condition</option>
-          <option value="good">Good - Used with minor wear</option>
-          <option value="fair">Fair - Used with noticeable wear</option>
-          <option value="poor">Poor - Heavily used, may need repairs</option>
-        </Select>
+        <div className="w-full">
+          <Dropdown
+            label="Condition"
+            value={formData.condition}
+            onChange={(value) => setFormData(prev => ({ ...prev, condition: value }))}
+            options={CONDITION_OPTIONS}
+            required
+            helperText="Be honest about the item's condition"
+          />
+        </div>
 
         <div>
           <label htmlFor="images" className="block text-sm font-medium mb-2 text-text dark:text-gray-200">
@@ -256,10 +263,7 @@ export function AddItemForm({ onSuccess }: AddItemFormProps = {}) {
 
         <Button type="submit" disabled={loading} className="w-full">
           {loading ? (
-            <span className="flex items-center justify-center gap-2">
-              <LoadingSpinner size="sm" />
-              Uploading...
-            </span>
+            'Uploading...'
           ) : (
             <span className="flex items-center justify-center gap-2">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -270,6 +274,53 @@ export function AddItemForm({ onSuccess }: AddItemFormProps = {}) {
           )}
         </Button>
       </form>
-    </div>
+      </div>
+
+      {showSuccessModal && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn">
+          <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-3xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 transform transition-all animate-scaleIn overflow-hidden">
+            {/* Header */}
+            <div className="relative px-6 py-5 bg-gradient-to-r from-emerald-500/10 via-emerald-500/20 to-emerald-500/10 border-b border-gray-200/50 dark:border-gray-700/50">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-bold text-text dark:text-gray-100">
+                  Success!
+                </h2>
+                <button
+                  onClick={handleSuccessModalClose}
+                  className="p-2 hover:bg-white/50 dark:hover:bg-gray-700/50 rounded-xl transition-all duration-200 hover:scale-110 active:scale-95"
+                  aria-label="Close modal"
+                >
+                  <svg className="w-5 h-5 text-text-secondary dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="px-6 py-5">
+              <div className="text-center py-4">
+                <div className="mx-auto w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mb-4">
+                  <svg className="w-8 h-8 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-bold text-text dark:text-gray-100 mb-2">
+                  Item Added Successfully!
+                </h3>
+                <p className="text-sm text-text-secondary dark:text-gray-400">
+                  Your listing is now live and visible to others.
+                </p>
+              </div>
+              <div className="flex justify-center mt-4">
+                <Button onClick={handleSuccessModalClose} className="px-8">
+                  Got it
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

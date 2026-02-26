@@ -4,5 +4,7 @@ export { Card, CardHeader, CardTitle, CardDescription, CardContent } from './Car
 export { Checkbox } from './Checkbox';
 export { Alert } from './Alert';
 export { LoadingSpinner } from './LoadingSpinner';
+export { Modal } from './Modal';
 export { Select } from './Select';
+export { Dropdown } from './Dropdown';
 export { Pagination } from './Pagination';

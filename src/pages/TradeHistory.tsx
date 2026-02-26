@@ -8,6 +8,8 @@ import { Pagination } from '../components/ui/Pagination';
 import { PageTransition } from '../components/PageTransition';
 import { TradeOffer } from '../types/swipe-trading';
 import { Item } from '../types/item';
+import { getPageTitleClasses, typography, getCardClasses, getPageContainerClasses } from '../styles/designSystem';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 interface EnrichedTradeHistory extends TradeOffer {
   tradeAnchorTitle: string;
@@ -19,6 +21,7 @@ interface EnrichedTradeHistory extends TradeOffer {
 }
 
 export function TradeHistory() {
+  usePageTitle('Trade History');
   const { user } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -171,13 +174,13 @@ export function TradeHistory() {
   return (
     <PageTransition variant="page">
       <div className="flex-1 w-full flex flex-col">
-        <div className="container mx-auto px-4 py-6 max-w-7xl flex-1">
+        <div className={getPageContainerClasses()}>
           {/* Header */}
           <div className="mb-6">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-accent via-accent-dark to-primary bg-clip-text text-transparent dark:from-primary-light dark:via-primary dark:to-accent-dark leading-tight pb-0.5">
+            <h1 className={getPageTitleClasses()}>
               Trade History
             </h1>
-            <p className="text-xs sm:text-sm text-text-secondary dark:text-gray-400 mt-1">
+            <p className={`${typography.subtitle} mt-1`}>
               View all your past and current trades
             </p>
           </div>
@@ -271,7 +274,7 @@ export function TradeHistory() {
             {filteredHistory.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE).map((trade) => (
               <div
                 key={trade.id}
-                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl border border-gray-200/50 dark:border-gray-700/50 p-4 hover:shadow-xl hover:shadow-primary/10 hover:border-accent/40 dark:hover:border-primary-light/40 transition-all duration-300"
+                className={`${getCardClasses()} hover:shadow-xl hover:shadow-primary/10 hover:border-accent/40 dark:hover:border-primary-light/40 transition-all duration-300`}
               >
                 <div className="flex items-start gap-4">
                   {/* Trade Direction Indicator */}

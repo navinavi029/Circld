@@ -7,11 +7,20 @@ import { LoadingSpinner, Button, Card } from '../components/ui';
 import { Item } from '../types/item';
 import { UserProfile } from '../types/user';
 import { PageTransition } from '../components/PageTransition';
+import { getCardClasses, getPrimaryButtonClasses, getPageContainerClasses } from '../styles/designSystem';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 export function ItemDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [item, setItem] = useState<Item | null>(null);
+  const [owner, setOwner] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+
+  usePageTitle(item ? item.title : 'Item Detail');
 
   console.log('ItemDetail component rendered, ID:', id);
   console.log('useParams result:', { id });
@@ -26,12 +35,6 @@ export function ItemDetail() {
       </div>
     );
   }
-
-  const [item, setItem] = useState<Item | null>(null);
-  const [owner, setOwner] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   useEffect(() => {
     async function fetchItemAndOwner() {
@@ -158,7 +161,7 @@ export function ItemDetail() {
   return (
     <PageTransition variant="page">
       <div className="flex-1 w-full">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className={getPageContainerClasses('lg')}>
           {/* Back Button */}
           <button
             onClick={() => navigate('/listings')}
@@ -173,7 +176,7 @@ export function ItemDetail() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Image Gallery - Takes 2 columns on large screens */}
             <div className="lg:col-span-2">
-              <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl border border-white/20 dark:border-gray-700/50 shadow-lg overflow-hidden">
+              <div className={getCardClasses('standard', 'normal') + ' overflow-hidden'}>
                 {/* Main Image */}
                 <div className="relative aspect-[16/10] bg-gray-100 dark:bg-gray-900">
                   {item.images && item.images.length > 0 ? (
@@ -224,7 +227,7 @@ export function ItemDetail() {
               </div>
 
               {/* Description Card - Below images on mobile/tablet */}
-              <div className="mt-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl border border-white/20 dark:border-gray-700/50 shadow-lg p-6">
+              <div className={getCardClasses('standard', 'normal') + ' mt-6'}>
                 <h2 className="text-lg font-semibold text-text dark:text-gray-100 mb-3 flex items-center">
                   <svg className="w-5 h-5 mr-2 text-accent dark:text-primary-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
@@ -240,7 +243,7 @@ export function ItemDetail() {
             {/* Item Details Sidebar */}
             <div className="lg:col-span-1 space-y-6">
               {/* Main Info Card */}
-              <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl border border-white/20 dark:border-gray-700/50 shadow-lg p-6">
+              <div className={getCardClasses('standard', 'normal')}>
                 {/* Status Badge */}
                 <div className="flex items-center justify-between mb-4">
                   <span className={`inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium ${getStatusColor(item.status)}`}>
@@ -310,7 +313,7 @@ export function ItemDetail() {
                 {/* Action Buttons */}
                 <div className="space-y-2">
                   {!isOwner && item.status === 'available' && (
-                    <Button variant="primary" size="lg" className="w-full">
+                    <Button variant="primary" size="lg" className={`w-full ${getPrimaryButtonClasses(true)}`}>
                       <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                       </svg>
@@ -322,7 +325,7 @@ export function ItemDetail() {
                       <Button
                         variant="primary"
                         size="lg"
-                        className="w-full"
+                        className={`w-full ${getPrimaryButtonClasses(true)}`}
                         onClick={() => navigate(`/listings/edit/${item.id}`)}
                       >
                         <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -343,7 +346,7 @@ export function ItemDetail() {
 
               {/* Owner Info Card */}
               {owner && (
-                <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl border border-white/20 dark:border-gray-700/50 shadow-lg p-6">
+                <div className={getCardClasses('standard', 'normal')}>
                   <h2 className="text-sm font-semibold text-text-secondary dark:text-gray-400 uppercase tracking-wide mb-4">
                     Listed By
                   </h2>
@@ -355,7 +358,7 @@ export function ItemDetail() {
                         className="w-14 h-14 rounded-full object-cover ring-2 ring-gray-100 dark:ring-gray-700"
                       />
                     ) : (
-                      <div className="w-14 h-14 rounded-full bg-gradient-to-br from-accent to-accent-dark dark:from-primary-light dark:to-primary flex items-center justify-center ring-2 ring-gray-100 dark:ring-gray-700">
+                      <div className={`w-14 h-14 rounded-full ${getPrimaryButtonClasses()} flex items-center justify-center ring-2 ring-gray-100 dark:ring-gray-700`}>
                         <span className="text-white text-lg font-semibold">
                           {owner.firstName.charAt(0)}{owner.lastName.charAt(0)}
                         </span>

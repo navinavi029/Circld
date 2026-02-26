@@ -4,8 +4,11 @@ import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '../firebase';
 import { Button, Input, Alert, Card } from '../components/ui';
 import { PageTransition } from '../components/PageTransition';
+import { getPageBackgroundClasses, getCardClasses, getPrimaryButtonClasses } from '../styles/designSystem';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 export function ForgotPassword() {
+  usePageTitle('Forgot Password');
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -30,12 +33,12 @@ export function ForgotPassword() {
 
   return (
     <PageTransition variant="auth">
-      <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-accent/10 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4 sm:p-6">
+      <div className={`${getPageBackgroundClasses()} flex items-center justify-center p-4 sm:p-6`}>
 
         {/* Card — polished entrance with blur + scale + slide */}
         <Card
           variant="glass"
-          className="max-w-md w-full animate-authCardIn shadow-2xl border-white/20 dark:border-gray-700/50"
+          className={`max-w-md w-full animate-authCardIn ${getCardClasses('glass', 'normal')}`}
         >
           {/* Lock/key icon */}
           <div className="flex justify-center mb-4 sm:mb-5 animate-fadeUp delay-75">
@@ -98,7 +101,7 @@ export function ForgotPassword() {
                 variant="primary"
                 size="lg"
                 isLoading={isLoading}
-                className="w-full text-sm sm:text-base"
+                className={`w-full text-sm sm:text-base ${getPrimaryButtonClasses(true)}`}
               >
                 {isLoading ? 'Sending...' : 'Send Reset Link'}
               </Button>

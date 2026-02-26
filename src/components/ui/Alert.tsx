@@ -8,28 +8,28 @@ interface AlertProps extends HTMLAttributes<HTMLDivElement> {
 export function Alert({ variant = 'info', title, children, className = '', ...props }: AlertProps) {
   const variants = {
     info: {
-      container: 'bg-info-light/20 dark:bg-info-dark/20 border-info',
-      icon: 'text-info',
+      container: 'bg-gradient-to-r from-info/10 to-info-light/10 dark:from-info-dark/20 dark:to-info/20 border-info dark:border-info-light',
+      icon: 'text-info dark:text-info-light',
       title: 'text-info-dark dark:text-info-light',
-      text: 'text-info-dark dark:text-info-light',
+      text: 'text-info-dark/90 dark:text-info-light/90',
     },
     success: {
-      container: 'bg-success/10 dark:bg-success/20 border-success',
-      icon: 'text-success',
+      container: 'bg-gradient-to-r from-success/10 to-success-light/10 dark:from-success/20 dark:to-success-light/20 border-success dark:border-success-light',
+      icon: 'text-success dark:text-success-light',
       title: 'text-success-dark dark:text-success-light',
-      text: 'text-success-dark dark:text-success-light',
+      text: 'text-success-dark/90 dark:text-success-light/90',
     },
     warning: {
-      container: 'bg-warning/10 dark:bg-warning/20 border-warning',
-      icon: 'text-warning',
+      container: 'bg-gradient-to-r from-warning/10 to-warning-light/10 dark:from-warning/20 dark:to-warning-light/20 border-warning dark:border-warning-light',
+      icon: 'text-warning dark:text-warning-light',
       title: 'text-warning-dark dark:text-warning-light',
-      text: 'text-warning-dark dark:text-warning-light',
+      text: 'text-warning-dark/90 dark:text-warning-light/90',
     },
     error: {
-      container: 'bg-error/10 dark:bg-error/20 border-error',
-      icon: 'text-error',
+      container: 'bg-gradient-to-r from-error/10 to-error-light/10 dark:from-error/20 dark:to-error-light/20 border-error dark:border-error-light',
+      icon: 'text-error dark:text-error-light',
       title: 'text-error-dark dark:text-error-light',
-      text: 'text-error-dark dark:text-error-light',
+      text: 'text-error-dark/90 dark:text-error-light/90',
     },
   };
 
@@ -52,18 +52,20 @@ export function Alert({ variant = 'info', title, children, className = '', ...pr
 
   return (
     <div
-      className={`border-l-4 rounded-lg p-4 ${style.container} ${className}`}
+      className={`border-l-4 rounded-xl p-4 shadow-sm backdrop-blur-sm ${style.container} ${className}`}
       {...props}
     >
-      <div className="flex items-start">
-        <svg className={`w-5 h-5 ${style.icon} mr-3 mt-0.5 flex-shrink-0`} fill="currentColor" viewBox="0 0 20 20">
-          {icons[variant]}
-        </svg>
-        <div className="flex-1">
+      <div className="flex items-start gap-3">
+        <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${style.icon} bg-current/10`}>
+          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+            {icons[variant]}
+          </svg>
+        </div>
+        <div className="flex-1 min-w-0">
           {title && (
-            <h4 className={`text-sm font-semibold mb-1 ${style.title}`}>{title}</h4>
+            <h4 className={`text-sm font-bold mb-1 ${style.title}`}>{title}</h4>
           )}
-          <div className={`text-sm ${style.text}`}>{children}</div>
+          <div className={`text-sm leading-relaxed ${style.text}`}>{children}</div>
         </div>
       </div>
     </div>

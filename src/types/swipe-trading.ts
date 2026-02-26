@@ -35,6 +35,7 @@ export interface TradeOffer {
   updatedAt: Timestamp;
   status: 'pending' | 'read' | 'accepted' | 'declined' | 'completed';
   completedBy?: string[]; // Array of user IDs who have confirmed completion
+  declineReason?: string; // Optional reason for declining the offer
 }
 
 /**
@@ -139,6 +140,9 @@ export interface Conversation {
   unreadCount: {
     [userId: string]: number;
   };
+  status?: 'active' | 'disabled'; // disabled when items are no longer available
+  disabledReason?: string; // reason for disabling (e.g., "Item no longer available")
+  disabledAt?: Timestamp; // when the conversation was disabled
 }
 
 /**

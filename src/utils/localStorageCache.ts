@@ -99,6 +99,19 @@ export function clearPendingSwipes(): void {
  */
 export function cacheSessionState(session: SwipeSession): void {
   try {
+    // Validate session has required Timestamp fields
+    if (!session.createdAt || !session.lastActivityAt) {
+      console.warn('Session missing required timestamp fields, skipping cache');
+      return;
+    }
+
+    // Validate timestamps have toMillis method
+    if (typeof session.createdAt.toMillis !== 'function' ||
+        typeof session.lastActivityAt.toMillis !== 'function') {
+      console.warn('Session timestamps are not valid Firestore Timestamps');
+      return;
+    }
+
     const cached: CachedSessionState = {
       sessionId: session.id,
       userId: session.userId,
@@ -108,7 +121,7 @@ export function cacheSessionState(session: SwipeSession): void {
       swipes: session.swipes.map(s => ({
         itemId: s.itemId,
         direction: s.direction,
-        timestamp: s.timestamp.toMillis(),
+        timestamp: s.timestamp?.toMillis?.() || Date.now(),
       })),
     };
     localStorage.setItem(CACHE_KEYS.SESSION_STATE, JSON.stringify(cached));

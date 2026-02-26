@@ -171,6 +171,7 @@ export async function createConversation(tradeOfferId: string, userId: string, a
       lastMessageAt: now,
       lastMessageText: '',
       unreadCount: {},
+      status: 'active',
     };
 
     await setDoc(newConversationRef, {
@@ -335,6 +336,11 @@ export async function sendMessage(
     }
 
     const conversation = conversationDoc.data() as Conversation;
+
+    // Check if conversation is disabled
+    if (conversation.status === 'disabled') {
+      throw new Error('This conversation is no longer active because the item is no longer available');
+    }
 
     // Validate sender is a participant
     if (!conversation.participantIds.includes(senderId)) {

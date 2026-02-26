@@ -9,6 +9,7 @@ import { SwipeSession, SwipeFilterPreferences } from '../types/swipe-trading';
 import { TradeAnchorSelector } from '../components/TradeAnchorSelector';
 import { SwipeInterface } from '../components/SwipeInterface';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
+import { LoadingProgress } from '../components/LoadingProgress';
 import { PageTransition } from '../components/PageTransition';
 import { buildItemPool } from '../services/itemPoolService';
 import { createTradeOffer } from '../services/tradeOfferService';
@@ -17,11 +18,12 @@ import {
   createSwipeSession,
   getSwipeHistory,
   syncPendingSwipes,
-  restoreSessionFromCache,
 } from '../services/swipeHistoryService';
 import { createTradeOfferNotification } from '../services/notificationService';
 import { createConversation } from '../services/messagingService';
 import { hasPendingSwipes, clearCachedSessionState } from '../utils/localStorageCache';
+import { getPageBackgroundClasses } from '../styles/designSystem';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 /**
  * SwipeTradingPage - Main page component for swipe trading feature
@@ -36,6 +38,7 @@ import { hasPendingSwipes, clearCachedSessionState } from '../utils/localStorage
  * Requirements: 1.2, 1.3, 1.5, 4.1, 6.1
  */
 export function SwipeTradingPage() {
+  usePageTitle('Swipe Trading');
   const { user } = useAuth();
   const { profile } = useProfile();
 
@@ -58,22 +61,23 @@ export function SwipeTradingPage() {
   const [showExtendedLoadingMessage, setShowExtendedLoadingMessage] = useState(false);
   const [showNewSessionOption, setShowNewSessionOption] = useState(false);
   const hasAttemptedRestoreRef = useRef(false);
+  const processingSwipesRef = useRef<Set<string>>(new Set());
   const [filterPreferences, setFilterPreferences] = useState<SwipeFilterPreferences>(() => {
     // Load filter preferences from localStorage
     const saved = localStorage.getItem('swipeFilterPreferences');
     return saved ? JSON.parse(saved) : { maxDistance: null, categories: [], conditions: [] };
   });
 
-  // Restore session from cache on mount (only once, even in Strict Mode)
+  // Note: Automatic session restoration removed to prevent unwanted auto-navigation
+  // Users now always start at the trade anchor selection screen
+  // Previous sessions are cleared when the page loads
+
   useEffect(() => {
     if (user && !hasAttemptedRestoreRef.current) {
       hasAttemptedRestoreRef.current = true;
-      const cachedSession = restoreSessionFromCache(user.uid);
-      if (cachedSession) {
-        setSession(cachedSession);
-        // Load the trade anchor item and pass the session
-        loadTradeAnchorFromSession(cachedSession.tradeAnchorId, cachedSession);
-      }
+      
+      // Clear any cached session to ensure fresh start
+      clearCachedSessionState();
     }
   }, [user]);
 
@@ -170,176 +174,6 @@ export function SwipeTradingPage() {
       } else {
         setError('Failed to load your items. Please try again.');
       }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  /**
-   * Loads a trade anchor item from a cached session
-   * Validates trade anchor existence before loading item pool
-   * Clears cache if anchor no longer exists
-   * Uses same error handling as new sessions
-   * Requirements: 6.1, 6.2, 6.3, 6.5
-   */
-  const loadTradeAnchorFromSession = async (tradeAnchorId: string, cachedSession: SwipeSession) => {
-    if (!user) return;
-
-    console.log('[SwipeTradingPage] Restoring session from cache:', {
-      timestamp: new Date().toISOString(),
-      component: 'SwipeTradingPage',
-      action: 'loadTradeAnchorFromSession',
-      sessionId: cachedSession.id,
-      userId: user.uid,
-      tradeAnchorId,
-      phase: 'starting-restoration',
-    });
-
-    try {
-      setLoading(true);
-      setError(null);
-      setLoadingPhase('loading-items');
-
-      // Validate trade anchor still exists (Requirement 6.1)
-      const itemRef = doc(db, 'items', tradeAnchorId);
-      const itemDoc = await getDoc(itemRef);
-
-      if (!itemDoc.exists()) {
-        // Trade anchor no longer exists - clear cache (Requirement 6.2)
-        console.warn('[SwipeTradingPage] Cached trade anchor no longer exists, clearing cache:', {
-          timestamp: new Date().toISOString(),
-          component: 'SwipeTradingPage',
-          action: 'loadTradeAnchorFromSession',
-          sessionId: cachedSession.id,
-          userId: user.uid,
-          tradeAnchorId,
-          phase: 'anchor-not-found',
-        });
-
-        clearCachedSessionState();
-        setError('Your previous trade anchor is no longer available. Please select a new item.');
-        setShowNewSessionOption(true);
-        setLoading(false);
-        setLoadingPhase('error');
-        return;
-      }
-
-      const itemData = itemDoc.data();
-
-      // Validate trade anchor is still available
-      if (itemData.status !== 'available') {
-        console.warn('[SwipeTradingPage] Cached trade anchor no longer available, clearing cache:', {
-          timestamp: new Date().toISOString(),
-          component: 'SwipeTradingPage',
-          action: 'loadTradeAnchorFromSession',
-          sessionId: cachedSession.id,
-          userId: user.uid,
-          tradeAnchorId,
-          status: itemData.status,
-          phase: 'anchor-unavailable',
-        });
-
-        clearCachedSessionState();
-        setError('Your previous trade anchor is no longer available. Please select a new item.');
-        setShowNewSessionOption(true);
-        setLoading(false);
-        setLoadingPhase('error');
-        return;
-      }
-
-      const item = { id: itemDoc.id, ...itemDoc.data() } as Item;
-      setTradeAnchor(item);
-      setSession(cachedSession);
-
-      // Load item pool with same error handling as new sessions (Requirement 6.3)
-      try {
-        console.log('[SwipeTradingPage] Loading item pool for restored session:', {
-          timestamp: new Date().toISOString(),
-          component: 'SwipeTradingPage',
-          action: 'loadTradeAnchorFromSession',
-          sessionId: cachedSession.id,
-          userId: user.uid,
-          tradeAnchorId,
-          phase: 'loading-item-pool',
-        });
-
-        const swipeHistory = await getSwipeHistory(cachedSession.id, user.uid);
-        console.log('[SwipeTradingPage] Swipe history loaded for restored session:', {
-          sessionId: cachedSession.id,
-          historyCount: swipeHistory.length,
-          phase: 'history-loaded',
-        });
-
-        const items = await buildItemPool(
-          user.uid,
-          swipeHistory,
-          20,
-          undefined,
-          filterPreferences,
-          profile?.coordinates || null
-        );
-
-        // Log successful restoration (Requirement 6.5)
-        console.log('[SwipeTradingPage] Session restored successfully:', {
-          timestamp: new Date().toISOString(),
-          component: 'SwipeTradingPage',
-          action: 'loadTradeAnchorFromSession',
-          sessionId: cachedSession.id,
-          userId: user.uid,
-          tradeAnchorId,
-          itemCount: items.length,
-          phase: 'restoration-complete',
-        });
-
-        setItemPool(items);
-
-        // Load owner profiles for the items
-        if (items.length > 0) {
-          const profiles = await loadOwnerProfiles(items);
-          setOwnerProfiles(profiles);
-        }
-
-        setIsSwipeMode(true);
-        setLoadingPhase('complete');
-      } catch (err) {
-        // Silently handle restoration errors - just clear cache and let user start fresh
-        console.warn('[SwipeTradingPage] Error loading item pool from cached session, clearing cache:', {
-          timestamp: new Date().toISOString(),
-          component: 'SwipeTradingPage',
-          action: 'loadTradeAnchorFromSession',
-          sessionId: cachedSession.id,
-          userId: user.uid,
-          tradeAnchorId,
-          error: err instanceof Error ? err.message : 'Unknown error',
-          phase: 'restoration-failed-clearing-cache',
-        });
-
-        // Clear the cached session and let user start fresh
-        clearCachedSessionState();
-        setSession(null);
-        setTradeAnchor(null);
-        setIsSwipeMode(false);
-        setLoadingPhase('idle');
-      }
-    } catch (err) {
-      // Silently handle restoration errors - just clear cache and let user start fresh
-      console.warn('[SwipeTradingPage] Error restoring session from cache, clearing cache:', {
-        timestamp: new Date().toISOString(),
-        component: 'SwipeTradingPage',
-        action: 'loadTradeAnchorFromSession',
-        sessionId: cachedSession.id,
-        userId: user.uid,
-        tradeAnchorId,
-        error: err instanceof Error ? err.message : 'Unknown error',
-        phase: 'restoration-failed-clearing-cache',
-      });
-
-      // Clear the cached session and let user start fresh
-      clearCachedSessionState();
-      setSession(null);
-      setTradeAnchor(null);
-      setIsSwipeMode(false);
-      setLoadingPhase('idle');
     } finally {
       setLoading(false);
     }
@@ -740,6 +574,9 @@ export function SwipeTradingPage() {
    * Creates a new session with empty swipe history
    */
   const handleChangeAnchor = () => {
+    // Clear cached session so user can select a new anchor
+    clearCachedSessionState();
+    
     setIsSwipeMode(false);
     setTradeAnchor(null);
     setSession(null);
@@ -760,11 +597,20 @@ export function SwipeTradingPage() {
       return;
     }
 
+    // Prevent duplicate swipe processing
+    if (processingSwipesRef.current.has(itemId)) {
+      console.warn('[SwipeTradingPage] Swipe already being processed for item:', itemId);
+      return;
+    }
+
     const item = itemPool.find(i => i.id === itemId);
     if (!item) {
       console.warn('Item not found in pool:', itemId);
       return;
     }
+
+    // Mark this item as being processed
+    processingSwipesRef.current.add(itemId);
 
     try {
       // Validate session is still valid (check if trade anchor still exists and is available)
@@ -788,6 +634,7 @@ export function SwipeTradingPage() {
         setSession(null);
         setError('Your trade anchor is no longer available. Please select a new item to continue.');
         setIsSwipeMode(false);
+        processingSwipesRef.current.delete(itemId);
         return;
       }
 
@@ -802,11 +649,17 @@ export function SwipeTradingPage() {
       // Remove item from pool
       setItemPool(prev => prev.filter(i => i.id !== itemId));
 
+      // Clean up processing tracker
+      processingSwipesRef.current.delete(itemId);
+
       // If we're running low on items, preload more (threshold changed from 3 to 5)
       if (itemPool.length <= 5) {
         preloadMoreItems();
       }
     } catch (err) {
+      // Clean up processing tracker on error
+      processingSwipesRef.current.delete(itemId);
+
       console.error('[SwipeTradingPage] Error handling swipe:', {
         timestamp: new Date().toISOString(),
         component: 'SwipeTradingPage',
@@ -969,15 +822,58 @@ export function SwipeTradingPage() {
 
   // Loading state - show when creating session or loading items after anchor selection
   if (loading && (loadingPhase === 'creating-session' || loadingPhase === 'loading-items')) {
+    const phaseMessages = {
+      'creating-session': {
+        message: 'Creating your swipe session',
+        subtitle: 'Setting up your personalized trading experience',
+      },
+      'loading-items': {
+        message: 'Finding perfect matches',
+        subtitle: 'Searching for items that match your preferences',
+      },
+    };
+
+    const currentPhase = phaseMessages[loadingPhase];
+
     return (
       <PageTransition variant="page">
-        <div className="flex-1 w-full flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 relative z-0">
-          <LoadingSpinner message="Starting swipe session..." size="lg" />
-          {showExtendedLoadingMessage && (
-            <p className="mt-4 text-gray-600 dark:text-gray-400">
-              This is taking longer than usual. Please wait...
-            </p>
-          )}
+        <div className={`flex-1 w-full flex flex-col items-center justify-center ${getPageBackgroundClasses()} relative z-0 min-h-screen px-4`}>
+          <div className="max-w-2xl w-full space-y-8">
+            {/* Main loading spinner */}
+            <LoadingSpinner 
+              message={currentPhase.message}
+              subtitle={currentPhase.subtitle}
+              size="lg" 
+              showDots={true}
+            />
+
+            {/* Progress indicator */}
+            <LoadingProgress 
+              phase={loadingPhase}
+              messages={{
+                'creating-session': 'Setting up',
+                'loading-items': 'Finding matches',
+                'complete': 'Ready to swipe',
+              }}
+            />
+
+            {/* Extended loading message */}
+            {showExtendedLoadingMessage && (
+              <div className="mt-8 px-6 py-4 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl shadow-lg border border-primary/20 dark:border-primary-light/20 text-center animate-fadeIn">
+                <div className="flex items-center justify-center gap-3 mb-2">
+                  <svg className="w-5 h-5 text-primary dark:text-primary-light animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  <p className="text-sm text-gray-700 dark:text-gray-300 font-medium">
+                    This is taking longer than usual...
+                  </p>
+                </div>
+                <p className="text-xs text-gray-600 dark:text-gray-400">
+                  We're working on it. Please wait a moment.
+                </p>
+              </div>
+            )}
+          </div>
         </div>
       </PageTransition>
     );
@@ -988,11 +884,21 @@ export function SwipeTradingPage() {
     return (
       <PageTransition variant="page">
         <div className="flex-1 w-full flex flex-col items-center justify-center min-h-[50vh] relative z-0">
-          <LoadingSpinner message="Loading swipe session..." size="lg" />
+          <LoadingSpinner 
+            message="Loading your items" 
+            subtitle="Preparing your trading inventory"
+            size="lg" 
+            showDots={true}
+          />
           {showExtendedLoadingMessage && (
-            <p className="mt-4 text-gray-600 dark:text-gray-400">
-              This is taking longer than usual. Please wait...
-            </p>
+            <div className="mt-8 px-6 py-4 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl shadow-lg border border-primary/20 dark:border-primary-light/20 max-w-md text-center animate-fadeIn">
+              <p className="text-sm text-gray-700 dark:text-gray-300 font-medium">
+                This is taking longer than usual...
+              </p>
+              <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                We're working on it. Please wait a moment.
+              </p>
+            </div>
           )}
         </div>
       </PageTransition>

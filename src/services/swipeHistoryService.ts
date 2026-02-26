@@ -71,18 +71,37 @@ export async function recordSwipe(
       });
 
       // Update cached session state after successful sync
-      const updatedSession = {
-        ...sessionData,
-        swipes: [...sessionData.swipes, swipeRecord],
-        lastActivityAt: Timestamp.now(),
-      };
-      cacheSessionState(updatedSession);
+      try {
+        const updatedSession = {
+          ...sessionData,
+          swipes: [...sessionData.swipes, swipeRecord],
+          lastActivityAt: Timestamp.now(),
+        };
+        
+        // Validate session data before caching
+        if (updatedSession.id && updatedSession.userId && updatedSession.createdAt && updatedSession.lastActivityAt) {
+          cacheSessionState(updatedSession);
+        } else {
+          console.warn('Session data incomplete, skipping cache:', {
+            hasId: !!updatedSession.id,
+            hasUserId: !!updatedSession.userId,
+            hasCreatedAt: !!updatedSession.createdAt,
+            hasLastActivityAt: !!updatedSession.lastActivityAt
+          });
+        }
+      } catch (cacheError) {
+        console.error('Failed to cache session state after swipe:', {
+          sessionId,
+          userId,
+          itemId,
+          error: cacheError instanceof Error ? cacheError.message : 'Unknown error'
+        });
+      }
     });
   } catch (error) {
     // If offline or network error, cache the swipe for later sync
     const errorMessage = error instanceof Error ? error.message : '';
     if (errorMessage.includes('network') || errorMessage.includes('offline')) {
-      console.log('Offline: caching swipe for later sync');
       cachePendingSwipe({
         sessionId,
         userId,
@@ -92,14 +111,33 @@ export async function recordSwipe(
       });
       
       // Update local cache optimistically
-      const cachedSession = getCachedSessionState();
-      if (cachedSession && cachedSession.id === sessionId) {
-        cachedSession.swipes.push({
+      try {
+        const cachedSession = getCachedSessionState();
+        if (cachedSession && cachedSession.id === sessionId) {
+          cachedSession.swipes.push({
+            itemId,
+            direction,
+            timestamp: Timestamp.fromMillis(Date.now()),
+          });
+          
+          // Validate session data before caching
+          if (cachedSession.userId && cachedSession.createdAt && cachedSession.lastActivityAt) {
+            cacheSessionState(cachedSession);
+          } else {
+            console.warn('Cached session data incomplete, skipping update:', {
+              hasUserId: !!cachedSession.userId,
+              hasCreatedAt: !!cachedSession.createdAt,
+              hasLastActivityAt: !!cachedSession.lastActivityAt
+            });
+          }
+        }
+      } catch (cacheError) {
+        console.error('Failed to update cached session state optimistically:', {
+          sessionId,
+          userId,
           itemId,
-          direction,
-          timestamp: Timestamp.fromMillis(Date.now()),
+          error: cacheError instanceof Error ? cacheError.message : 'Unknown error'
         });
-        cacheSessionState(cachedSession);
       }
     } else {
       throw error;
@@ -138,7 +176,25 @@ export async function getSwipeHistory(
       }
 
       // Update cache with fresh data
-      cacheSessionState(sessionData);
+      try {
+        // Validate session data before caching
+        if (sessionData.id && sessionData.userId && sessionData.createdAt && sessionData.lastActivityAt) {
+          cacheSessionState(sessionData);
+        } else {
+          console.warn('Session data incomplete, skipping cache:', {
+            hasId: !!sessionData.id,
+            hasUserId: !!sessionData.userId,
+            hasCreatedAt: !!sessionData.createdAt,
+            hasLastActivityAt: !!sessionData.lastActivityAt
+          });
+        }
+      } catch (cacheError) {
+        console.error('Failed to cache session state after fetching history:', {
+          sessionId,
+          userId,
+          error: cacheError instanceof Error ? cacheError.message : 'Unknown error'
+        });
+      }
       
       return sessionData.swipes || [];
     });
@@ -148,7 +204,6 @@ export async function getSwipeHistory(
     // If offline, return cached data
     const errorMessage = error instanceof Error ? error.message : '';
     if (errorMessage.includes('network') || errorMessage.includes('offline')) {
-      console.log('Offline: using cached swipe history');
       const cachedSession = getCachedSessionState();
       if (cachedSession && cachedSession.id === sessionId && cachedSession.userId === userId) {
         return cachedSession.swipes;
@@ -224,13 +279,6 @@ export async function createSwipeSession(
       throw new Error('Trade anchor item is not available');
     }
 
-    // Debug logging for ownership check
-    console.log('Ownership check:', {
-      itemOwnerId: tradeAnchorData.ownerId,
-      currentUserId: userId,
-      match: tradeAnchorData.ownerId === userId
-    });
-
     if (tradeAnchorData.ownerId !== userId) {
       throw new Error(`User does not own the trade anchor item. Item owner: ${tradeAnchorData.ownerId}, Current user: ${userId}`);
     }
@@ -256,7 +304,26 @@ export async function createSwipeSession(
     };
 
     // Cache the new session state
-    cacheSessionState(session);
+    try {
+      // Validate session data before caching
+      if (session.id && session.userId && session.createdAt && session.lastActivityAt) {
+        cacheSessionState(session);
+      } else {
+        console.warn('New session data incomplete, skipping cache:', {
+          hasId: !!session.id,
+          hasUserId: !!session.userId,
+          hasCreatedAt: !!session.createdAt,
+          hasLastActivityAt: !!session.lastActivityAt
+        });
+      }
+    } catch (cacheError) {
+      console.error('Failed to cache new session state:', {
+        sessionId: newSessionRef.id,
+        userId,
+        tradeAnchorId,
+        error: cacheError instanceof Error ? cacheError.message : 'Unknown error'
+      });
+    }
     
     return session;
   });

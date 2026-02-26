@@ -3,10 +3,21 @@ import { Item } from '../types/item';
 import { SwipeFilterPreferences } from '../types/swipe-trading';
 import { useNavigate } from 'react-router-dom';
 import { Input } from './ui/Input';
-import { Select } from './ui/Select';
+import { Dropdown } from './ui/Dropdown';
 import { Button } from './ui/Button';
 
 type ViewMode = 'grid' | 'list';
+
+function getConditionBadgeClass(condition: string): string {
+  switch (condition) {
+    case 'new': return 'bg-emerald-500 text-white';
+    case 'like-new': return 'bg-sky-500 text-white';
+    case 'good': return 'bg-amber-500 text-white';
+    case 'fair': return 'bg-orange-500 text-white';
+    case 'poor': return 'bg-red-500 text-white';
+    default: return 'bg-gray-500 text-white';
+  }
+}
 
 const CATEGORIES = [
   'Electronics',
@@ -64,6 +75,7 @@ export const TradeAnchorSelector: React.FC<TradeAnchorSelectorProps> = ({
   const [swipeMaxDistance, setSwipeMaxDistance] = useState<string>('null');
   const [swipeCategories, setSwipeCategories] = useState<string[]>([]);
   const [swipeConditions, setSwipeConditions] = useState<string[]>([]);
+  const [showHowItWorks, setShowHowItWorks] = useState(false);
 
   // Filter to show only available items
   const availableItems = userItems.filter(item => item.status === 'available');
@@ -104,8 +116,13 @@ export const TradeAnchorSelector: React.FC<TradeAnchorSelectorProps> = ({
     setSelectedCondition('all');
   };
 
-  const handleItemClick = (item: Item) => {
+  const handleItemClick = (item: Item, e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     if (!isLoading && !loadingItemId) {
+      console.log('[TradeAnchorSelector] Item clicked, opening modal:', item.id);
       setSelectedItem(item);
       setShowFilterModal(true);
     }
@@ -129,6 +146,13 @@ export const TradeAnchorSelector: React.FC<TradeAnchorSelectorProps> = ({
 
   const handleStartSwiping = () => {
     if (!selectedItem) return;
+    
+    console.log('[TradeAnchorSelector] Starting swipe session with filters:', {
+      itemId: selectedItem.id,
+      maxDistance: swipeMaxDistance,
+      categories: swipeCategories,
+      conditions: swipeConditions,
+    });
     
     setLoadingItemId(selectedItem.id);
     setShowFilterModal(false);
@@ -220,28 +244,78 @@ export const TradeAnchorSelector: React.FC<TradeAnchorSelectorProps> = ({
         </button>
 
         <div className="mb-6">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-accent via-accent-dark to-primary bg-clip-text text-transparent dark:from-primary-light dark:via-primary dark:to-accent-dark leading-tight pb-0.5 mb-2">
-            Select Your Trade Anchor
-          </h1>
-          <p className="text-sm text-text-secondary dark:text-gray-400 mb-4">
-            Choose which item you want to trade away
-          </p>
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-4">
+            <div>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-accent via-accent-dark to-primary bg-clip-text text-transparent dark:from-primary-light dark:via-primary dark:to-accent-dark leading-tight pb-0.5 mb-2">
+                Select Your Trade Anchor
+              </h1>
+              <p className="text-sm text-text-secondary dark:text-gray-400">
+                Choose which item you want to trade away
+              </p>
+            </div>
 
-          {/* Info banner */}
-          <div className="bg-gradient-to-r from-accent/10 via-primary/10 to-accent/10 dark:from-primary-light/10 dark:via-accent/10 dark:to-primary-light/10 border border-accent/20 dark:border-primary-light/20 rounded-xl p-4 flex items-start gap-3">
-            <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-accent to-accent-dark dark:from-primary-light dark:to-primary rounded-full flex items-center justify-center">
+            {/* View mode toggle */}
+            {availableItems.length > 0 && (
+              <div className="hidden sm:flex items-center bg-white/70 dark:bg-gray-800/70 border border-gray-200/60 dark:border-gray-700/60 rounded-xl p-1 gap-1 self-start sm:self-auto">
+                <button
+                  onClick={() => setViewMode('grid')}
+                  title="Grid view"
+                  className={`p-1.5 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-accent dark:bg-primary-light text-white shadow-sm' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}
+                >
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 0h8v8h-8z" />
+                  </svg>
+                </button>
+                <button
+                  onClick={() => setViewMode('list')}
+                  title="List view"
+                  className={`p-1.5 rounded-lg transition-all ${viewMode === 'list' ? 'bg-accent dark:bg-primary-light text-white shadow-sm' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* How it works hint button */}
+          <div className="mb-4 relative">
+            <button
+              onClick={() => setShowHowItWorks(!showHowItWorks)}
+              className="w-9 h-9 bg-gradient-to-br from-accent to-accent-dark dark:from-primary-light dark:to-primary rounded-full flex items-center justify-center hover:shadow-lg hover:shadow-accent/30 dark:hover:shadow-primary/30 transition-all hover:scale-110 active:scale-95 group"
+              title="How it works"
+            >
               <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-            </div>
-            <div className="flex-1 min-w-0">
-              <h3 className="text-sm font-semibold text-text dark:text-gray-100 mb-1">
-                How it works
-              </h3>
-              <p className="text-xs text-text-secondary dark:text-gray-400 leading-relaxed">
-                Select one of your items below. You'll then swipe through other users' items to find potential trades. When you like an item, we'll send them a trade offer!
-              </p>
-            </div>
+            </button>
+            
+            {showHowItWorks && (
+              <div className="absolute top-full left-0 mt-2 w-80 bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl border border-accent/20 dark:border-primary-light/20 rounded-xl p-4 shadow-xl z-10 animate-in fade-in slide-in-from-top-2 duration-300">
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-accent/20 to-primary/20 dark:from-primary-light/20 dark:to-accent/20 rounded-full flex items-center justify-center">
+                    <svg className="w-4 h-4 text-accent dark:text-primary-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="text-sm font-semibold text-text dark:text-gray-100 mb-1">How it works</h4>
+                    <p className="text-xs text-text-secondary dark:text-gray-400 leading-relaxed">
+                      Select one of your items below. You'll then swipe through other users' items to find potential trades. When you like an item, we'll send them a trade offer!
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setShowHowItWorks(false)}
+                    className="flex-shrink-0 text-text-secondary dark:text-gray-400 hover:text-text dark:hover:text-gray-200 transition-colors"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -274,70 +348,48 @@ export const TradeAnchorSelector: React.FC<TradeAnchorSelectorProps> = ({
 
               {/* Category and Condition */}
               <div className="flex gap-3 flex-shrink-0">
-                <Select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="w-40"
-                >
-                  <option value="all">All Categories</option>
-                  {categories.map(c => <option key={c} value={c}>{c}</option>)}
-                </Select>
+                <div className="w-40">
+                  <Dropdown
+                    value={selectedCategory}
+                    onChange={setSelectedCategory}
+                    options={[
+                      { value: 'all', label: 'All Categories' },
+                      ...categories.map(c => ({ value: c, label: c }))
+                    ]}
+                  />
+                </div>
 
-                <Select
-                  value={selectedCondition}
-                  onChange={(e) => setSelectedCondition(e.target.value)}
-                  className="w-36"
-                >
-                  <option value="all">All Conditions</option>
-                  <option value="new">New</option>
-                  <option value="like-new">Like New</option>
-                  <option value="good">Good</option>
-                  <option value="fair">Fair</option>
-                  <option value="poor">Poor</option>
-                </Select>
+                <div className="w-36">
+                  <Dropdown
+                    value={selectedCondition}
+                    onChange={setSelectedCondition}
+                    options={[
+                      { value: 'all', label: 'All Conditions' },
+                      { value: 'new', label: 'New' },
+                      { value: 'like-new', label: 'Like New' },
+                      { value: 'good', label: 'Good' },
+                      { value: 'fair', label: 'Fair' },
+                      { value: 'poor', label: 'Poor' },
+                    ]}
+                  />
+                </div>
               </div>
             </div>
 
-            {/* Filter status and view mode toggle */}
-            <div className="flex items-center justify-between">
+            {/* Filter status */}
+            {hasActiveFilters && (
               <div className="flex items-center gap-2">
-                {hasActiveFilters && (
-                  <>
-                    <span className="text-xs text-text-secondary dark:text-gray-400">
-                      {filteredItems.length} of {availableItems.length} items
-                    </span>
-                    <button
-                      onClick={clearAllFilters}
-                      className="text-xs text-accent dark:text-primary-light hover:underline font-medium"
-                    >
-                      Clear filters
-                    </button>
-                  </>
-                )}
-              </div>
-
-              {/* View mode toggle */}
-              <div className="flex items-center bg-white/70 dark:bg-gray-800/70 border border-gray-200/60 dark:border-gray-700/60 rounded-xl p-1 gap-1">
+                <span className="text-xs text-text-secondary dark:text-gray-400">
+                  {filteredItems.length} of {availableItems.length} items
+                </span>
                 <button
-                  onClick={() => setViewMode('grid')}
-                  title="Grid view"
-                  className={`p-1.5 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-accent dark:bg-primary-light text-white shadow-sm' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}
+                  onClick={clearAllFilters}
+                  className="text-xs text-accent dark:text-primary-light hover:underline font-medium"
                 >
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 0h8v8h-8z" />
-                  </svg>
-                </button>
-                <button
-                  onClick={() => setViewMode('list')}
-                  title="List view"
-                  className={`p-1.5 rounded-lg transition-all ${viewMode === 'list' ? 'bg-accent dark:bg-primary-light text-white shadow-sm' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                  </svg>
+                  Clear filters
                 </button>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Empty filtered state */}
@@ -376,7 +428,7 @@ export const TradeAnchorSelector: React.FC<TradeAnchorSelectorProps> = ({
             return (
               <div
                 key={item.id}
-                onClick={() => handleItemClick(item)}
+                onClick={(e) => handleItemClick(item, e)}
                 onMouseEnter={() => !isLoading && setHoveredItemId(item.id)}
                 onMouseLeave={() => setHoveredItemId(null)}
                 className={`
@@ -450,7 +502,7 @@ export const TradeAnchorSelector: React.FC<TradeAnchorSelectorProps> = ({
 
                   {/* Condition badge */}
                   <div className="absolute top-3 left-3 z-10">
-                    <span className="px-2.5 py-1 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md text-xs font-bold text-gray-900 dark:text-white rounded-lg shadow-lg border border-gray-200/50 dark:border-gray-700/50 capitalize">
+                    <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold capitalize shadow-md ${getConditionBadgeClass(item.condition)}`}>
                       {item.condition.replace('-', ' ')}
                     </span>
                   </div>
@@ -492,8 +544,20 @@ export const TradeAnchorSelector: React.FC<TradeAnchorSelectorProps> = ({
 
         {/* Filter Modal */}
         {showFilterModal && selectedItem && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden animate-slideUp">
+          <div 
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn"
+            onClick={(e) => {
+              // Close modal only if clicking the backdrop
+              if (e.target === e.currentTarget) {
+                setShowFilterModal(false);
+                setSelectedItem(null);
+              }
+            }}
+          >
+            <div 
+              className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden animate-slideUp"
+              onClick={(e) => e.stopPropagation()}
+            >
               {/* Modal Header */}
               <div className="bg-gradient-to-r from-accent via-accent-dark to-primary dark:from-primary-light dark:via-primary dark:to-accent px-6 py-4 flex items-center justify-between flex-shrink-0">
                 <div className="flex items-center gap-3">
@@ -508,7 +572,10 @@ export const TradeAnchorSelector: React.FC<TradeAnchorSelectorProps> = ({
                   </div>
                 </div>
                 <button
-                  onClick={() => {
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
                     setShowFilterModal(false);
                     setSelectedItem(null);
                   }}
@@ -551,17 +618,13 @@ export const TradeAnchorSelector: React.FC<TradeAnchorSelectorProps> = ({
                     </svg>
                     Maximum Distance
                   </label>
-                  <Select
-                    value={swipeMaxDistance}
-                    onChange={(e) => setSwipeMaxDistance(e.target.value)}
-                    className="w-full"
-                  >
-                    {DISTANCE_OPTIONS.map(option => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </Select>
+                  <div className="w-full">
+                    <Dropdown
+                      value={swipeMaxDistance}
+                      onChange={setSwipeMaxDistance}
+                      options={DISTANCE_OPTIONS}
+                    />
+                  </div>
                 </div>
 
                 {/* Category Filter */}
@@ -576,7 +639,12 @@ export const TradeAnchorSelector: React.FC<TradeAnchorSelectorProps> = ({
                     {CATEGORIES.map(category => (
                       <button
                         key={category}
-                        onClick={() => handleSwipeCategoryToggle(category)}
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleSwipeCategoryToggle(category);
+                        }}
                         className={`px-3 py-2 text-sm rounded-lg border transition-all font-medium ${swipeCategories.includes(category)
                             ? 'bg-gradient-to-r from-accent to-accent-dark dark:from-primary-light dark:to-primary text-white border-transparent shadow-sm'
                             : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 hover:border-accent dark:hover:border-primary-light'
@@ -605,7 +673,12 @@ export const TradeAnchorSelector: React.FC<TradeAnchorSelectorProps> = ({
                     {CONDITIONS.map(condition => (
                       <button
                         key={condition.value}
-                        onClick={() => handleSwipeConditionToggle(condition.value)}
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleSwipeConditionToggle(condition.value);
+                        }}
                         className={`px-3 py-2 text-sm rounded-lg border transition-all font-medium ${swipeConditions.includes(condition.value)
                             ? 'bg-gradient-to-r from-accent to-accent-dark dark:from-primary-light dark:to-primary text-white border-transparent shadow-sm'
                             : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 hover:border-accent dark:hover:border-primary-light'

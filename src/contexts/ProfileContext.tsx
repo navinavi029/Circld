@@ -63,20 +63,14 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
       (docSnap) => {
         if (docSnap.exists()) {
           const profileData = docSnap.data() as UserProfile;
-          console.log('Profile data loaded:', profileData);
-          console.log('firstName:', profileData.firstName, 'trimmed:', profileData.firstName?.trim());
-          console.log('lastName:', profileData.lastName, 'trimmed:', profileData.lastName?.trim());
-          console.log('location:', profileData.location, 'trimmed:', profileData.location?.trim());
           setProfile(profileData);
         } else {
-          console.log('Profile document does not exist');
           setProfile(null);
         }
         setLoading(false);
         setError(null);
       },
       (err) => {
-        console.error('Profile fetch error:', err);
         setError(err.message || 'Failed to fetch profile');
         setProfile(null);
         setLoading(false);
@@ -88,7 +82,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
 
   // Check if profile has all required fields with actual content
   const hasProfileValue = useMemo(() => {
-    const result = Boolean(
+    return Boolean(
       profile && 
       profile.firstName && 
       profile.firstName.trim().length > 0 && 
@@ -97,18 +91,6 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
       profile.location && 
       profile.location.trim().length > 0
     );
-
-    console.log('hasProfile calculated:', result, {
-      profileExists: !!profile,
-      firstName: profile?.firstName,
-      firstNameValid: profile?.firstName && profile.firstName.trim().length > 0,
-      lastName: profile?.lastName,
-      lastNameValid: profile?.lastName && profile.lastName.trim().length > 0,
-      location: profile?.location,
-      locationValid: profile?.location && profile.location.trim().length > 0
-    });
-
-    return result;
   }, [profile]);
 
   return (

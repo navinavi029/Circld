@@ -10,11 +10,11 @@ import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 import { Alert } from '../components/ui/Alert';
 import { AddItemForm } from '../components/AddItemForm';
 import { Button } from '../components/ui/Button';
-import { Select } from '../components/ui/Select';
+import { Dropdown } from '../components/ui/Dropdown';
 import { Pagination } from '../components/ui/Pagination';
-import { QuickActions } from '../components/QuickActions';
 import { useAuth } from '../contexts/AuthContext';
-import { toggleFavorite } from '../utils/metadata';
+import { getPageTitleClasses, typography, getPrimaryButtonClasses, getPageContainerClasses } from '../styles/designSystem';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 type ViewMode = 'grid' | 'list';
 
@@ -44,6 +44,7 @@ function getConditionBadgeClass(condition: string): string {
 }
 
 export function Listings() {
+  usePageTitle('My Listings');
   const navigate = useNavigate();
   const { user } = useAuth();
   const [items, setItems] = useState<Item[]>([]);
@@ -55,7 +56,6 @@ export function Listings() {
   const [selectedCondition, setSelectedCondition] = useState('all');
   const [showTradeOffersOnly, setShowTradeOffersOnly] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
-  const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [ownerProfiles, setOwnerProfiles] = useState<Map<string, UserProfile>>(new Map());
   const [currentPage, setCurrentPage] = useState(1);
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
@@ -71,12 +71,6 @@ export function Listings() {
   useEffect(() => {
     filterItems();
   }, [items, searchTerm, selectedCategory, selectedCondition, showTradeOffersOnly]);
-
-  useEffect(() => {
-    if (user) {
-      loadFavorites();
-    }
-  }, [user]);
 
   useEffect(() => {
     if (items.length > 0) {
@@ -123,16 +117,6 @@ export function Listings() {
     setCurrentPage(1);
   };
 
-  const loadFavorites = async () => {
-    if (!user) return;
-    try {
-      const snapshot = await getDocs(query(collection(db, 'favorites'), where('userId', '==', user.uid)));
-      setFavorites(new Set(snapshot.docs.map(doc => doc.data().itemId)));
-    } catch (err) {
-      console.error('Error loading favorites:', err);
-    }
-  };
-
   const loadOwnerProfiles = async () => {
     const ownerIds = Array.from(new Set(items.map(item => item.ownerId)));
     const profiles = new Map<string, UserProfile>();
@@ -143,25 +127,6 @@ export function Listings() {
       } catch { /* ignore */ }
     }));
     setOwnerProfiles(profiles);
-  };
-
-  const handleFavoriteToggle = async (itemId: string) => {
-    if (!user) { navigate('/login'); return; }
-    try {
-      const newStatus = await toggleFavorite(itemId, user.uid);
-      setFavorites(prev => {
-        const next = new Set(prev);
-        newStatus ? next.add(itemId) : next.delete(itemId);
-        return next;
-      });
-      setItems(prev => prev.map(item =>
-        item.id === itemId
-          ? { ...item, favoriteCount: (item.favoriteCount || 0) + (newStatus ? 1 : -1) }
-          : item
-      ));
-    } catch {
-      setError('Failed to update favorite status');
-    }
   };
 
   const getOwnerProfile = (ownerId: string) => ownerProfiles.get(ownerId);
@@ -182,8 +147,6 @@ export function Listings() {
     setShowTradeOffersOnly(false);
   };
 
-  const totalViews = items.reduce((sum, item) => sum + (item.viewCount || 0), 0);
-  const totalFavorites = items.reduce((sum, item) => sum + (item.favoriteCount || 0), 0);
   const totalInterest = items.reduce((sum, item) => sum + (item.swipeInterestCount || 0), 0);
 
   const pagedItems = filteredItems.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
@@ -199,44 +162,29 @@ export function Listings() {
   return (
     <PageTransition variant="page">
       <div className="flex-1 w-full">
-        <div className="container mx-auto px-4 py-6 max-w-7xl">
+        <div className={getPageContainerClasses()}>
 
           {/* ── Header ── */}
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-6">
             <div>
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-accent via-accent-dark to-primary bg-clip-text text-transparent dark:from-primary-light dark:via-primary dark:to-accent-dark leading-tight pb-0.5">
+              <h1 className={getPageTitleClasses()}>
                 My Listings
               </h1>
-              <p className="text-xs sm:text-sm text-text-secondary dark:text-gray-400 mt-1">
+              <p className={`${typography.subtitle} mt-1`}>
                 {items.length > 0
                   ? `${items.length} ${items.length === 1 ? 'item' : 'items'} listed`
                   : 'No items yet — add your first listing!'}
               </p>
 
               {/* Stat chips */}
-              {items.length > 0 && (
+              {items.length > 0 && totalInterest > 0 && (
                 <div className="flex flex-wrap gap-2 mt-3">
                   <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white/80 dark:bg-gray-800/80 border border-gray-200/60 dark:border-gray-700/60 rounded-full text-xs font-medium text-text-secondary dark:text-gray-400 shadow-sm">
-                    <svg className="w-3.5 h-3.5 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    <svg className="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                     </svg>
-                    {totalViews.toLocaleString()} views
+                    {totalInterest.toLocaleString()} trade interest
                   </span>
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white/80 dark:bg-gray-800/80 border border-gray-200/60 dark:border-gray-700/60 rounded-full text-xs font-medium text-text-secondary dark:text-gray-400 shadow-sm">
-                    <svg className="w-3.5 h-3.5 text-rose-500" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                    </svg>
-                    {totalFavorites.toLocaleString()} saves
-                  </span>
-                  {totalInterest > 0 && (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white/80 dark:bg-gray-800/80 border border-gray-200/60 dark:border-gray-700/60 rounded-full text-xs font-medium text-text-secondary dark:text-gray-400 shadow-sm">
-                      <svg className="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                      </svg>
-                      {totalInterest.toLocaleString()} trade interest
-                    </span>
-                  )}
                 </div>
               )}
             </div>
@@ -268,7 +216,7 @@ export function Listings() {
 
               <Button
                 onClick={() => setShowAddForm(true)}
-                className="hidden sm:flex items-center gap-2 !bg-gradient-to-r !from-accent !to-accent-dark dark:!from-primary-light dark:!to-primary hover:shadow-lg hover:shadow-accent/30 dark:hover:shadow-primary/30 transition-shadow"
+                className={`hidden sm:flex items-center gap-2 ${getPrimaryButtonClasses(true)}`}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
@@ -309,27 +257,31 @@ export function Listings() {
 
               {/* Category and Condition inline */}
               <div className="flex gap-3 flex-shrink-0">
-                <Select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="w-40"
-                >
-                  <option value="all">All Categories</option>
-                  {categories.map(c => <option key={c} value={c}>{c}</option>)}
-                </Select>
+                <div className="w-40">
+                  <Dropdown
+                    value={selectedCategory}
+                    onChange={setSelectedCategory}
+                    options={[
+                      { value: 'all', label: 'All Categories' },
+                      ...categories.map(c => ({ value: c, label: c }))
+                    ]}
+                  />
+                </div>
 
-                <Select
-                  value={selectedCondition}
-                  onChange={(e) => setSelectedCondition(e.target.value)}
-                  className="w-36"
-                >
-                  <option value="all">All Conditions</option>
-                  <option value="new">New</option>
-                  <option value="like-new">Like New</option>
-                  <option value="good">Good</option>
-                  <option value="fair">Fair</option>
-                  <option value="poor">Poor</option>
-                </Select>
+                <div className="w-36">
+                  <Dropdown
+                    value={selectedCondition}
+                    onChange={setSelectedCondition}
+                    options={[
+                      { value: 'all', label: 'All Conditions' },
+                      { value: 'new', label: 'New' },
+                      { value: 'like-new', label: 'Like New' },
+                      { value: 'good', label: 'Good' },
+                      { value: 'fair', label: 'Fair' },
+                      { value: 'poor', label: 'Poor' },
+                    ]}
+                  />
+                </div>
               </div>
             </div>
 
@@ -431,7 +383,6 @@ export function Listings() {
               {viewMode === 'grid' && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                   {pagedItems.map((item) => {
-                    const isFavorited = favorites.has(item.id);
                     const ownerProfile = getOwnerProfile(item.ownerId);
                     const ownerInitials = getOwnerInitials(item.ownerId);
                     const hasTradeInterest = (item.swipeInterestCount || 0) > 0;
@@ -440,15 +391,8 @@ export function Listings() {
                       <div
                         key={item.id}
                         onClick={() => navigate(`/listings/${item.id}`)}
-                        className="group bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden hover:shadow-2xl hover:shadow-primary/10 hover:border-accent/40 dark:hover:border-primary-light/40 hover:-translate-y-1.5 transition-all duration-300 cursor-pointer flex flex-col relative"
+                        className={`group bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-lg overflow-hidden hover:shadow-2xl hover:shadow-primary/10 hover:border-accent/40 dark:hover:border-primary-light/40 hover:-translate-y-1.5 transition-all duration-300 cursor-pointer flex flex-col relative`}
                       >
-                        <QuickActions
-                          itemId={item.id}
-                          itemTitle={item.title}
-                          isFavorited={isFavorited}
-                          onFavoriteToggle={handleFavoriteToggle}
-                        />
-
                         {/* Image */}
                         <div className="relative aspect-[4/3] overflow-hidden bg-gray-100 dark:bg-gray-700 flex-shrink-0">
                           {item.images.length > 0 ? (
@@ -534,26 +478,7 @@ export function Listings() {
                               </span>
                             </div>
 
-                            {/* Micro stats */}
-                            <div className="flex items-center gap-2">
-                              {(item.viewCount || 0) > 0 && (
-                                <span className="flex items-center gap-0.5 text-[10px] text-gray-400 dark:text-gray-500">
-                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                  </svg>
-                                  {item.viewCount}
-                                </span>
-                              )}
-                              {(item.favoriteCount || 0) > 0 && (
-                                <span className="flex items-center gap-0.5 text-[10px] text-rose-400">
-                                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                                  </svg>
-                                  {item.favoriteCount}
-                                </span>
-                              )}
-                            </div>
+
                           </div>
                         </div>
                       </div>
@@ -566,7 +491,6 @@ export function Listings() {
               {viewMode === 'list' && (
                 <div className="flex flex-col gap-3">
                   {pagedItems.map((item) => {
-                    const isFavorited = favorites.has(item.id);
                     const ownerProfile = getOwnerProfile(item.ownerId);
                     const ownerInitials = getOwnerInitials(item.ownerId);
                     const hasTradeInterest = (item.swipeInterestCount || 0) > 0;
@@ -575,7 +499,7 @@ export function Listings() {
                       <div
                         key={item.id}
                         onClick={() => navigate(`/listings/${item.id}`)}
-                        className="group bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden hover:shadow-xl hover:shadow-primary/10 hover:border-accent/40 dark:hover:border-primary-light/40 hover:-translate-y-0.5 transition-all duration-300 cursor-pointer flex flex-row relative"
+                        className={`group bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-lg overflow-hidden hover:shadow-xl hover:shadow-primary/10 hover:border-accent/40 dark:hover:border-primary-light/40 hover:-translate-y-0.5 transition-all duration-300 cursor-pointer flex flex-row relative`}
                       >
                         {/* Thumbnail */}
                         <div className="relative w-28 sm:w-40 flex-shrink-0 overflow-hidden bg-gray-100 dark:bg-gray-700">
@@ -641,33 +565,7 @@ export function Listings() {
                               </span>
                             </div>
 
-                            <div className="flex items-center gap-3">
-                              {(item.viewCount || 0) > 0 && (
-                                <span className="flex items-center gap-1 text-[11px] text-gray-400 dark:text-gray-500">
-                                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                  </svg>
-                                  {item.viewCount}
-                                </span>
-                              )}
-                              {(item.favoriteCount || 0) > 0 && (
-                                <span className="flex items-center gap-1 text-[11px] text-rose-400">
-                                  <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                                  </svg>
-                                  {item.favoriteCount}
-                                </span>
-                              )}
-                              <button
-                                onClick={(e) => { e.stopPropagation(); handleFavoriteToggle(item.id); }}
-                                className={`p-1 rounded-full transition-colors ${isFavorited ? 'text-rose-500' : 'text-gray-300 hover:text-rose-400'}`}
-                              >
-                                <svg className="w-4 h-4" fill={isFavorited ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                                </svg>
-                              </button>
-                            </div>
+
                           </div>
                         </div>
                       </div>

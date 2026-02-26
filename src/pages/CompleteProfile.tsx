@@ -7,8 +7,11 @@ import { MapPicker } from '../components/MapPicker';
 import { type Coordinates } from '../utils/location';
 import { Button, Input, Alert, Card } from '../components/ui';
 import { PageTransition } from '../components/PageTransition';
+import { getPageTitleClasses, typography, getPrimaryButtonClasses, getPageBackgroundClasses, getCardClasses } from '../styles/designSystem';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 export function CompleteProfile() {
+  usePageTitle('Complete Profile');
   const { user } = useAuth();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -83,12 +86,12 @@ export function CompleteProfile() {
 
   return (
     <PageTransition variant="auth">
-      <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-accent/10 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4">
+      <div className={`${getPageBackgroundClasses()} flex items-center justify-center p-4`}>
         <div className="absolute top-4 right-4">
           <ThemeToggle />
         </div>
 
-        <Card variant="glass" className="max-w-md w-full animate-fadeIn shadow-2xl border-white/20 dark:border-gray-700/50">
+        <Card variant="glass" className={`max-w-md w-full animate-fadeIn shadow-2xl border-white/20 dark:border-gray-700/50 ${getCardClasses('glass', 'normal')}`}>
           <div className="flex justify-center mb-6">
             <div className="w-16 h-16 bg-primary dark:bg-primary-light rounded-2xl flex items-center justify-center shadow-lg">
               <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -97,10 +100,10 @@ export function CompleteProfile() {
             </div>
           </div>
 
-          <h1 className="text-3xl font-bold text-primary dark:text-primary-light mb-2 text-center">
+          <h1 className={getPageTitleClasses()}>
             Complete Your Profile
           </h1>
-          <p className="text-text-secondary dark:text-gray-400 text-center mb-8">
+          <p className={`${typography.subtitle} text-center mb-8`}>
             We need a few more details to set up your account
           </p>
 
@@ -178,7 +181,7 @@ export function CompleteProfile() {
                 variant="primary"
                 size="lg"
                 isLoading={isLoading}
-                className="w-full"
+                className={`w-full ${getPrimaryButtonClasses(true)}`}
               >
                 {isLoading ? 'Creating profile...' : 'Complete Profile'}
               </Button>

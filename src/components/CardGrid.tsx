@@ -2,7 +2,6 @@ import { Item } from '../types/item';
 import { UserProfile } from '../types/user';
 import { SwipeCard } from './SwipeCard';
 import { useRef, useEffect, useState, memo } from 'react';
-import { LoadingSpinner } from './ui/LoadingSpinner';
 
 interface CardGridProps {
   items: Item[];
@@ -152,47 +151,45 @@ export const CardGrid = memo(function CardGrid({
         role="status"
         aria-label="Loading card"
       >
-        <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl overflow-hidden border-2 border-gray-100 dark:border-gray-700 animate-pulse relative">
-          {/* Image skeleton */}
-          <div className="aspect-[4/3] bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 relative">
+        <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl overflow-hidden border-2 border-gray-100 dark:border-gray-700 relative">
+          {/* Image skeleton with shimmer */}
+          <div className="aspect-[4/3] bg-gradient-to-br from-gray-200 via-gray-300 to-gray-200 dark:from-gray-700 dark:via-gray-600 dark:to-gray-700 animate-shimmer relative">
             {/* Loading spinner overlay */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <LoadingSpinner size="lg" message="" />
+            <div className="absolute inset-0 flex items-center justify-center bg-white/30 dark:bg-gray-900/30 backdrop-blur-sm">
+              <div className="flex flex-col items-center gap-3">
+                <div className="w-12 h-12 border-4 border-primary/30 dark:border-primary-light/30 border-t-primary dark:border-t-primary-light rounded-full animate-spin" />
+                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Loading card...</span>
+              </div>
             </div>
           </div>
 
           {/* Content skeleton */}
           <div className="p-6 space-y-4">
             {/* Title skeleton */}
-            <div className="h-7 bg-gray-200 dark:bg-gray-700 rounded-lg w-3/4" />
+            <div className="h-7 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 dark:from-gray-700 dark:via-gray-600 dark:to-gray-700 rounded-lg w-3/4 animate-shimmer" />
 
             {/* Description skeleton */}
             <div className="space-y-2">
-              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full" />
-              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6" />
+              <div className="h-4 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 dark:from-gray-700 dark:via-gray-600 dark:to-gray-700 rounded w-full animate-shimmer" />
+              <div className="h-4 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 dark:from-gray-700 dark:via-gray-600 dark:to-gray-700 rounded w-5/6 animate-shimmer" />
             </div>
 
             {/* Badges skeleton */}
             <div className="flex gap-2">
-              <div className="h-6 w-20 bg-gray-200 dark:bg-gray-700 rounded-full" />
-              <div className="h-6 w-24 bg-gray-200 dark:bg-gray-700 rounded-full" />
+              <div className="h-6 w-20 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 dark:from-gray-700 dark:via-gray-600 dark:to-gray-700 rounded-full animate-shimmer" />
+              <div className="h-6 w-24 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 dark:from-gray-700 dark:via-gray-600 dark:to-gray-700 rounded-full animate-shimmer" />
             </div>
 
             {/* Owner skeleton */}
             <div className="pt-4 border-t-2 border-gray-200 dark:border-gray-700">
               <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-full bg-gray-200 dark:bg-gray-700" />
+                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-gray-200 via-gray-300 to-gray-200 dark:from-gray-700 dark:via-gray-600 dark:to-gray-700 animate-shimmer" />
                 <div className="flex-1 space-y-2">
-                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2" />
-                  <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/3" />
+                  <div className="h-4 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 dark:from-gray-700 dark:via-gray-600 dark:to-gray-700 rounded w-1/2 animate-shimmer" />
+                  <div className="h-3 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 dark:from-gray-700 dark:via-gray-600 dark:to-gray-700 rounded w-1/3 animate-shimmer" />
                 </div>
               </div>
             </div>
-          </div>
-
-          {/* Loading text */}
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-            <span className="sr-only">Loading card...</span>
           </div>
         </div>
       </div>

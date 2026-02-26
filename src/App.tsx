@@ -15,6 +15,7 @@ import { ConversationView } from './components/ConversationView';
 import { TradeOffers } from './pages/TradeOffers';
 import { TradeHistory } from './pages/TradeHistory';
 import { Home } from './pages/Home';
+import { Demo } from './pages/Demo';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { PublicRoute } from './components/PublicRoute';
 import { MainLayout } from './components/MainLayout';
@@ -71,6 +72,7 @@ function AppRoutes() {
       {/* Main layout routes — AnimatePresence inside MainLayout handles page transitions */}
       {!isAuthPath && (
         <Routes>
+          <Route path="/demo" element={<Demo />} />
           <Route element={<MainLayout />}>
             <Route path="/" element={<Home />} />
             <Route

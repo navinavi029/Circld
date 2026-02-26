@@ -7,15 +7,15 @@
   /* Custom breakpoints */
   --breakpoint-xs: 480px;
 
-  /* Primary colors - Vibrant Emerald */
+  /* Primary colors - Vibrant Emerald with better contrast */
   --color-primary: #10b981;
   --color-primary-light: #34d399;
-  --color-primary-dark: #047857;
+  --color-primary-dark: #059669;
 
-  /* Accent colors - Teal */
-  --color-accent: #0f766e;
-  --color-accent-light: #14b8a6;
-  --color-accent-dark: #115e59;
+  /* Accent colors - Refined Teal */
+  --color-accent: #14b8a6;
+  --color-accent-light: #2dd4bf;
+  --color-accent-dark: #0f766e;
 
   /* Info colors */
   --color-info: #3b82f6;
@@ -25,7 +25,7 @@
   /* Semantic colors */
   --color-success: #10b981;
   --color-success-light: #34d399;
-  --color-success-dark: #047857;
+  --color-success-dark: #059669;
 
   --color-warning: #f59e0b;
   --color-warning-light: #fbbf24;
@@ -35,7 +35,7 @@
   --color-error-light: #f87171;
   --color-error-dark: #dc2626;
 
-  /* Background colors - Light mode (slate-50 base) */
+  /* Background colors - Light mode (refined slate) */
   --color-background: #f8fafc;
   --color-background-light: #ffffff;
   --color-background-dark: #f1f5f9;
@@ -46,32 +46,34 @@
   --color-text-disabled: #94a3b8;
 
   /* Border colors - Light mode */
-  --color-border: #cbd5e1;
+  --color-border: #e2e8f0;
   --color-border-dark: #94a3b8;
-  --color-border-light: #e2e8f0;
+  --color-border-light: #f1f5f9;
 }
 
-/* Dark mode color overrides (slate-900 base) */
+/* Dark mode color overrides (refined slate-950 base) */
 .dark {
-  --color-background: #0f172a;
-  --color-background-light: #1e293b;
-  --color-background-dark: #020617;
+  --color-background: #020617;
+  --color-background-light: #0f172a;
+  --color-background-dark: #000000;
 
   --color-text: #f8fafc;
   --color-text-secondary: #cbd5e1;
   --color-text-disabled: #64748b;
 
-  --color-border: #334155;
-  --color-border-dark: #1e293b;
-  --color-border-light: #475569;
+  --color-border: #1e293b;
+  --color-border-dark: #0f172a;
+  --color-border-light: #334155;
 }
 
 * {
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
 body {
-  font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+  font-family: 'Inter', 'Poppins', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Global scrollbar hiding - applies to all elements */
@@ -107,11 +109,15 @@ body {
   }
 
   .animate-scaleIn {
-    animation: scaleIn 0.4s ease-out;
+    animation: scaleIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .animate-slideDown {
-    animation: slideDown 0.4s ease-out;
+    animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .animate-slideUp {
+    animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   /* Auth page card entrance */
@@ -130,6 +136,11 @@ body {
   .animate-switchIn {
     animation: switchIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
     will-change: opacity, transform;
+  }
+
+  /* Bounce animation */
+  .animate-bounce-subtle {
+    animation: bounceSubtle 2s ease-in-out infinite;
   }
 
   /* Stagger delay helpers */
@@ -205,6 +216,18 @@ body {
     }
   }
 
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
   @keyframes authCardIn {
     from {
       opacity: 0;
@@ -240,6 +263,15 @@ body {
     to {
       opacity: 1;
       transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes bounceSubtle {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
     }
   }
 
@@ -287,6 +319,20 @@ body {
     }
   }
 
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  .animate-shimmer {
+    background-size: 200% 100%;
+    animation: shimmer 2s ease-in-out infinite;
+  }
+
   /* Hide scrollbar for Chrome, Safari and Opera */
   .hide-scrollbar::-webkit-scrollbar {
     display: none;
@@ -299,6 +345,67 @@ body {
     scrollbar-width: none;
     /* Firefox */
   }
+}
+
+/* Enhanced Select Dropdown Styles */
+select {
+  /* Smooth scrolling for long option lists */
+  scroll-behavior: smooth;
+}
+
+/* Style the dropdown options */
+select option {
+  padding: 0.75rem 1rem;
+  font-weight: 500;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* Light mode option styles */
+select option {
+  background-color: #ffffff;
+  color: #0f172a;
+}
+
+select option:hover {
+  background-color: #f8fafc;
+}
+
+select option:checked,
+select option:focus {
+  background: linear-gradient(to right, #0f766e, #115e59);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* Dark mode option styles */
+.dark select option {
+  background-color: #1e293b;
+  color: #f8fafc;
+}
+
+.dark select option:hover {
+  background-color: #334155;
+}
+
+.dark select option:checked,
+.dark select option:focus {
+  background: linear-gradient(to right, #34d399, #10b981);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* Disabled option styles */
+select option:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  color: #94a3b8;
+}
+
+.dark select option:disabled {
+  color: #64748b;
 }
 
 /* Leaflet Map Styles */
