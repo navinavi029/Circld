@@ -19,12 +19,9 @@ export const TradeAnchorDisplay: React.FC<TradeAnchorDisplayProps> = ({
   onChangeClick,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isPulsing, setIsPulsing] = useState(false);
 
   // Handle change button click with pulse animation (Requirement 7.6)
   const handleChangeClick = () => {
-    setIsPulsing(true);
-    setTimeout(() => setIsPulsing(false), 600);
     setIsExpanded(false);
     onChangeClick();
   };

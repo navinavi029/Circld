@@ -32,7 +32,7 @@ const Demo = lazy(() => import('./pages/Demo').then(m => ({ default: m.Demo })))
 function RouteLoadingFallback() {
   return (
     <div className="min-h-screen flex items-center justify-center">
-      <LoadingSpinner message="Loading page" size="lg" showDots />
+      <LoadingSpinner message="Loading page" size="lg" variant="flow" />
     </div>
   );
 }

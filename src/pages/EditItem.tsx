@@ -160,8 +160,8 @@ export function EditItem() {
       // Upload new images
       const newImageUrls: string[] = [];
       for (const image of newImages) {
-        const url = await uploadToCloudinary(image);
-        newImageUrls.push(url);
+        const result = await uploadToCloudinary(image);
+        newImageUrls.push(result.url);
       }
 
       // Combine existing and new images

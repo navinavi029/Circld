@@ -393,8 +393,7 @@ export function SwipeInterface({
                 <LoadingSpinner 
                   size="md" 
                   message="Loading items" 
-                  showDots={true}
-                  subtitle="Finding the best matches for you"
+                  variant="flow"
                 />
               </div>
             </div>
