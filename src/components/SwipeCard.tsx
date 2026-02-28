@@ -1,8 +1,20 @@
 import { useState, useRef, useEffect, memo } from 'react';
+import { motion } from 'framer-motion';
 import { Item } from '../types/item';
 import { UserProfile } from '../types/user';
 import { useProfile } from '../contexts/ProfileContext';
+import { useHaptic } from '../contexts/HapticContext';
+import { useAudio } from '../contexts/AudioContext';
 import { calculateDistanceForItem, formatDistanceDisplay } from '../utils/location';
+import { getResponsiveImageUrl } from '../utils/cloudinary';
+import { 
+  calculateRotation, 
+  calculateDragOpacity, 
+  getOverlayState,
+  calculateVelocity,
+  shouldCompleteSwipe,
+  getEntranceConfig
+} from '../utils/swipeAnimations';
 
 interface SwipeCardProps {
   item: Item;
@@ -18,22 +30,30 @@ interface DragState {
   startY: number;
   currentX: number;
   currentY: number;
+  startTime: number;
 }
 
-const SWIPE_THRESHOLD = 100; // pixels to trigger swipe
-const ROTATION_FACTOR = 0.1; // rotation per pixel moved
+const SWIPE_THRESHOLD = 50; // Minimum pixels to trigger swipe (Requirement 11.5)
+const SWIPE_DEBOUNCE_MS = 300; // Debounce time to prevent double-triggering (Requirement 11.3)
+const VERTICAL_SCROLL_THRESHOLD = 30; // Pixels of vertical movement to cancel swipe (Requirement 11.6)
 
 export const SwipeCard = memo(function SwipeCard({ item, ownerProfile, onSwipeLeft, onSwipeRight, compact = false }: SwipeCardProps) {
   const { profile } = useProfile();
+  const { trigger: triggerHaptic } = useHaptic();
+  const { play: playSound } = useAudio();
   const [dragState, setDragState] = useState<DragState>({
     isDragging: false,
     startX: 0,
     startY: 0,
     currentX: 0,
     currentY: 0,
+    startTime: 0,
   });
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [imageLoaded, setImageLoaded] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
+  const lastSwipeTimeRef = useRef<number>(-SWIPE_DEBOUNCE_MS); // Initialize to allow first swipe
+  const thresholdReachedRef = useRef<boolean>(false); // Track if threshold haptic was triggered
 
   const [isAnimatingOut, setIsAnimatingOut] = useState(false);
 
@@ -44,10 +64,36 @@ export const SwipeCard = memo(function SwipeCard({ item, ownerProfile, onSwipeLe
   );
   const distanceDisplay = formatDistanceDisplay(distance, ownerProfile.location);
 
-  // Calculate transform values based on drag position
+  // Get responsive image URL for the current image
+  const currentImageUrl = item.images && item.images.length > 0
+    ? getResponsiveImageUrl(item.images[currentImageIndex], { deviceType: 'auto' })
+    : '';
+
+  // Get responsive owner photo URL
+  const ownerPhotoUrl = ownerProfile.photoUrl
+    ? getResponsiveImageUrl(ownerProfile.photoUrl, { width: 56, height: 56, crop: 'fill' })
+    : '';
+
+  // Get condition badge color based on item condition (Requirement 1.5)
+  const getConditionColor = (condition: string): string => {
+    switch (condition) {
+      case 'excellent':
+        return 'bg-green-500 text-white border-green-600';
+      case 'good':
+        return 'bg-blue-500 text-white border-blue-600';
+      case 'fair':
+        return 'bg-yellow-500 text-white border-yellow-600';
+      case 'poor':
+        return 'bg-red-500 text-white border-red-600';
+      default:
+        return 'bg-gray-500 text-white border-gray-600';
+    }
+  };
+
+  // Calculate transform values based on drag position using animation utilities
   const deltaX = dragState.currentX - dragState.startX;
   const deltaY = dragState.currentY - dragState.startY;
-  const rotation = deltaX * ROTATION_FACTOR;
+  const rotation = calculateRotation(deltaX);
 
   // Calculate opacity with fade-out effect
   let opacity = 1;
@@ -55,27 +101,45 @@ export const SwipeCard = memo(function SwipeCard({ item, ownerProfile, onSwipeLe
     // Fade out during exit animation
     opacity = 0;
   } else if (dragState.isDragging) {
-    // Gradual fade during drag
-    opacity = Math.max(0.5, 1 - Math.abs(deltaX) / 300);
+    // Gradual fade during drag using animation utility
+    opacity = calculateDragOpacity(deltaX);
   }
 
-  // Determine overlay color and opacity
-  const overlayOpacity = Math.min(Math.abs(deltaX) / SWIPE_THRESHOLD, 1);
-  const showGreenOverlay = deltaX > 30;
-  const showRedOverlay = deltaX < -30;
+  // Determine overlay state using animation utility
+  const overlayState = getOverlayState(deltaX);
+  const showGreenOverlay = overlayState.type === 'like';
+  const showRedOverlay = overlayState.type === 'pass';
+  const overlayOpacity = overlayState.opacity;
+
+  // Trigger haptic feedback when threshold is reached (Requirement 4.1)
+  useEffect(() => {
+    if (dragState.isDragging && overlayState.visible && !thresholdReachedRef.current) {
+      triggerHaptic('light');
+      thresholdReachedRef.current = true;
+    } else if (!overlayState.visible) {
+      thresholdReachedRef.current = false;
+    }
+  }, [overlayState.visible, dragState.isDragging, triggerHaptic]);
 
   // Image navigation
   const nextImage = () => {
     if (item.images && item.images.length > 1) {
+      setImageLoaded(false); // Reset loaded state for fade-in animation
       setCurrentImageIndex((prev) => (prev + 1) % item.images.length);
     }
   };
 
   const prevImage = () => {
     if (item.images && item.images.length > 1) {
+      setImageLoaded(false); // Reset loaded state for fade-in animation
       setCurrentImageIndex((prev) => (prev - 1 + item.images.length) % item.images.length);
     }
   };
+
+  // Reset image loaded state when item changes
+  useEffect(() => {
+    setImageLoaded(false);
+  }, [item.id, currentImageIndex]);
 
   // Touch event handlers
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -89,12 +153,34 @@ export const SwipeCard = memo(function SwipeCard({ item, ownerProfile, onSwipeLe
       startY: touch.clientY,
       currentX: touch.clientX,
       currentY: touch.clientY,
+      startTime: Date.now(),
     });
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
     if (!dragState.isDragging) return;
+    
     const touch = e.touches[0];
+    const deltaX = touch.clientX - dragState.startX;
+    const deltaY = touch.clientY - dragState.startY;
+    
+    // Cancel swipe if vertical scroll is detected (Requirement 11.6)
+    if (Math.abs(deltaY) > VERTICAL_SCROLL_THRESHOLD && Math.abs(deltaY) > Math.abs(deltaX)) {
+      console.log('Vertical scroll detected, canceling swipe');
+      setDragState(prev => ({
+        ...prev,
+        isDragging: false,
+        currentX: prev.startX,
+        currentY: prev.startY,
+      }));
+      return;
+    }
+    
+    // Prevent default to stop scrolling when horizontal swipe is detected
+    if (Math.abs(deltaX) > 10) {
+      e.preventDefault();
+    }
+    
     setDragState(prev => ({
       ...prev,
       currentX: touch.clientX,
@@ -102,8 +188,12 @@ export const SwipeCard = memo(function SwipeCard({ item, ownerProfile, onSwipeLe
     }));
   };
 
-  const handleTouchEnd = () => {
+  const handleTouchEnd = (e: React.TouchEvent) => {
     if (!dragState.isDragging) return;
+    
+    // Prevent event propagation to avoid triggering button clicks (Requirement 11.1, 11.2)
+    e.stopPropagation();
+    
     handleSwipeEnd();
   };
 
@@ -131,6 +221,7 @@ export const SwipeCard = memo(function SwipeCard({ item, ownerProfile, onSwipeLe
       startY: e.clientY,
       currentX: e.clientX,
       currentY: e.clientY,
+      startTime: Date.now(),
     });
   };
 
@@ -150,19 +241,37 @@ export const SwipeCard = memo(function SwipeCard({ item, ownerProfile, onSwipeLe
     }
   };
 
-  // Handle swipe completion
+  // Handle swipe completion with velocity check
   const handleSwipeEnd = () => {
     const swipeDistance = deltaX;
+    const deltaYAbs = Math.abs(dragState.currentY - dragState.startY);
 
-    if (Math.abs(swipeDistance) >= SWIPE_THRESHOLD) {
-      // Swipe threshold met
+    // Check if vertical scroll was detected (Requirement 11.6)
+    if (deltaYAbs > VERTICAL_SCROLL_THRESHOLD && deltaYAbs > Math.abs(swipeDistance)) {
+      console.log('Vertical scroll detected, resetting card');
+      setDragState(prev => ({
+        ...prev,
+        isDragging: false,
+        currentX: prev.startX,
+        currentY: prev.startY,
+      }));
+      return;
+    }
+
+    // Calculate velocity for velocity-based swipe (Requirement 8.1)
+    const deltaTime = Date.now() - dragState.startTime;
+    const velocity = calculateVelocity(swipeDistance, deltaTime);
+
+    // Check if swipe should complete (distance or velocity threshold)
+    if (shouldCompleteSwipe(swipeDistance, velocity)) {
+      // Swipe threshold met - trigger animation
       if (swipeDistance > 0) {
         animateSwipe('right');
       } else {
         animateSwipe('left');
       }
     } else {
-      // Reset card position
+      // Reset card position with spring animation
       setDragState(prev => ({
         ...prev,
         isDragging: false,
@@ -177,6 +286,15 @@ export const SwipeCard = memo(function SwipeCard({ item, ownerProfile, onSwipeLe
     // Prevent duplicate swipes
     if (isAnimatingOut) return;
     
+    // Debounce check (Requirement 11.3)
+    const now = Date.now();
+    if (now - lastSwipeTimeRef.current < SWIPE_DEBOUNCE_MS) {
+      console.log('Swipe debounced, ignoring');
+      return;
+    }
+    
+    lastSwipeTimeRef.current = now;
+    
     const targetX = direction === 'right' ? window.innerWidth * 1.5 : -window.innerWidth * 1.5;
 
     setIsAnimatingOut(true);
@@ -185,6 +303,14 @@ export const SwipeCard = memo(function SwipeCard({ item, ownerProfile, onSwipeLe
       isDragging: false,
       currentX: prev.startX + targetX,
     }));
+
+    // Trigger haptic and audio feedback (Requirements 4.2, 16.1, 16.2, 16.3)
+    triggerHaptic('medium');
+    if (direction === 'right') {
+      playSound('like');
+    } else {
+      playSound('pass');
+    }
 
     // Trigger callback immediately - parent will handle timing
     if (direction === 'right') {
@@ -213,12 +339,34 @@ export const SwipeCard = memo(function SwipeCard({ item, ownerProfile, onSwipeLe
 
         const swipeDistance = prev.currentX - prev.startX;
 
-        if (Math.abs(swipeDistance) >= SWIPE_THRESHOLD) {
-          // Swipe threshold met - animate off screen
+        if (Math.abs(swipeDistance) > SWIPE_THRESHOLD) {
+          // Swipe threshold met - check debounce
+          const now = Date.now();
+          if (now - lastSwipeTimeRef.current < SWIPE_DEBOUNCE_MS) {
+            console.log('Mouse swipe debounced, ignoring');
+            return {
+              ...prev,
+              isDragging: false,
+              currentX: prev.startX,
+              currentY: prev.startY,
+            };
+          }
+          
+          lastSwipeTimeRef.current = now;
+          
+          // Animate off screen
           const direction = swipeDistance > 0 ? 'right' : 'left';
           const targetX = direction === 'right' ? window.innerWidth * 1.5 : -window.innerWidth * 1.5;
 
           setIsAnimatingOut(true);
+
+          // Trigger haptic and audio feedback (Requirements 4.2, 16.1, 16.2, 16.3)
+          triggerHaptic('medium');
+          if (direction === 'right') {
+            playSound('like');
+          } else {
+            playSound('pass');
+          }
 
           // Trigger callback immediately - parent will handle timing
           if (direction === 'right') {
@@ -282,83 +430,135 @@ export const SwipeCard = memo(function SwipeCard({ item, ownerProfile, onSwipeLe
     transition: dragState.isDragging
       ? 'none'
       : isAnimatingOut
-        ? 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s ease-out'
+        ? 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease-out'
         : 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease-out',
     cursor: dragState.isDragging ? 'grabbing' : 'grab',
     willChange: dragState.isDragging || isAnimatingOut ? 'transform, opacity' : 'auto',
   };
 
+  // Entrance animation config
+  const entranceConfig = getEntranceConfig();
+
   return (
-    <div
-      ref={cardRef}
-      className="relative w-full max-w-md mx-auto select-none animate-scaleIn"
-      style={cardStyle}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-      onTouchCancel={handleTouchCancel}
-      onMouseDown={handleMouseDown}
-      onKeyDown={handleKeyDown}
-      tabIndex={0}
-      role="button"
-      aria-label={`Swipe card for ${item.title}. Press left arrow to pass, right arrow to like.`}
+    <motion.div
+      initial={{ scale: entranceConfig.scale.from, opacity: 0 }}
+      animate={{ scale: entranceConfig.scale.to, opacity: 1 }}
+      transition={{ duration: entranceConfig.duration / 1000 }}
+      className={`relative w-full select-none ${compact ? 'h-full' : 'max-w-md mx-auto'}`}
     >
-      {/* Card Container */}
-      <div className={`bg-white dark:bg-gray-800 shadow-2xl overflow-hidden border-2 border-gray-100 dark:border-gray-700 ${compact ? 'rounded-2xl' : 'rounded-3xl'} ${dragState.isDragging ? 'shadow-3xl scale-[1.02]' : ''} transition-shadow duration-200`}>
-        {/* Image Section */}
-        <div className="relative aspect-[4/3] bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800">
+      <div
+        ref={cardRef}
+        style={cardStyle}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onTouchCancel={handleTouchCancel}
+        onMouseDown={handleMouseDown}
+        onKeyDown={handleKeyDown}
+        tabIndex={0}
+        role="button"
+        aria-label={`Swipe card for ${item.title}. Press left arrow to pass, right arrow to like.`}
+      >
+      {/* Card Container - Enhanced with rounded corners and shadows (Requirement 1.1) */}
+      {/* Dark mode optimizations: elevated surface colors, softer shadows (Requirements 19.1, 19.3) */}
+      <div className={`bg-white dark:bg-gray-800 shadow-2xl dark:shadow-xl dark:shadow-black/30 overflow-hidden border border-gray-200 dark:border-gray-700 ${compact ? 'rounded-2xl h-full flex flex-col' : 'rounded-3xl'} ${dragState.isDragging ? 'shadow-3xl dark:shadow-2xl dark:shadow-black/40 scale-[1.02]' : ''} transition-shadow duration-200`}>
+        {/* Image Section with gradient overlay for text readability (Requirement 1.2) */}
+        {/* Dark mode: reduced overlay opacity (Requirement 19.2) */}
+        <div className="relative aspect-[4/3] bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 overflow-hidden">
           {item.images && item.images.length > 0 ? (
             <>
-              <img
-                src={item.images[currentImageIndex]}
+              {/* Image with fade-in animation (Requirement 7.3) and parallax effect (Requirement 7.4) */}
+              <motion.img
+                key={currentImageUrl}
+                src={currentImageUrl}
                 alt={item.title}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover dark:brightness-90"
                 draggable={false}
                 loading="lazy"
+                initial={{ opacity: 0, scale: 1.1 }}
+                animate={{ 
+                  opacity: imageLoaded ? 1 : 0,
+                  scale: imageLoaded ? 1 : 1.1,
+                  x: dragState.isDragging ? deltaX * 0.05 : 0 // Parallax effect during drag
+                }}
+                transition={{ 
+                  opacity: { duration: 0.2 },
+                  scale: { duration: 0.2 },
+                  x: { duration: 0 } // Instant parallax response
+                }}
+                onLoad={() => setImageLoaded(true)}
               />
+              
+              {/* Gradient overlay for better text readability (Requirement 1.2) */}
+              {/* Dark mode: reduced opacity by 20% (Requirement 19.2) */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20 dark:from-black/32 dark:via-transparent dark:to-black/16 pointer-events-none" />
 
               {/* Image Navigation Buttons */}
               {item.images.length > 1 && (
                 <>
-                  <button
+                  <motion.button
                     onClick={(e) => {
                       e.stopPropagation();
+                      e.preventDefault();
                       prevImage();
+                    }}
+                    onTouchEnd={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
                     }}
                     className={`absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 backdrop-blur-sm text-white rounded-full flex items-center justify-center transition-all z-10 ${compact ? 'w-8 h-8' : 'w-10 h-10'}`}
                     aria-label="Previous image"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    transition={{ duration: 0.2 }}
                   >
                     <svg className={compact ? 'w-4 h-4' : 'w-5 h-5'} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
                     </svg>
-                  </button>
-                  <button
+                  </motion.button>
+                  <motion.button
                     onClick={(e) => {
                       e.stopPropagation();
+                      e.preventDefault();
                       nextImage();
+                    }}
+                    onTouchEnd={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
                     }}
                     className={`absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 backdrop-blur-sm text-white rounded-full flex items-center justify-center transition-all z-10 ${compact ? 'w-8 h-8' : 'w-10 h-10'}`}
                     aria-label="Next image"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    transition={{ duration: 0.2 }}
                   >
                     <svg className={compact ? 'w-4 h-4' : 'w-5 h-5'} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                     </svg>
-                  </button>
+                  </motion.button>
 
                   {/* Image Dots Indicator */}
                   <div className={`absolute left-1/2 -translate-x-1/2 flex gap-1.5 z-10 ${compact ? 'bottom-2' : 'bottom-4'}`}>
                     {item.images.map((_, idx) => (
-                      <button
+                      <motion.button
                         key={idx}
                         onClick={(e) => {
                           e.stopPropagation();
+                          e.preventDefault();
                           setCurrentImageIndex(idx);
+                        }}
+                        onTouchEnd={(e) => {
+                          e.stopPropagation();
+                          e.preventDefault();
                         }}
                         className={`w-2 h-2 rounded-full transition-all ${idx === currentImageIndex
                             ? 'bg-white w-6'
                             : 'bg-white/50 hover:bg-white/75'
                           }`}
                         aria-label={`Go to image ${idx + 1}`}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.95 }}
+                        transition={{ duration: 0.2 }}
                       />
                     ))}
                   </div>
@@ -422,16 +622,16 @@ export const SwipeCard = memo(function SwipeCard({ item, ownerProfile, onSwipeLe
             </div>
           )}
 
-          {/* Condition Badge */}
+          {/* Condition Badge with color coding (Requirement 1.5) */}
           <div className={`absolute z-10 ${compact ? 'top-2 left-2' : 'top-4 left-4'}`}>
-            <span className={`bg-white/95 dark:bg-gray-800/95 backdrop-blur-md font-bold text-gray-900 dark:text-white rounded-full shadow-lg border border-gray-200 dark:border-gray-700 capitalize ${compact ? 'px-2 py-1 text-xs' : 'px-3 py-1.5 text-sm'}`}>
+            <span className={`${getConditionColor(item.condition)} backdrop-blur-md font-bold rounded-full shadow-lg border-2 capitalize ${compact ? 'px-3 py-1 text-xs' : 'px-4 py-1.5 text-sm'}`}>
               {item.condition.replace('-', ' ')}
             </span>
           </div>
 
-          {/* Category Badge */}
+          {/* Category Badge - Dark mode: use primary-light for accents (Requirement 19.5) */}
           <div className={`absolute z-10 ${compact ? 'top-2 right-2' : 'top-4 right-4'}`}>
-            <span className={`bg-accent/95 dark:bg-primary-light/95 backdrop-blur-md font-bold text-white rounded-full shadow-lg capitalize ${compact ? 'px-2 py-1 text-xs' : 'px-3 py-1.5 text-sm'}`}>
+            <span className={`bg-accent dark:bg-primary-light backdrop-blur-md font-bold text-white rounded-full shadow-lg capitalize ${compact ? 'px-2 py-1 text-xs' : 'px-3 py-1.5 text-sm'}`}>
               {item.category}
             </span>
           </div>
@@ -449,19 +649,19 @@ export const SwipeCard = memo(function SwipeCard({ item, ownerProfile, onSwipeLe
             {item.description}
           </p>
 
-          {/* Owner Info */}
+          {/* Owner Info with enhanced profile photo styling (Requirement 1.3) */}
           <div className={`border-t-2 border-gray-200 dark:border-gray-700 ${compact ? 'pt-3' : 'pt-4'}`}>
             <div className="flex items-center gap-4">
-              {ownerProfile.photoUrl ? (
+              {ownerPhotoUrl ? (
                 <img
-                  src={ownerProfile.photoUrl}
+                  src={ownerPhotoUrl}
                   alt={`${ownerProfile.firstName} ${ownerProfile.lastName}`}
-                  className={`rounded-full object-cover border-3 border-white dark:border-gray-700 shadow-lg ${compact ? 'w-10 h-10' : 'w-14 h-14'}`}
+                  className={`rounded-full object-cover border-4 border-white dark:border-gray-700 shadow-xl ring-2 ring-gray-200 dark:ring-gray-600 ${compact ? 'w-12 h-12' : 'w-16 h-16'}`}
                   loading="lazy"
                 />
               ) : (
-                <div className={`rounded-full bg-gradient-to-br from-accent to-accent-dark dark:from-primary-light dark:to-primary flex items-center justify-center border-3 border-white dark:border-gray-700 shadow-lg ${compact ? 'w-10 h-10' : 'w-14 h-14'}`}>
-                  <span className={`text-white font-bold ${compact ? 'text-lg' : 'text-xl'}`}>
+                <div className={`rounded-full bg-gradient-to-br from-accent to-accent-dark dark:from-primary-light dark:to-primary flex items-center justify-center border-4 border-white dark:border-gray-700 shadow-xl ring-2 ring-gray-200 dark:ring-gray-600 ${compact ? 'w-12 h-12' : 'w-16 h-16'}`}>
+                  <span className={`text-white font-bold ${compact ? 'text-lg' : 'text-2xl'}`}>
                     {ownerProfile.firstName[0]}{ownerProfile.lastName[0]}
                   </span>
                 </div>
@@ -482,11 +682,12 @@ export const SwipeCard = memo(function SwipeCard({ item, ownerProfile, onSwipeLe
           </div>
         </div>
       </div>
+      </div>
 
       {/* Swipe Instructions (visible on focus) */}
       <div className="sr-only" aria-live="polite">
         Use arrow keys to swipe. Left arrow to pass, right arrow to like.
       </div>
-    </div>
+    </motion.div>
   );
 });

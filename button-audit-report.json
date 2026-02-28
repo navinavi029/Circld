@@ -1,0 +1,5098 @@
+{
+  "totalButtons": 377,
+  "componentButtons": 252,
+  "nativeButtons": 125,
+  "results": [
+    {
+      "location": {
+        "file": "src\\components\\AddItemForm.tsx",
+        "line": 245,
+        "column": 19
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "type": "button",
+        "onClick": "() => removeImage(index)",
+        "className": "absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white rounded-full w-7 h-7 flex items-center justify-center transition-all shadow-lg hover:scale-110",
+        "aria-label": "`Remove image ${index + 1}`"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\AddItemForm.tsx",
+        "line": 264,
+        "column": 9
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "type": "submit",
+        "disabled": "loading",
+        "className": "w-full"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\AddItemForm.tsx",
+        "line": 294,
+        "column": 15
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "onClick": "handleSuccessModalClose",
+        "className": "w-full"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ConversationView.tsx",
+        "line": 329,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "primary",
+      "styling": "component",
+      "props": {
+        "onClick": "() => navigate('/messages')",
+        "variant": "primary"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ConversationView.tsx",
+        "line": 344,
+        "column": 13
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => navigate('/messages')",
+        "className": "p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 group",
+        "aria-label": "Back to messages"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ConversationView.tsx",
+        "line": 529,
+        "column": 21
+      },
+      "type": "Button_Component",
+      "variant": "primary",
+      "styling": "component",
+      "props": {
+        "onClick": "() => setShowCompareModal(true)",
+        "variant": "primary",
+        "className": "flex-1 text-sm py-2"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ConversationView.tsx",
+        "line": 540,
+        "column": 21
+      },
+      "type": "Button_Component",
+      "variant": "outline",
+      "styling": "component",
+      "props": {
+        "onClick": "handleCancelTrade",
+        "variant": "outline",
+        "className": "flex-1 text-sm py-2 border-red-300 dark:border-red-700 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ConversationView.tsx",
+        "line": 672,
+        "column": 15
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => setSendError(null)",
+        "className": "hover:scale-110 transition-transform"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ConversationView.tsx",
+        "line": 708,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "primary",
+      "styling": "component",
+      "props": {
+        "type": "submit",
+        "variant": "primary",
+        "disabled": "!messageText.trim() || sending || messageText.length > 2000 || conversation?.status === 'disabled'",
+        "isLoading": "sending",
+        "className": "h-12 px-6 rounded-xl shadow-sm hover:shadow transition-all duration-200"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ConversationView.tsx",
+        "line": 746,
+        "column": 15
+      },
+      "type": "Button_Component",
+      "variant": "secondary",
+      "styling": "component",
+      "props": {
+        "variant": "secondary",
+        "onClick": "() => setShowCompletionModal(false)",
+        "disabled": "completingTrade"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ConversationView.tsx",
+        "line": 753,
+        "column": 15
+      },
+      "type": "Button_Component",
+      "variant": "primary",
+      "styling": "component",
+      "props": {
+        "variant": "primary",
+        "onClick": "confirmCompleteTrade",
+        "isLoading": "completingTrade",
+        "disabled": "completingTrade"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ConversationView.tsx",
+        "line": 862,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "secondary",
+      "styling": "component",
+      "props": {
+        "variant": "secondary",
+        "onClick": "() => setShowCancelModal(false)",
+        "disabled": "cancellingTrade"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ConversationView.tsx",
+        "line": 869,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "primary",
+      "styling": "component",
+      "props": {
+        "variant": "primary",
+        "onClick": "confirmCancelTrade",
+        "isLoading": "cancellingTrade",
+        "disabled": "cancellingTrade",
+        "className": "bg-red-600 hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ConversationView.tsx",
+        "line": 1155,
+        "column": 17
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "onClick": "() => {\r\n                    setShowCompareModal(false);\r\n                    handleCompleteTrade();\r\n                  }",
+        "className": "flex-1 text-lg py-4 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none",
+        "disabled": "tradeOffer.completedBy?.includes(user?.uid || '')"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\EmptyState.tsx",
+        "line": 274,
+        "column": 13
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "key": "index",
+        "onClick": "action.onClick",
+        "className": "action.variant === 'primary'\r\n                  ? 'px-6 py-3 bg-gradient-to-r from-accent to-accent-dark dark:from-primary-light dark:to-primary text-white rounded-lg font-medium hover:shadow-lg hover:shadow-accent/30 dark:hover:shadow-primary/30 transition-all'\r\n                  : 'px-6 py-3 bg-white dark:bg-gray-800 text-text dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-all'"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\HowItWorksSlideshow.tsx",
+        "line": 318,
+        "column": 13
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "key": "index",
+        "onClick": "() => goToSlide(index)",
+        "className": "`w-2.5 h-2.5 rounded-full transition-all ${\r\n                index === currentSlide\r\n                  ? 'bg-primary w-8'\r\n                  : 'bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500'\r\n              }`"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ImageGallery.tsx",
+        "line": 98,
+        "column": 11
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => setIsLightboxOpen(true)",
+        "className": "w-full h-full cursor-zoom-in focus:outline-none focus:ring-2 focus:ring-accent dark:focus:ring-primary-light",
+        "aria-label": "Open image in fullscreen"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ImageGallery.tsx",
+        "line": 124,
+        "column": 17
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "key": "index",
+        "onClick": "() => handleThumbnailClick(index)",
+        "className": "`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all focus:outline-none focus:ring-2 focus:ring-accent dark:focus:ring-primary-light ${\r\n                    selectedIndex === index\r\n                      ? 'border-accent dark:border-primary-light ring-2 ring-accent/20 dark:ring-primary-light/20'\r\n                      : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'\r\n                  }`",
+        "aria-label": "`View image ${index + 1}`",
+        "aria-current": "selectedIndex === index ? 'true' : 'false'",
+        "role": "listitem"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ImageGallery.tsx",
+        "line": 157,
+        "column": 11
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => setIsLightboxOpen(false)",
+        "className": "absolute top-4 right-4 p-2 text-white hover:bg-white/10 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-white",
+        "aria-label": "Close lightbox"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ImageGallery.tsx",
+        "line": 169,
+        "column": 13
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "handlePrevious",
+        "className": "absolute left-4 p-3 text-white hover:bg-white/10 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-white",
+        "aria-label": "Previous image"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ImageGallery.tsx",
+        "line": 191,
+        "column": 13
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "handleNext",
+        "className": "absolute right-4 p-3 text-white hover:bg-white/10 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-white",
+        "aria-label": "Next image"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\MapPicker.tsx",
+        "line": 164,
+        "column": 13
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "onClose",
+        "className": "p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\MapPicker.tsx",
+        "line": 184,
+        "column": 13
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "searchLocation",
+        "disabled": "isSearching || !searchQuery.trim()",
+        "className": "px-6 py-2 bg-primary hover:bg-primary-light dark:bg-primary-light dark:hover:bg-primary text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\MapPicker.tsx",
+        "line": 206,
+        "column": 13
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "detectLocation",
+        "disabled": "isDetecting",
+        "className": "px-4 py-2 bg-accent hover:bg-accent-light dark:bg-accent dark:hover:bg-accent-light text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2",
+        "title": "Detect my location"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\MapPicker.tsx",
+        "line": 284,
+        "column": 13
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "handleConfirm",
+        "disabled": "isLoadingAddress",
+        "className": "flex-1 bg-accent hover:bg-accent-light dark:bg-accent dark:hover:bg-accent-light text-white font-medium py-3 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\MapPicker.tsx",
+        "line": 294,
+        "column": 13
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "onClose",
+        "className": "px-6 py-3 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-text dark:text-gray-100 font-medium rounded-lg transition-colors"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\Navigation.tsx",
+        "line": 84,
+        "column": 11
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => navigate('/')",
+        "className": "flex items-center space-x-2 sm:space-x-3 group outline-none",
+        "aria-label": "Go to home page"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\Navigation.tsx",
+        "line": 106,
+        "column": 13
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => navigate('/listings')",
+        "className": "`px-3 lg:px-4 py-2 rounded-full font-medium text-sm lg:text-base transition-all duration-300 outline-none flex items-center space-x-1.5 lg:space-x-2 w-28 lg:w-32 justify-center group ${isActive('/listings')\r\n                ? 'bg-primary/20 dark:bg-primary/30 text-primary-dark dark:text-primary-light font-bold'\r\n                : 'text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light hover:bg-gray-100/50 dark:hover:bg-gray-800/50'\r\n                }`",
+        "aria-label": "View your listings",
+        "aria-current": "isActive('/listings') ? 'page' : undefined"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\Navigation.tsx",
+        "line": 122,
+        "column": 13
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => navigate('/swipe-trading')",
+        "className": "`px-3 lg:px-4 py-2 rounded-full font-medium text-sm lg:text-base transition-all duration-300 outline-none flex items-center space-x-1.5 lg:space-x-2 w-32 lg:w-40 justify-center group ${isActive('/swipe-trading')\r\n                ? 'bg-primary/20 dark:bg-primary/30 text-primary-dark dark:text-primary-light font-bold'\r\n                : 'text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light hover:bg-gray-100/50 dark:hover:bg-gray-800/50'\r\n                }`",
+        "aria-label": "Go to swipe trading",
+        "aria-current": "isActive('/swipe-trading') ? 'page' : undefined"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\Navigation.tsx",
+        "line": 138,
+        "column": 13
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => navigate('/messages')",
+        "className": "`px-3 lg:px-4 py-2 rounded-full font-medium text-sm lg:text-base transition-all duration-300 outline-none flex items-center space-x-1.5 lg:space-x-2 w-30 lg:w-36 justify-center group ${isActive('/messages') || location.pathname.startsWith('/messages/')\r\n                ? 'bg-primary/20 dark:bg-primary/30 text-primary-dark dark:text-primary-light font-bold'\r\n                : 'text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light hover:bg-gray-100/50 dark:hover:bg-gray-800/50'\r\n                }`",
+        "aria-label": "unreadCount > 0 ? `View messages, ${unreadCount} unread` : 'View messages'",
+        "aria-current": "(isActive('/messages') || location.pathname.startsWith('/messages/')) ? 'page' : undefined"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\Navigation.tsx",
+        "line": 163,
+        "column": 13
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => navigate('/trade-offers')",
+        "className": "`px-3 lg:px-4 py-2 rounded-full font-medium text-sm lg:text-base transition-all duration-300 outline-none flex items-center space-x-1.5 lg:space-x-2 w-24 lg:w-32 justify-center group ${isActive('/trade-offers')\r\n                ? 'bg-primary/20 dark:bg-primary/30 text-primary-dark dark:text-primary-light font-bold'\r\n                : 'text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light hover:bg-gray-100/50 dark:hover:bg-gray-800/50'\r\n                }`",
+        "aria-label": "View trade offers",
+        "aria-current": "isActive('/trade-offers') ? 'page' : undefined"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\Navigation.tsx",
+        "line": 183,
+        "column": 15
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => navigate('/login')",
+        "className": "flex items-center space-x-2 px-4 py-2 rounded-full bg-gradient-to-r from-primary to-primary-dark dark:from-primary-light dark:to-primary text-white font-semibold text-sm lg:text-base shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-200 outline-none",
+        "aria-label": "Login to your account"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\Navigation.tsx",
+        "line": 195,
+        "column": 17
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "toggleDropdown",
+        "className": "flex items-center space-x-3 px-3 py-1.5 rounded-full hover:bg-gray-100/80 dark:hover:bg-gray-800/80 transition-all duration-200 group outline-none",
+        "aria-label": "Open user menu",
+        "aria-expanded": "isDropdownOpen",
+        "aria-haspopup": "true"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\Navigation.tsx",
+        "line": 303,
+        "column": 27
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "handleProfileClick",
+        "className": "w-full px-4 py-3 text-left hover:bg-primary/5 dark:hover:bg-primary-light/10 transition-colors flex items-center space-x-3 group",
+        "aria-label": "Go to my profile"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\Navigation.tsx",
+        "line": 319,
+        "column": 27
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => {\r\n                              setIsDropdownOpen(false);\r\n                              navigate('/swipe-history');\r\n                            }",
+        "className": "w-full px-4 py-3 text-left hover:bg-primary/5 dark:hover:bg-primary-light/10 transition-colors flex items-center space-x-3 group",
+        "aria-label": "View swipe history"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\Navigation.tsx",
+        "line": 338,
+        "column": 27
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => {\r\n                              setIsDropdownOpen(false);\r\n                              navigate('/trade-history');\r\n                            }",
+        "className": "w-full px-4 py-3 text-left hover:bg-primary/5 dark:hover:bg-primary-light/10 transition-colors flex items-center space-x-3 group",
+        "aria-label": "View trade history"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\Navigation.tsx",
+        "line": 359,
+        "column": 27
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "handleLogoutClick",
+        "className": "w-full px-4 py-3 text-left hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center space-x-3 group",
+        "aria-label": "Logout from your account"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\Navigation.tsx",
+        "line": 384,
+        "column": 11
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "toggleMobileMenu",
+        "className": "md:hidden p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-all z-50 relative outline-none",
+        "aria-label": "isMobileMenuOpen ? \"Close menu\" : \"Open menu\"",
+        "aria-expanded": "isMobileMenuOpen",
+        "aria-controls": "mobile-menu"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\Navigation.tsx",
+        "line": 431,
+        "column": 15
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => setIsMobileMenuOpen(false)",
+        "className": "absolute top-6 right-4 sm:right-6 p-2.5 rounded-full bg-white/50 dark:bg-gray-800/50 hover:bg-white/80 dark:hover:bg-gray-700/80 text-gray-800 dark:text-gray-200 backdrop-blur-md transition-all shadow-sm border border-white/40 dark:border-white/10 z-50 outline-none hover:scale-105 active:scale-95",
+        "aria-label": "Close mobile menu"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\Navigation.tsx",
+        "line": 443,
+        "column": 17
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => { setIsMobileMenuOpen(false); navigate('/login'); }",
+        "className": "mb-6 w-full p-4 rounded-3xl flex items-center justify-center space-x-3 bg-gradient-to-r from-primary to-primary-dark dark:from-primary-light dark:to-primary text-white font-bold text-base sm:text-lg shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 outline-none",
+        "aria-label": "Login to your account"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\Navigation.tsx",
+        "line": 456,
+        "column": 21
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "handleProfileClick",
+        "className": "relative outline-none shrink-0"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\Navigation.tsx",
+        "line": 488,
+        "column": 17
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "handleListingsClick",
+        "className": "`w-full p-3.5 sm:p-4 rounded-2xl flex items-center space-x-3.5 sm:space-x-4 transition-all duration-300 outline-none animate-in slide-in-from-left-4 fade-in delay-[100ms] ${isActive('/listings')\r\n                    ? 'bg-primary/20 dark:bg-primary/30 text-primary-dark dark:text-primary-light font-bold'\r\n                    : 'bg-white/40 dark:bg-gray-800/40 hover:bg-white/60 dark:hover:bg-gray-700/50 text-gray-800 dark:text-gray-100 border border-white/20 dark:border-white/5'\r\n                    }`",
+        "aria-label": "View your listings",
+        "aria-current": "isActive('/listings') ? 'page' : undefined"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\Navigation.tsx",
+        "line": 505,
+        "column": 17
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "handleSwipeTradingClick",
+        "className": "`w-full p-3.5 sm:p-4 rounded-2xl flex items-center space-x-3.5 sm:space-x-4 transition-all duration-300 outline-none animate-in slide-in-from-left-4 fade-in delay-[150ms] ${isActive('/swipe-trading')\r\n                    ? 'bg-primary/20 dark:bg-primary/30 text-primary-dark dark:text-primary-light font-bold'\r\n                    : 'bg-white/40 dark:bg-gray-800/40 hover:bg-white/60 dark:hover:bg-gray-700/50 text-gray-800 dark:text-gray-100 border border-white/20 dark:border-white/5'\r\n                    }`",
+        "aria-label": "Go to swipe trading",
+        "aria-current": "isActive('/swipe-trading') ? 'page' : undefined"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\Navigation.tsx",
+        "line": 522,
+        "column": 17
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => handleMobileNav('/messages')",
+        "className": "`w-full p-3.5 sm:p-4 rounded-2xl flex items-center space-x-3.5 sm:space-x-4 transition-all duration-300 outline-none animate-in slide-in-from-left-4 fade-in delay-[200ms] ${isActive('/messages') || location.pathname.startsWith('/messages/')\r\n                    ? 'bg-primary/20 dark:bg-primary/30 text-primary-dark dark:text-primary-light font-bold'\r\n                    : 'bg-white/40 dark:bg-gray-800/40 hover:bg-white/60 dark:hover:bg-gray-700/50 text-gray-800 dark:text-gray-100 border border-white/20 dark:border-white/5'\r\n                    }`",
+        "aria-label": "unreadCount > 0 ? `View messages, ${unreadCount} unread` : 'View messages'",
+        "aria-current": "(isActive('/messages') || location.pathname.startsWith('/messages/')) ? 'page' : undefined"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\Navigation.tsx",
+        "line": 553,
+        "column": 17
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => handleMobileNav('/trade-offers')",
+        "className": "`w-full p-3.5 sm:p-4 rounded-2xl flex items-center space-x-3.5 sm:space-x-4 transition-all duration-300 outline-none animate-in slide-in-from-left-4 fade-in delay-[225ms] ${isActive('/trade-offers')\r\n                    ? 'bg-primary/20 dark:bg-primary/30 text-primary-dark dark:text-primary-light font-bold'\r\n                    : 'bg-white/40 dark:bg-gray-800/40 hover:bg-white/60 dark:hover:bg-gray-700/50 text-gray-800 dark:text-gray-100 border border-white/20 dark:border-white/5'\r\n                    }`",
+        "aria-label": "View trade offers",
+        "aria-current": "isActive('/trade-offers') ? 'page' : undefined"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\Navigation.tsx",
+        "line": 570,
+        "column": 17
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "handleProfileClick",
+        "className": "`w-full p-3.5 sm:p-4 rounded-2xl flex items-center space-x-3.5 sm:space-x-4 transition-all duration-300 outline-none animate-in slide-in-from-left-4 fade-in delay-[250ms] ${isActive('/profile')\r\n                    ? 'bg-primary/20 dark:bg-primary/30 text-primary-dark dark:text-primary-light font-bold'\r\n                    : 'bg-white/40 dark:bg-gray-800/40 hover:bg-white/60 dark:hover:bg-gray-700/50 text-gray-800 dark:text-gray-100 border border-white/20 dark:border-white/5'\r\n                    }`",
+        "aria-label": "Go to my profile",
+        "aria-current": "isActive('/profile') ? 'page' : undefined"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\Navigation.tsx",
+        "line": 587,
+        "column": 17
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => handleMobileNav('/swipe-history')",
+        "className": "`w-full p-3.5 sm:p-4 rounded-2xl flex items-center space-x-3.5 sm:space-x-4 transition-all duration-300 outline-none animate-in slide-in-from-left-4 fade-in delay-[300ms] ${isActive('/swipe-history')\r\n                    ? 'bg-primary/20 dark:bg-primary/30 text-primary-dark dark:text-primary-light font-bold'\r\n                    : 'bg-white/40 dark:bg-gray-800/40 hover:bg-white/60 dark:hover:bg-gray-700/50 text-gray-800 dark:text-gray-100 border border-white/20 dark:border-white/5'\r\n                    }`",
+        "aria-label": "View swipe history",
+        "aria-current": "isActive('/swipe-history') ? 'page' : undefined"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\Navigation.tsx",
+        "line": 604,
+        "column": 17
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => handleMobileNav('/trade-history')",
+        "className": "`w-full p-3.5 sm:p-4 rounded-2xl flex items-center space-x-3.5 sm:space-x-4 transition-all duration-300 outline-none animate-in slide-in-from-left-4 fade-in delay-[325ms] ${isActive('/trade-history')\r\n                    ? 'bg-primary/20 dark:bg-primary/30 text-primary-dark dark:text-primary-light font-bold'\r\n                    : 'bg-white/40 dark:bg-gray-800/40 hover:bg-white/60 dark:hover:bg-gray-700/50 text-gray-800 dark:text-gray-100 border border-white/20 dark:border-white/5'\r\n                    }`",
+        "aria-label": "View trade history",
+        "aria-current": "isActive('/trade-history') ? 'page' : undefined"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\Navigation.tsx",
+        "line": 625,
+        "column": 19
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "handleLogoutClick",
+        "className": "w-full p-3.5 sm:p-4 rounded-2xl flex items-center justify-center space-x-3 text-red-600 dark:text-red-400 bg-red-50/50 dark:bg-red-900/10 hover:bg-red-100/50 dark:hover:bg-red-900/20 border border-red-100 dark:border-red-900/30 transition-all font-bold tracking-wide outline-none text-base sm:text-lg",
+        "aria-label": "Logout from your account"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\NotificationList.tsx",
+        "line": 176,
+        "column": 15
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => handleViewItem(notification, data.tradeAnchorId)",
+        "className": "flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\NotificationList.tsx",
+        "line": 182,
+        "column": 15
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => handleStartConversation(notification)",
+        "disabled": "acceptingOfferId === notification.tradeOfferId",
+        "className": "flex-1 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ProfilePhotoUpload.tsx",
+        "line": 324,
+        "column": 15
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "handleCropConfirm",
+        "className": "flex-1 bg-accent hover:bg-accent-light active:bg-accent-dark text-white font-medium py-2 px-4 rounded-md transition-colors"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ProfilePhotoUpload.tsx",
+        "line": 330,
+        "column": 15
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "handleCropCancel",
+        "className": "flex-1 bg-border hover:bg-border-dark dark:bg-gray-600 dark:hover:bg-gray-500 text-text dark:text-gray-100 font-medium py-2 px-4 rounded-md transition-colors"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\QuickActions.tsx",
+        "line": 48,
+        "column": 9
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "handleFavoriteClick",
+        "disabled": "isFavoriteLoading",
+        "className": "w-10 h-10 bg-white dark:bg-gray-800 rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform disabled:opacity-50 disabled:cursor-not-allowed",
+        "aria-label": "isFavorited ? 'Remove from favorites' : 'Add to favorites'"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\QuickActions.tsx",
+        "line": 77,
+        "column": 9
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "handleShareClick",
+        "className": "w-10 h-10 bg-white dark:bg-gray-800 rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform",
+        "aria-label": "Share item"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ShareMenu.tsx",
+        "line": 60,
+        "column": 11
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "onClose",
+        "className": "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200",
+        "aria-label": "Close"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ShareMenu.tsx",
+        "line": 87,
+        "column": 11
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "handleCopyLink",
+        "className": "w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left",
+        "aria-label": "Copy link"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ShareMenu.tsx",
+        "line": 103,
+        "column": 11
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "handleEmailShare",
+        "className": "w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left",
+        "aria-label": "Share via email"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ShareMenu.tsx",
+        "line": 119,
+        "column": 11
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "handleTwitterShare",
+        "className": "w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left",
+        "aria-label": "Share on Twitter"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ShareMenu.tsx",
+        "line": 135,
+        "column": 11
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "handleFacebookShare",
+        "className": "w-full flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left",
+        "aria-label": "Share on Facebook"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\SwipeFilters.tsx",
+        "line": 100,
+        "column": 7
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => setShowFilters(!showFilters)",
+        "className": "flex items-center gap-2 px-4 py-2.5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200/60 dark:border-gray-700/60 rounded-xl shadow-sm hover:bg-white dark:hover:bg-gray-700 hover:shadow-md transition-all text-text dark:text-gray-100 font-medium"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\SwipeFilters.tsx",
+        "line": 136,
+        "column": 17
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "key": "category",
+        "onClick": "() => handleCategoryToggle(category)",
+        "className": "`px-3 py-2 text-sm rounded-lg border transition-all font-medium ${selectedCategories.includes(category)\r\n                      ? 'bg-gradient-to-r from-accent to-accent-dark dark:from-primary-light dark:to-primary text-white border-transparent shadow-sm'\r\n                      : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 hover:border-accent dark:hover:border-primary-light'\r\n                    }`"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\SwipeFilters.tsx",
+        "line": 162,
+        "column": 17
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "key": "condition.value",
+        "onClick": "() => handleConditionToggle(condition.value)",
+        "className": "`px-3 py-2 text-sm rounded-lg border transition-all font-medium ${selectedConditions.includes(condition.value)\r\n                      ? 'bg-gradient-to-r from-accent to-accent-dark dark:from-primary-light dark:to-primary text-white border-transparent shadow-sm'\r\n                      : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 hover:border-accent dark:hover:border-primary-light'\r\n                    }`"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\SwipeFilters.tsx",
+        "line": 183,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "onClick": "handleApply",
+        "className": "flex-1 !bg-gradient-to-r !from-accent !to-accent-dark dark:!from-primary-light dark:!to-primary hover:shadow-lg hover:shadow-accent/30 dark:hover:shadow-primary/30 transition-shadow"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\SwipeFilters.tsx",
+        "line": 189,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "outline",
+      "styling": "component",
+      "props": {
+        "onClick": "handleReset",
+        "variant": "outline",
+        "className": "flex-1"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\SwipeInterface.tsx",
+        "line": 263,
+        "column": 11
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => navigate('/listings')",
+        "className": "fixed top-6 left-6 z-20 p-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-full shadow-lg border border-white/20 dark:border-gray-700/50 hover:bg-white dark:hover:bg-gray-700 hover:scale-110 active:scale-95 transition-all duration-300",
+        "aria-label": "Return to listings"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\SwipeInterface.tsx",
+        "line": 315,
+        "column": 9
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => navigate('/listings')",
+        "className": "fixed top-6 left-6 z-20 p-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-full shadow-lg border border-white/20 dark:border-gray-700/50 hover:bg-white dark:hover:bg-gray-700 hover:scale-110 active:scale-95 transition-all duration-300",
+        "aria-label": "Return to listings"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\SwipeInterface.tsx",
+        "line": 371,
+        "column": 11
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => navigate('/listings')",
+        "className": "fixed top-6 left-6 z-20 p-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-full shadow-lg border border-white/20 dark:border-gray-700/50 hover:bg-white dark:hover:bg-gray-700 hover:scale-110 active:scale-95 transition-all duration-300",
+        "aria-label": "Return to listings"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\SwipeInterface.tsx",
+        "line": 433,
+        "column": 9
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => navigate('/listings')",
+        "className": "fixed top-6 left-6 z-20 p-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-full shadow-lg border border-white/20 dark:border-gray-700/50 hover:bg-white dark:hover:bg-gray-700 hover:scale-110 active:scale-95 transition-all duration-300",
+        "aria-label": "Return to listings"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ThemeToggle.tsx",
+        "line": 7,
+        "column": 5
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "toggleTheme",
+        "className": "relative p-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-all duration-300 overflow-hidden group",
+        "aria-label": "`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`",
+        "type": "button"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\TradeAnchorSelector.tsx",
+        "line": 182,
+        "column": 11
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => navigate('/listings')",
+        "className": "inline-flex items-center gap-2 text-text-secondary dark:text-gray-400 hover:text-accent dark:hover:text-primary-light transition-colors group mb-6"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\TradeAnchorSelector.tsx",
+        "line": 218,
+        "column": 13
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => navigate('/listings')",
+        "className": "px-6 py-3 bg-gradient-to-r from-accent to-accent-dark dark:from-primary-light dark:to-primary text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-accent/30 dark:hover:shadow-primary/30 transition-all hover:scale-105 active:scale-95"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\TradeAnchorSelector.tsx",
+        "line": 237,
+        "column": 9
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => navigate('/listings')",
+        "className": "inline-flex items-center gap-2 text-text-secondary dark:text-gray-400 hover:text-accent dark:hover:text-primary-light transition-colors group mb-6"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\TradeAnchorSelector.tsx",
+        "line": 261,
+        "column": 17
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => setViewMode('grid')",
+        "title": "Grid view",
+        "className": "`p-1.5 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-accent dark:bg-primary-light text-white shadow-sm' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\TradeAnchorSelector.tsx",
+        "line": 270,
+        "column": 17
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => setViewMode('list')",
+        "title": "List view",
+        "className": "`p-1.5 rounded-lg transition-all ${viewMode === 'list' ? 'bg-accent dark:bg-primary-light text-white shadow-sm' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\TradeAnchorSelector.tsx",
+        "line": 285,
+        "column": 13
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => setShowHowItWorks(!showHowItWorks)",
+        "className": "w-9 h-9 bg-gradient-to-br from-accent to-accent-dark dark:from-primary-light dark:to-primary rounded-full flex items-center justify-center hover:shadow-lg hover:shadow-accent/30 dark:hover:shadow-primary/30 transition-all hover:scale-110 active:scale-95 group",
+        "title": "How it works"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\TradeAnchorSelector.tsx",
+        "line": 309,
+        "column": 19
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => setShowHowItWorks(false)",
+        "className": "flex-shrink-0 text-text-secondary dark:text-gray-400 hover:text-text dark:hover:text-gray-200 transition-colors"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\TradeAnchorSelector.tsx",
+        "line": 339,
+        "column": 19
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => setSearchTerm('')",
+        "className": "absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\TradeAnchorSelector.tsx",
+        "line": 386,
+        "column": 17
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "clearAllFilters",
+        "className": "text-xs text-accent dark:text-primary-light hover:underline font-medium"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\TradeAnchorSelector.tsx",
+        "line": 410,
+        "column": 15
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "clearAllFilters",
+        "className": "px-4 py-2 bg-accent dark:bg-primary-light text-white rounded-lg hover:shadow-lg transition-all text-sm font-medium"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\TradeAnchorSelector.tsx",
+        "line": 575,
+        "column": 17
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "type": "button",
+        "onClick": "(e) => {\r\n                    e.preventDefault();\r\n                    e.stopPropagation();\r\n                    setShowFilterModal(false);\r\n                    setSelectedItem(null);\r\n                  }",
+        "className": "text-white/80 hover:text-white hover:bg-white/20 rounded-full p-2 transition-all"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\TradeAnchorSelector.tsx",
+        "line": 641,
+        "column": 23
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "key": "category",
+        "type": "button",
+        "onClick": "(e) => {\r\n                          e.preventDefault();\r\n                          e.stopPropagation();\r\n                          handleSwipeCategoryToggle(category);\r\n                        }",
+        "className": "`px-3 py-2 text-sm rounded-lg border transition-all font-medium ${swipeCategories.includes(category)\r\n                            ? 'bg-gradient-to-r from-accent to-accent-dark dark:from-primary-light dark:to-primary text-white border-transparent shadow-sm'\r\n                            : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 hover:border-accent dark:hover:border-primary-light'\r\n                          }`"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\TradeAnchorSelector.tsx",
+        "line": 675,
+        "column": 23
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "key": "condition.value",
+        "type": "button",
+        "onClick": "(e) => {\r\n                          e.preventDefault();\r\n                          e.stopPropagation();\r\n                          handleSwipeConditionToggle(condition.value);\r\n                        }",
+        "className": "`px-3 py-2 text-sm rounded-lg border transition-all font-medium ${swipeConditions.includes(condition.value)\r\n                            ? 'bg-gradient-to-r from-accent to-accent-dark dark:from-primary-light dark:to-primary text-white border-transparent shadow-sm'\r\n                            : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 hover:border-accent dark:hover:border-primary-light'\r\n                          }`"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\TradeAnchorSelector.tsx",
+        "line": 702,
+        "column": 17
+      },
+      "type": "Button_Component",
+      "variant": "outline",
+      "styling": "component",
+      "props": {
+        "onClick": "handleResetSwipeFilters",
+        "variant": "outline",
+        "className": "flex-1"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\TradeAnchorSelector.tsx",
+        "line": 709,
+        "column": 17
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "onClick": "handleStartSwiping",
+        "className": "flex-1 !bg-gradient-to-r !from-accent !to-accent-dark dark:!from-primary-light dark:!to-primary hover:shadow-lg hover:shadow-accent/30 dark:hover:shadow-primary/30 transition-shadow"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.accessibility.test.tsx",
+        "line": 8,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {}
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.accessibility.test.tsx",
+        "line": 15,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "variant": "primary",
+      "styling": "component",
+      "props": {
+        "variant": "primary"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.accessibility.test.tsx",
+        "line": 19,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "variant": "secondary",
+      "styling": "component",
+      "props": {
+        "variant": "secondary"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.accessibility.test.tsx",
+        "line": 23,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "variant": "outline",
+      "styling": "component",
+      "props": {
+        "variant": "outline"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.accessibility.test.tsx",
+        "line": 27,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "variant": "ghost",
+      "styling": "component",
+      "props": {
+        "variant": "ghost"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.accessibility.test.tsx",
+        "line": 31,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "variant": "danger",
+      "styling": "component",
+      "props": {
+        "variant": "danger"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.accessibility.test.tsx",
+        "line": 37,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "variant": "primary",
+      "styling": "component",
+      "props": {
+        "variant": "primary"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.accessibility.test.tsx",
+        "line": 41,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "variant": "secondary",
+      "styling": "component",
+      "props": {
+        "variant": "secondary"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.accessibility.test.tsx",
+        "line": 45,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "variant": "outline",
+      "styling": "component",
+      "props": {
+        "variant": "outline"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.accessibility.test.tsx",
+        "line": 49,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "variant": "ghost",
+      "styling": "component",
+      "props": {
+        "variant": "ghost"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.accessibility.test.tsx",
+        "line": 53,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "variant": "danger",
+      "styling": "component",
+      "props": {
+        "variant": "danger"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.accessibility.test.tsx",
+        "line": 59,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {}
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.accessibility.test.tsx",
+        "line": 68,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {}
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.accessibility.test.tsx",
+        "line": 79,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "disabled": true
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.accessibility.test.tsx",
+        "line": 87,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "disabled": true
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.accessibility.test.tsx",
+        "line": 94,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "disabled": true
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.accessibility.test.tsx",
+        "line": 103,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "variant": "primary",
+      "styling": "component",
+      "props": {
+        "variant": "primary",
+        "disabled": true
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.accessibility.test.tsx",
+        "line": 108,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "variant": "secondary",
+      "styling": "component",
+      "props": {
+        "variant": "secondary",
+        "disabled": true
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.accessibility.test.tsx",
+        "line": 115,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "isLoading": true
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.accessibility.test.tsx",
+        "line": 132,
+        "column": 38
+      },
+      "type": "Button_Component",
+      "variant": "variant",
+      "styling": "component",
+      "props": {
+        "variant": "variant",
+        "disabled": true
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.accessibility.test.tsx",
+        "line": 145,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {}
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.accessibility.test.tsx",
+        "line": 152,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {}
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.accessibility.test.tsx",
+        "line": 165,
+        "column": 38
+      },
+      "type": "Button_Component",
+      "variant": "variant",
+      "styling": "component",
+      "props": {
+        "variant": "variant"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.accessibility.test.tsx",
+        "line": 174,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {}
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.accessibility.test.tsx",
+        "line": 182,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {}
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.accessibility.test.tsx",
+        "line": 193,
+        "column": 38
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "size": "size"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.accessibility.test.tsx",
+        "line": 203,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {}
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.accessibility.test.tsx",
+        "line": 225,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {}
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.danger.test.tsx",
+        "line": 7,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "variant": "danger",
+      "styling": "component",
+      "props": {
+        "variant": "danger"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.danger.test.tsx",
+        "line": 17,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "variant": "danger",
+      "styling": "component",
+      "props": {
+        "variant": "danger"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.danger.test.tsx",
+        "line": 26,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "variant": "danger",
+      "styling": "component",
+      "props": {
+        "variant": "danger"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.danger.test.tsx",
+        "line": 37,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "variant": "danger",
+      "styling": "component",
+      "props": {
+        "variant": "danger"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.danger.test.tsx",
+        "line": 45,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "variant": "danger",
+      "styling": "component",
+      "props": {
+        "variant": "danger"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.danger.test.tsx",
+        "line": 52,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "variant": "danger",
+      "styling": "component",
+      "props": {
+        "variant": "danger"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.danger.test.tsx",
+        "line": 60,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "variant": "danger",
+      "styling": "component",
+      "props": {
+        "variant": "danger"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.danger.test.tsx",
+        "line": 69,
+        "column": 7
+      },
+      "type": "Button_Component",
+      "variant": "danger",
+      "styling": "component",
+      "props": {
+        "variant": "danger",
+        "size": "sm"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.danger.test.tsx",
+        "line": 73,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "variant": "danger",
+      "styling": "component",
+      "props": {
+        "variant": "danger",
+        "size": "md"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.danger.test.tsx",
+        "line": 76,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "variant": "danger",
+      "styling": "component",
+      "props": {
+        "variant": "danger",
+        "size": "lg"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.danger.test.tsx",
+        "line": 81,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "variant": "danger",
+      "styling": "component",
+      "props": {
+        "variant": "danger",
+        "disabled": true
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.danger.test.tsx",
+        "line": 90,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "variant": "danger",
+      "styling": "component",
+      "props": {
+        "variant": "danger",
+        "isLoading": true
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.ghost.test.tsx",
+        "line": 7,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "variant": "ghost",
+      "styling": "component",
+      "props": {
+        "variant": "ghost"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.ghost.test.tsx",
+        "line": 15,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "variant": "ghost",
+      "styling": "component",
+      "props": {
+        "variant": "ghost"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.ghost.test.tsx",
+        "line": 23,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "variant": "ghost",
+      "styling": "component",
+      "props": {
+        "variant": "ghost"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.ghost.test.tsx",
+        "line": 31,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "variant": "ghost",
+      "styling": "component",
+      "props": {
+        "variant": "ghost"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.ghost.test.tsx",
+        "line": 39,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "variant": "ghost",
+      "styling": "component",
+      "props": {
+        "variant": "ghost"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.ghost.test.tsx",
+        "line": 47,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "variant": "ghost",
+      "styling": "component",
+      "props": {
+        "variant": "ghost"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.ghost.test.tsx",
+        "line": 55,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "variant": "ghost",
+      "styling": "component",
+      "props": {
+        "variant": "ghost"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.ghost.test.tsx",
+        "line": 63,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "variant": "ghost",
+      "styling": "component",
+      "props": {
+        "variant": "ghost"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.ghost.test.tsx",
+        "line": 71,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "variant": "ghost",
+      "styling": "component",
+      "props": {
+        "variant": "ghost"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.demo.tsx",
+        "line": 49,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "primary",
+      "styling": "component",
+      "props": {
+        "variant": "primary",
+        "aria-label": "Like"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.demo.tsx",
+        "line": 52,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "primary",
+      "styling": "component",
+      "props": {
+        "variant": "primary",
+        "size": "sm",
+        "aria-label": "Like small"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.demo.tsx",
+        "line": 55,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "primary",
+      "styling": "component",
+      "props": {
+        "variant": "primary",
+        "size": "lg",
+        "aria-label": "Like large"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.demo.tsx",
+        "line": 62,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "secondary",
+      "styling": "component",
+      "props": {
+        "variant": "secondary",
+        "aria-label": "Add"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.demo.tsx",
+        "line": 65,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "secondary",
+      "styling": "component",
+      "props": {
+        "variant": "secondary",
+        "size": "sm",
+        "aria-label": "Add small"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.demo.tsx",
+        "line": 68,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "secondary",
+      "styling": "component",
+      "props": {
+        "variant": "secondary",
+        "size": "lg",
+        "aria-label": "Add large"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.demo.tsx",
+        "line": 75,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "outline",
+      "styling": "component",
+      "props": {
+        "variant": "outline",
+        "aria-label": "Next"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.demo.tsx",
+        "line": 78,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "outline",
+      "styling": "component",
+      "props": {
+        "variant": "outline",
+        "size": "sm",
+        "aria-label": "Next small"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.demo.tsx",
+        "line": 81,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "outline",
+      "styling": "component",
+      "props": {
+        "variant": "outline",
+        "size": "lg",
+        "aria-label": "Next large"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.demo.tsx",
+        "line": 88,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "ghost",
+      "styling": "component",
+      "props": {
+        "variant": "ghost",
+        "aria-label": "More"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.demo.tsx",
+        "line": 91,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "ghost",
+      "styling": "component",
+      "props": {
+        "variant": "ghost",
+        "size": "sm",
+        "aria-label": "More small"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.demo.tsx",
+        "line": 94,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "ghost",
+      "styling": "component",
+      "props": {
+        "variant": "ghost",
+        "size": "lg",
+        "aria-label": "More large"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.demo.tsx",
+        "line": 101,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "danger",
+      "styling": "component",
+      "props": {
+        "variant": "danger",
+        "aria-label": "Delete"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.demo.tsx",
+        "line": 104,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "danger",
+      "styling": "component",
+      "props": {
+        "variant": "danger",
+        "size": "sm",
+        "aria-label": "Delete small"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.demo.tsx",
+        "line": 107,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "danger",
+      "styling": "component",
+      "props": {
+        "variant": "danger",
+        "size": "lg",
+        "aria-label": "Delete large"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.demo.tsx",
+        "line": 120,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "primary",
+      "styling": "component",
+      "props": {
+        "variant": "primary"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.demo.tsx",
+        "line": 124,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "secondary",
+      "styling": "component",
+      "props": {
+        "variant": "secondary"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.demo.tsx",
+        "line": 128,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "outline",
+      "styling": "component",
+      "props": {
+        "variant": "outline"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.demo.tsx",
+        "line": 135,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "primary",
+      "styling": "component",
+      "props": {
+        "variant": "primary",
+        "size": "sm"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.demo.tsx",
+        "line": 139,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "secondary",
+      "styling": "component",
+      "props": {
+        "variant": "secondary",
+        "size": "lg"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.demo.tsx",
+        "line": 153,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "primary",
+      "styling": "component",
+      "props": {
+        "variant": "primary",
+        "iconPosition": "trailing"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.demo.tsx",
+        "line": 157,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "secondary",
+      "styling": "component",
+      "props": {
+        "variant": "secondary",
+        "iconPosition": "trailing"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.demo.tsx",
+        "line": 161,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "outline",
+      "styling": "component",
+      "props": {
+        "variant": "outline",
+        "iconPosition": "trailing"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.demo.tsx",
+        "line": 168,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "primary",
+      "styling": "component",
+      "props": {
+        "variant": "primary",
+        "size": "sm",
+        "iconPosition": "trailing"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.demo.tsx",
+        "line": 172,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "secondary",
+      "styling": "component",
+      "props": {
+        "variant": "secondary",
+        "size": "lg",
+        "iconPosition": "trailing"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.demo.tsx",
+        "line": 187,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "primary",
+      "styling": "component",
+      "props": {
+        "variant": "primary",
+        "isLoading": true,
+        "aria-label": "Loading"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.demo.tsx",
+        "line": 190,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "secondary",
+      "styling": "component",
+      "props": {
+        "variant": "secondary",
+        "isLoading": true
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.demo.tsx",
+        "line": 198,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "primary",
+      "styling": "component",
+      "props": {
+        "variant": "primary",
+        "disabled": true,
+        "aria-label": "Disabled"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.demo.tsx",
+        "line": 201,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "danger",
+      "styling": "component",
+      "props": {
+        "variant": "danger",
+        "disabled": true
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.demo.tsx",
+        "line": 218,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "primary",
+      "styling": "component",
+      "props": {
+        "variant": "primary",
+        "size": "sm"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.demo.tsx",
+        "line": 222,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "primary",
+      "styling": "component",
+      "props": {
+        "variant": "primary",
+        "size": "md"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.demo.tsx",
+        "line": 226,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "primary",
+      "styling": "component",
+      "props": {
+        "variant": "primary",
+        "size": "lg"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.test.tsx",
+        "line": 11,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "aria-label": "Icon button"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.test.tsx",
+        "line": 20,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {}
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.test.tsx",
+        "line": 29,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {}
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.test.tsx",
+        "line": 40,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "size": "sm",
+        "aria-label": "Small icon"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.test.tsx",
+        "line": 48,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "size": "md",
+        "aria-label": "Medium icon"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.test.tsx",
+        "line": 56,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "size": "lg",
+        "aria-label": "Large icon"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.test.tsx",
+        "line": 66,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "size": "sm",
+        "aria-label": "Small icon"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.test.tsx",
+        "line": 76,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "size": "md",
+        "aria-label": "Medium icon"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.test.tsx",
+        "line": 84,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "size": "lg",
+        "aria-label": "Large icon"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.test.tsx",
+        "line": 94,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "aria-label": "Delete item"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.test.tsx",
+        "line": 105,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {}
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.test.tsx",
+        "line": 120,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "aria-label": "Icon button"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.test.tsx",
+        "line": 133,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {}
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.test.tsx",
+        "line": 144,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "size": "sm"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.test.tsx",
+        "line": 151,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "size": "md"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.test.tsx",
+        "line": 158,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "size": "lg"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.test.tsx",
+        "line": 167,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {}
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.test.tsx",
+        "line": 185,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "iconPosition": "leading"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.test.tsx",
+        "line": 200,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "iconPosition": "trailing"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.test.tsx",
+        "line": 220,
+        "column": 16
+      },
+      "type": "Button_Component",
+      "variant": "variant",
+      "styling": "component",
+      "props": {
+        "variant": "variant",
+        "aria-label": "`${variant} icon`"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.test.tsx",
+        "line": 234,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "isLoading": true,
+        "aria-label": "Loading"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.test.tsx",
+        "line": 243,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "isLoading": true,
+        "aria-label": "Loading"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.test.tsx",
+        "line": 253,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "disabled": true,
+        "aria-label": "Disabled icon"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.icon.test.tsx",
+        "line": 262,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "disabled": true,
+        "aria-label": "Disabled icon"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.loading.demo.tsx",
+        "line": 28,
+        "column": 11
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "onClick": "handleClick",
+        "isLoading": "isLoading"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.loading.demo.tsx",
+        "line": 36,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "primary",
+      "styling": "component",
+      "props": {
+        "variant": "primary",
+        "isLoading": true
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.loading.demo.tsx",
+        "line": 39,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "secondary",
+      "styling": "component",
+      "props": {
+        "variant": "secondary",
+        "isLoading": true
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.loading.demo.tsx",
+        "line": 42,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "outline",
+      "styling": "component",
+      "props": {
+        "variant": "outline",
+        "isLoading": true
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.loading.demo.tsx",
+        "line": 45,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "ghost",
+      "styling": "component",
+      "props": {
+        "variant": "ghost",
+        "isLoading": true
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.loading.demo.tsx",
+        "line": 48,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "danger",
+      "styling": "component",
+      "props": {
+        "variant": "danger",
+        "isLoading": true
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.loading.demo.tsx",
+        "line": 57,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "size": "sm",
+        "isLoading": true
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.loading.demo.tsx",
+        "line": 60,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "size": "md",
+        "isLoading": true
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.loading.demo.tsx",
+        "line": 63,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "size": "lg",
+        "isLoading": true
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.loading.demo.tsx",
+        "line": 71,
+        "column": 11
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "isLoading": true,
+        "aria-label": "Loading"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.loading.demo.tsx",
+        "line": 77,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "primary",
+      "styling": "component",
+      "props": {
+        "variant": "primary"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.loading.demo.tsx",
+        "line": 78,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "primary",
+      "styling": "component",
+      "props": {
+        "variant": "primary",
+        "isLoading": true
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.loading.test.tsx",
+        "line": 8,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "isLoading": true
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.loading.test.tsx",
+        "line": 16,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "isLoading": "false"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.loading.test.tsx",
+        "line": 23,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {}
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.loading.test.tsx",
+        "line": 32,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "isLoading": true
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.loading.test.tsx",
+        "line": 39,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "isLoading": "false"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.loading.test.tsx",
+        "line": 48,
+        "column": 35
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {}
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.loading.test.tsx",
+        "line": 53,
+        "column": 16
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "isLoading": true
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.loading.test.tsx",
+        "line": 66,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "variant": "primary",
+      "styling": "component",
+      "props": {
+        "isLoading": true,
+        "variant": "primary"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.loading.test.tsx",
+        "line": 77,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "isLoading": true
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.loading.test.tsx",
+        "line": 91,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "isLoading": true,
+        "aria-label": "Loading"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.loading.test.tsx",
+        "line": 103,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "isLoading": true,
+        "size": "sm"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.loading.test.tsx",
+        "line": 110,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "isLoading": true,
+        "size": "md"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.loading.test.tsx",
+        "line": 117,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "isLoading": true,
+        "size": "lg"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.loading.test.tsx",
+        "line": 126,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "isLoading": true,
+        "disabled": true
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.loading.test.tsx",
+        "line": 133,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "isLoading": true
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.loading.test.tsx",
+        "line": 140,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "disabled": true
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.loading.test.tsx",
+        "line": 152,
+        "column": 16
+      },
+      "type": "Button_Component",
+      "variant": "variant",
+      "styling": "component",
+      "props": {
+        "isLoading": true,
+        "variant": "variant"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.primary.test.tsx",
+        "line": 7,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "variant": "primary",
+      "styling": "component",
+      "props": {
+        "variant": "primary"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.primary.test.tsx",
+        "line": 16,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "variant": "primary",
+      "styling": "component",
+      "props": {
+        "variant": "primary"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.primary.test.tsx",
+        "line": 26,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "variant": "primary",
+      "styling": "component",
+      "props": {
+        "variant": "primary"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.primary.test.tsx",
+        "line": 35,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "variant": "primary",
+      "styling": "component",
+      "props": {
+        "variant": "primary"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.primary.test.tsx",
+        "line": 46,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "variant": "primary",
+      "styling": "component",
+      "props": {
+        "variant": "primary"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.primary.test.tsx",
+        "line": 53,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "variant": "primary",
+      "styling": "component",
+      "props": {
+        "variant": "primary"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.primary.test.tsx",
+        "line": 64,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "variant": "primary",
+      "styling": "component",
+      "props": {
+        "variant": "primary"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.primary.test.tsx",
+        "line": 71,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "variant": "primary",
+      "styling": "component",
+      "props": {
+        "variant": "primary"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.secondary.test.tsx",
+        "line": 7,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "variant": "secondary",
+      "styling": "component",
+      "props": {
+        "variant": "secondary"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.secondary.test.tsx",
+        "line": 16,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "variant": "secondary",
+      "styling": "component",
+      "props": {
+        "variant": "secondary"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.secondary.test.tsx",
+        "line": 25,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "variant": "secondary",
+      "styling": "component",
+      "props": {
+        "variant": "secondary"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.secondary.test.tsx",
+        "line": 34,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "variant": "secondary",
+      "styling": "component",
+      "props": {
+        "variant": "secondary"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.secondary.test.tsx",
+        "line": 43,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "variant": "secondary",
+      "styling": "component",
+      "props": {
+        "variant": "secondary"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.secondary.test.tsx",
+        "line": 52,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "variant": "secondary",
+      "styling": "component",
+      "props": {
+        "variant": "secondary"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.secondary.test.tsx",
+        "line": 63,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "variant": "secondary",
+      "styling": "component",
+      "props": {
+        "variant": "secondary"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.secondary.test.tsx",
+        "line": 71,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "variant": "secondary",
+      "styling": "component",
+      "props": {
+        "variant": "secondary"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.size.test.tsx",
+        "line": 8,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "size": "sm"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.size.test.tsx",
+        "line": 16,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "size": "sm"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.size.test.tsx",
+        "line": 24,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "size": "sm"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.size.test.tsx",
+        "line": 33,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "size": "md"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.size.test.tsx",
+        "line": 43,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "size": "md"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.size.test.tsx",
+        "line": 51,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "size": "md"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.size.test.tsx",
+        "line": 58,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {}
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.size.test.tsx",
+        "line": 68,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "size": "lg"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.size.test.tsx",
+        "line": 78,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "size": "lg"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.size.test.tsx",
+        "line": 86,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "size": "lg"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.size.test.tsx",
+        "line": 95,
+        "column": 35
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "size": "sm"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.size.test.tsx",
+        "line": 99,
+        "column": 16
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "size": "md"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.size.test.tsx",
+        "line": 103,
+        "column": 16
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "size": "lg"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.size.test.tsx",
+        "line": 109,
+        "column": 35
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "size": "sm"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.size.test.tsx",
+        "line": 113,
+        "column": 16
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "size": "md"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.size.test.tsx",
+        "line": 117,
+        "column": 16
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "size": "lg"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.size.test.tsx",
+        "line": 125,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "variant": "primary",
+      "styling": "component",
+      "props": {
+        "variant": "primary",
+        "size": "sm"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.size.test.tsx",
+        "line": 134,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "variant": "secondary",
+      "styling": "component",
+      "props": {
+        "variant": "secondary",
+        "size": "lg"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.size.test.tsx",
+        "line": 143,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "variant": "outline",
+      "styling": "component",
+      "props": {
+        "variant": "outline",
+        "size": "md"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.size.test.tsx",
+        "line": 151,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "variant": "ghost",
+      "styling": "component",
+      "props": {
+        "variant": "ghost",
+        "size": "sm"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.size.test.tsx",
+        "line": 159,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "variant": "danger",
+      "styling": "component",
+      "props": {
+        "variant": "danger",
+        "size": "lg"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.size.test.tsx",
+        "line": 171,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "size": "sm"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.size.test.tsx",
+        "line": 179,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "size": "md"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.size.test.tsx",
+        "line": 187,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "size": "lg"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.size.test.tsx",
+        "line": 195,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "size": "sm",
+        "disabled": true
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.size.test.tsx",
+        "line": 203,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "size": "sm",
+        "isLoading": true
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.size.test.tsx",
+        "line": 213,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "size": "lg"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.size.test.tsx",
+        "line": 233,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "variant": "primary",
+      "styling": "component",
+      "props": {
+        "variant": "primary",
+        "size": "sm"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.size.test.tsx",
+        "line": 241,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "variant": "secondary",
+      "styling": "component",
+      "props": {
+        "variant": "secondary",
+        "size": "sm"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.size.test.tsx",
+        "line": 249,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "variant": "outline",
+      "styling": "component",
+      "props": {
+        "variant": "outline",
+        "size": "sm"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.size.test.tsx",
+        "line": 257,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "variant": "ghost",
+      "styling": "component",
+      "props": {
+        "variant": "ghost",
+        "size": "sm"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.size.test.tsx",
+        "line": 265,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "variant": "danger",
+      "styling": "component",
+      "props": {
+        "variant": "danger",
+        "size": "sm"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.size.test.tsx",
+        "line": 275,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {}
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.test.tsx",
+        "line": 8,
+        "column": 7
+      },
+      "type": "Button_Component",
+      "variant": "primary",
+      "styling": "component",
+      "props": {
+        "variant": "primary",
+        "size": "md",
+        "isLoading": "false",
+        "iconPosition": "leading",
+        "aria-label": "Test button"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.test.tsx",
+        "line": 23,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {}
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.test.tsx",
+        "line": 35,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "disabled": true
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.test.tsx",
+        "line": 45,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {}
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.test.tsx",
+        "line": 53,
+        "column": 7
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "iconPosition": "leading"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.test.tsx",
+        "line": 57,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "iconPosition": "trailing"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.test.tsx",
+        "line": 62,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "aria-label": "Custom label"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.test.tsx",
+        "line": 71,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "variant": "outline",
+      "styling": "component",
+      "props": {
+        "variant": "outline"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.test.tsx",
+        "line": 78,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "variant": "outline",
+      "styling": "component",
+      "props": {
+        "variant": "outline"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.test.tsx",
+        "line": 87,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "variant": "outline",
+      "styling": "component",
+      "props": {
+        "variant": "outline"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.test.tsx",
+        "line": 95,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "variant": "outline",
+      "styling": "component",
+      "props": {
+        "variant": "outline"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.test.tsx",
+        "line": 104,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "variant": "outline",
+      "styling": "component",
+      "props": {
+        "variant": "outline"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.test.tsx",
+        "line": 113,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "variant": "outline",
+      "styling": "component",
+      "props": {
+        "variant": "outline"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.test.tsx",
+        "line": 122,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "variant": "outline",
+      "styling": "component",
+      "props": {
+        "variant": "outline"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.test.tsx",
+        "line": 131,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "variant": "outline",
+      "styling": "component",
+      "props": {
+        "variant": "outline",
+        "disabled": true
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.test.tsx",
+        "line": 140,
+        "column": 33
+      },
+      "type": "Button_Component",
+      "variant": "outline",
+      "styling": "component",
+      "props": {
+        "variant": "outline",
+        "size": "sm"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.test.tsx",
+        "line": 145,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "variant": "outline",
+      "styling": "component",
+      "props": {
+        "variant": "outline",
+        "size": "md"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.test.tsx",
+        "line": 150,
+        "column": 14
+      },
+      "type": "Button_Component",
+      "variant": "outline",
+      "styling": "component",
+      "props": {
+        "variant": "outline",
+        "size": "lg"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.test.tsx",
+        "line": 157,
+        "column": 12
+      },
+      "type": "Button_Component",
+      "variant": "outline",
+      "styling": "component",
+      "props": {
+        "variant": "outline",
+        "isLoading": true
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Button.tsx",
+        "line": 71,
+        "column": 7
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "ref": "ref",
+        "type": "button",
+        "className": "`${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`",
+        "disabled": "disabled || isLoading",
+        "...spread": "props"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Dropdown.tsx",
+        "line": 214,
+        "column": 9
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "ref": "triggerRef",
+        "type": "button",
+        "onClick": "handleToggle",
+        "disabled": "disabled",
+        "className": "`${baseStyles} ${stateStyles} flex items-center justify-between gap-2`",
+        "aria-haspopup": "listbox",
+        "aria-expanded": "isOpen",
+        "aria-labelledby": "labelId",
+        "aria-describedby": "errorId || helperId",
+        "aria-invalid": "error ? 'true' : 'false'",
+        "aria-required": "required"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Modal.tsx",
+        "line": 183,
+        "column": 13
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "onClose",
+        "className": "min-w-[48px] min-h-[48px] p-2 hover:bg-white/50 dark:hover:bg-gray-700/50 rounded-xl transition-all duration-200 hover:scale-110 active:scale-95 touch-action-manipulation",
+        "aria-label": "Close modal"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Pagination.tsx",
+        "line": 60,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "outline",
+      "styling": "component",
+      "props": {
+        "variant": "outline",
+        "size": "sm",
+        "onClick": "handlePrevious",
+        "disabled": "currentPage === 1",
+        "className": "px-3",
+        "aria-label": "Previous page"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Pagination.tsx",
+        "line": 76,
+        "column": 25
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "key": "`page-${page}`",
+        "onClick": "() => onPageChange(page)",
+        "className": "`w-10 h-10 rounded-lg text-sm font-medium transition-colors flex items-center justify-center ${currentPage === page\r\n                                    ? 'bg-primary text-white shadow-md'\r\n                                    : 'text-text-secondary hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800'\r\n                                }`",
+        "aria-current": "currentPage === page ? 'page' : undefined",
+        "aria-label": "`Page ${page}`"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Pagination.tsx",
+        "line": 96,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "outline",
+      "styling": "component",
+      "props": {
+        "variant": "outline",
+        "size": "sm",
+        "onClick": "handleNext",
+        "disabled": "currentPage === totalPages",
+        "className": "px-3",
+        "aria-label": "Next page"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\components\\ui\\Toast.tsx",
+        "line": 70,
+        "column": 9
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => {\r\n            setIsVisible(false);\r\n            setTimeout(() => onClose?.(), 300);\r\n          }",
+        "className": "ml-2 hover:bg-white/20 rounded-full p-1 transition-colors flex-shrink-0",
+        "aria-label": "Close notification"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\demo\\components\\DemoConversationView.tsx",
+        "line": 326,
+        "column": 13
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "disabled": true,
+        "className": "h-12 px-6 rounded-xl shadow-sm bg-primary dark:bg-primary-light text-white opacity-50 cursor-not-allowed"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\demo\\components\\DemoErrorBoundary.tsx",
+        "line": 125,
+        "column": 15
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "this.handleSkip",
+        "className": "px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-full backdrop-blur-sm transition-all"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\demo\\components\\DemoNotificationList.tsx",
+        "line": 151,
+        "column": 15
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => handleViewItem(data.tradeAnchorId)",
+        "className": "flex-1 px-5 py-3 bg-gradient-to-r from-accent to-accent-dark text-white font-semibold rounded-xl hover:shadow-xl hover:shadow-accent/30 dark:hover:shadow-accent/40 transition-all duration-300 hover:-translate-y-0.5 text-sm"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\demo\\components\\DemoNotificationList.tsx",
+        "line": 157,
+        "column": 15
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "handleStartConversation",
+        "className": "flex-1 px-5 py-3 bg-gradient-to-r from-primary to-primary-dark text-white font-semibold rounded-xl hover:shadow-xl hover:shadow-primary/30 dark:hover:shadow-primary/40 transition-all duration-300 hover:-translate-y-0.5 text-sm"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\demo\\components\\NavigationControls.tsx",
+        "line": 88,
+        "column": 9
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "handlePrevious",
+        "disabled": "!canGoPrevious || isAnimating",
+        "className": "`${isMobile ? 'px-4 py-2.5 text-sm' : 'px-7 py-3.5 text-base'} bg-white/15 hover:bg-white/25 disabled:bg-white/5 disabled:cursor-not-allowed text-white font-semibold rounded-full backdrop-blur-md transition-all duration-300 disabled:opacity-40 shadow-lg hover:shadow-xl hover:-translate-y-0.5 border border-white/20`",
+        "aria-label": "Previous step"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\demo\\components\\NavigationControls.tsx",
+        "line": 113,
+        "column": 15
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "key": "index",
+        "onClick": "() => handleGoToStep(index)",
+        "disabled": "isAnimating",
+        "className": "`${isMobile ? 'w-2 h-2' : 'w-3 h-3'} rounded-full transition-all duration-300 ${\r\n                  index === currentStep\r\n                    ? 'bg-white scale-125 shadow-lg shadow-white/50'\r\n                    : 'bg-white/40 hover:bg-white/60 hover:scale-110'\r\n                } ${isAnimating ? 'cursor-not-allowed' : 'cursor-pointer'}`",
+        "aria-label": "`Go to step ${index + 1}`",
+        "aria-current": "index === currentStep ? 'step' : undefined"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\demo\\components\\NavigationControls.tsx",
+        "line": 131,
+        "column": 11
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "handleNext",
+        "disabled": "!canGoNext || isAnimating",
+        "className": "`${isMobile ? 'px-4 py-2.5 text-sm' : 'px-7 py-3.5 text-base'} bg-white/15 hover:bg-white/25 disabled:bg-white/5 disabled:cursor-not-allowed text-white font-semibold rounded-full backdrop-blur-md transition-all duration-300 disabled:opacity-40 shadow-lg hover:shadow-xl hover:-translate-y-0.5 border border-white/20`",
+        "aria-label": "Next step"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\demo\\components\\NavigationControls.tsx",
+        "line": 140,
+        "column": 11
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "handleRestart",
+        "disabled": "isAnimating",
+        "className": "`${isMobile ? 'px-4 py-2.5 text-sm' : 'px-7 py-3.5 text-base'} bg-white/15 hover:bg-white/25 disabled:bg-white/5 disabled:cursor-not-allowed text-white font-semibold rounded-full backdrop-blur-md transition-all duration-300 disabled:opacity-40 shadow-lg hover:shadow-xl hover:-translate-y-0.5 border border-white/20`",
+        "aria-label": "Restart demo"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\CompleteProfile.tsx",
+        "line": 162,
+        "column": 17
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "type": "button",
+        "onClick": "() => setShowMapPicker(true)",
+        "className": "absolute right-2 top-1/2 -translate-y-1/2 p-2 text-primary dark:text-primary-light hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-colors",
+        "title": "Pick on map"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\CompleteProfile.tsx",
+        "line": 179,
+        "column": 15
+      },
+      "type": "Button_Component",
+      "variant": "primary",
+      "styling": "component",
+      "props": {
+        "type": "submit",
+        "variant": "primary",
+        "size": "lg",
+        "isLoading": "isLoading",
+        "className": "`w-full ${getPrimaryButtonClasses(true)}`"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\EditItem.tsx",
+        "line": 208,
+        "column": 11
+      },
+      "type": "Button_Component",
+      "variant": "outline",
+      "styling": "component",
+      "props": {
+        "onClick": "() => navigate(`/listings/${id}`)",
+        "variant": "outline"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\EditItem.tsx",
+        "line": 306,
+        "column": 25
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "type": "button",
+        "onClick": "() => removeExistingImage(index)",
+        "className": "absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\EditItem.tsx",
+        "line": 329,
+        "column": 25
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "type": "button",
+        "onClick": "() => removeNewImage(index)",
+        "className": "absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\EditItem.tsx",
+        "line": 367,
+        "column": 17
+      },
+      "type": "Button_Component",
+      "variant": "outline",
+      "styling": "component",
+      "props": {
+        "type": "button",
+        "variant": "outline",
+        "onClick": "() => navigate(`/listings/${id}`)",
+        "disabled": "saving",
+        "className": "flex-1"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\EditItem.tsx",
+        "line": 376,
+        "column": 17
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "type": "submit",
+        "disabled": "saving || totalImages === 0",
+        "className": "flex-1"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\EditItem.tsx",
+        "line": 404,
+        "column": 17
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "onClick": "handleSuccessClose",
+        "className": "w-full"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\EditProfile.tsx",
+        "line": 409,
+        "column": 11
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "handleCancel",
+        "className": "getPrimaryButtonClasses() + \" w-full text-white font-medium py-2 px-4 rounded-md\""
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\EditProfile.tsx",
+        "line": 551,
+        "column": 19
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "type": "button",
+        "onClick": "() => setShowMapPicker(true)",
+        "disabled": "locationCooldownActive",
+        "className": "absolute right-2 top-1/2 -translate-y-1/2 p-2 text-primary dark:text-primary-light hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed",
+        "title": "locationCooldownActive ? `Location locked for ${locationCooldownRemaining}` : \"Pick on map\""
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\EditProfile.tsx",
+        "line": 576,
+        "column": 17
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "handleSave",
+        "disabled": "isSaveDisabled",
+        "className": "getPrimaryButtonClasses() + \" flex-1 text-white font-medium py-3 px-6 rounded-xl shadow-md disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed transform flex items-center justify-center\""
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\EditProfile.tsx",
+        "line": 591,
+        "column": 17
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "handleCancel",
+        "disabled": "updateLoading",
+        "className": "flex-1 bg-white/50 hover:bg-white/80 dark:bg-gray-700/50 dark:hover:bg-gray-600/80 border border-gray-200 dark:border-gray-600 disabled:opacity-50 text-text dark:text-gray-100 font-medium py-3 px-6 rounded-xl transition-all disabled:cursor-not-allowed flex items-center justify-center"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\EditProfile.tsx",
+        "line": 631,
+        "column": 17
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "handleSuccessClose",
+        "className": "w-full bg-gradient-to-r from-accent to-accent-dark dark:from-primary-light dark:to-primary text-white font-medium py-3 px-6 rounded-xl hover:shadow-lg transition-all"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\ForgotPassword.tsx",
+        "line": 99,
+        "column": 15
+      },
+      "type": "Button_Component",
+      "variant": "primary",
+      "styling": "component",
+      "props": {
+        "type": "submit",
+        "variant": "primary",
+        "size": "lg",
+        "isLoading": "isLoading",
+        "className": "`w-full text-sm sm:text-base ${getPrimaryButtonClasses(true)}`"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\Home.tsx",
+        "line": 330,
+        "column": 19
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "size": "lg",
+        "onClick": "() => navigate('/login')",
+        "className": "`w-full sm:w-auto px-10 py-4 rounded-2xl text-base font-black shadow-2xl shadow-primary/30 ${getPrimaryButtonClasses()} border-0 hover:shadow-primary/50`"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\Home.tsx",
+        "line": 339,
+        "column": 19
+      },
+      "type": "Button_Component",
+      "variant": "outline",
+      "styling": "component",
+      "props": {
+        "size": "lg",
+        "variant": "outline",
+        "onClick": "() => navigate('/listings')",
+        "className": "w-full sm:w-auto px-10 py-4 rounded-2xl text-base font-bold border-2 border-primary/40 hover:border-primary hover:bg-primary/10 dark:hover:bg-primary/15 backdrop-blur-sm transition-all shadow-lg"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\Home.tsx",
+        "line": 692,
+        "column": 17
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "size": "lg",
+        "onClick": "() => navigate('/login')",
+        "className": "w-full sm:w-auto px-12 py-5 rounded-2xl text-lg font-black bg-white text-primary hover:bg-gray-50 border-0 shadow-2xl shadow-black/30 hover:shadow-black/40"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\Home.tsx",
+        "line": 701,
+        "column": 17
+      },
+      "type": "Button_Component",
+      "variant": "outline",
+      "styling": "component",
+      "props": {
+        "size": "lg",
+        "variant": "outline",
+        "className": "w-full sm:w-auto px-12 py-5 rounded-2xl text-lg font-bold border-2 border-white/50 text-white hover:bg-white/20 hover:border-white/80 transition-all backdrop-blur-md shadow-xl"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\ItemDetail.tsx",
+        "line": 175,
+        "column": 15
+      },
+      "type": "Button_Component",
+      "variant": "primary",
+      "styling": "component",
+      "props": {
+        "onClick": "() => navigate('/listings')",
+        "variant": "primary"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\ItemDetail.tsx",
+        "line": 194,
+        "column": 11
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => navigate('/listings')",
+        "className": "inline-flex items-center text-accent dark:text-primary-light hover:text-accent-dark dark:hover:text-primary transition-colors mb-6 group"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\ItemDetail.tsx",
+        "line": 237,
+        "column": 25
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "key": "index",
+        "onClick": "() => setSelectedImageIndex(index)",
+        "className": "`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${selectedImageIndex === index\r\n                            ? 'border-accent dark:border-primary-light ring-2 ring-accent/20 dark:ring-primary-light/20'\r\n                            : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'\r\n                            }`"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\ItemDetail.tsx",
+        "line": 301,
+        "column": 21
+      },
+      "type": "Button_Component",
+      "variant": "outline",
+      "styling": "component",
+      "props": {
+        "onClick": "() => navigate(`/listings/${item.id}/edit`)",
+        "variant": "outline",
+        "className": "w-full flex items-center justify-center gap-2"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\ItemDetail.tsx",
+        "line": 311,
+        "column": 21
+      },
+      "type": "Button_Component",
+      "variant": "outline",
+      "styling": "component",
+      "props": {
+        "onClick": "handleDeleteClick",
+        "variant": "outline",
+        "className": "w-full flex items-center justify-center gap-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 border-red-200 dark:border-red-800"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\ItemDetail.tsx",
+        "line": 370,
+        "column": 21
+      },
+      "type": "Button_Component",
+      "variant": "primary",
+      "styling": "component",
+      "props": {
+        "variant": "primary",
+        "size": "lg",
+        "className": "`w-full ${getPrimaryButtonClasses(true)}`"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\ItemDetail.tsx",
+        "line": 417,
+        "column": 25
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "className": "mt-3 text-sm text-accent dark:text-primary-light hover:text-accent-dark dark:hover:text-primary font-medium flex items-center"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\ItemDetail.tsx",
+        "line": 449,
+        "column": 19
+      },
+      "type": "Button_Component",
+      "variant": "outline",
+      "styling": "component",
+      "props": {
+        "onClick": "() => setShowDeleteModal(false)",
+        "variant": "outline",
+        "disabled": "deleting",
+        "className": "flex-1"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\ItemDetail.tsx",
+        "line": 457,
+        "column": 19
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "onClick": "handleDeleteConfirm",
+        "disabled": "deleting",
+        "className": "flex-1 bg-red-600 hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\ItemDetail.tsx",
+        "line": 486,
+        "column": 17
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "onClick": "handleSuccessClose",
+        "className": "w-full"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\Listings.tsx",
+        "line": 197,
+        "column": 19
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => setViewMode('grid')",
+        "title": "Grid view",
+        "className": "`p-1.5 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-accent dark:bg-primary-light text-white shadow-sm' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\Listings.tsx",
+        "line": 206,
+        "column": 19
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => setViewMode('list')",
+        "title": "List view",
+        "className": "`p-1.5 rounded-lg transition-all ${viewMode === 'list' ? 'bg-accent dark:bg-primary-light text-white shadow-sm' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\Listings.tsx",
+        "line": 218,
+        "column": 15
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "onClick": "() => setShowAddForm(true)",
+        "className": "`hidden sm:flex items-center gap-2 ${getPrimaryButtonClasses(true)}`"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\Listings.tsx",
+        "line": 248,
+        "column": 19
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => setSearchTerm('')",
+        "className": "absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\Listings.tsx",
+        "line": 291,
+        "column": 15
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => setShowTradeOffersOnly(!showTradeOffersOnly)",
+        "className": "`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border transition-all ${showTradeOffersOnly\r\n                  ? 'bg-accent dark:bg-primary-light text-white border-transparent shadow-sm'\r\n                  : 'bg-transparent text-text-secondary dark:text-gray-400 border-gray-300 dark:border-gray-600 hover:border-accent dark:hover:border-primary-light'\r\n                  }`"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\Listings.tsx",
+        "line": 305,
+        "column": 17
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => setSelectedCategory('all')",
+        "className": "inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-accent/10 dark:bg-primary-light/10 text-accent dark:text-primary-light border border-accent/20 dark:border-primary-light/20"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\Listings.tsx",
+        "line": 317,
+        "column": 17
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => setSelectedCondition('all')",
+        "className": "inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-accent/10 dark:bg-primary-light/10 text-accent dark:text-primary-light border border-accent/20 dark:border-primary-light/20 capitalize"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\Listings.tsx",
+        "line": 329,
+        "column": 17
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "clearAllFilters",
+        "className": "ml-auto text-xs text-text-secondary dark:text-gray-500 hover:text-accent dark:hover:text-primary-light transition-colors underline underline-offset-2"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\Listings.tsx",
+        "line": 365,
+        "column": 19
+      },
+      "type": "Button_Component",
+      "variant": "outline",
+      "styling": "component",
+      "props": {
+        "onClick": "clearAllFilters",
+        "variant": "outline"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\Listings.tsx",
+        "line": 368,
+        "column": 21
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "onClick": "() => setShowAddForm(true)"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\Listings.tsx",
+        "line": 374,
+        "column": 21
+      },
+      "type": "Button_Component",
+      "variant": "outline",
+      "styling": "component",
+      "props": {
+        "variant": "outline",
+        "onClick": "() => navigate('/swipe')"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\Listings.tsx",
+        "line": 592,
+        "column": 9
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => setShowAddForm(true)",
+        "className": "sm:hidden fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-br from-accent to-accent-dark dark:from-primary-light dark:to-primary text-white rounded-full shadow-lg shadow-accent/40 hover:shadow-xl hover:shadow-accent/50 hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center z-40",
+        "aria-label": "Add new listing"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\Listings.tsx",
+        "line": 617,
+        "column": 17
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => setShowAddForm(false)",
+        "className": "text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700",
+        "aria-label": "Close modal"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\Login.tsx",
+        "line": 157,
+        "column": 17
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "type": "button",
+        "onClick": "() => setShowPassword(!showPassword)",
+        "className": "absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 mt-[14px] transition-colors duration-200",
+        "aria-label": "showPassword ? 'Hide password' : 'Show password'"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\Login.tsx",
+        "line": 198,
+        "column": 19
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "type": "button",
+        "onClick": "() => setShowConfirmPassword(!showConfirmPassword)",
+        "className": "absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 mt-[14px] transition-colors duration-200",
+        "aria-label": "showConfirmPassword ? 'Hide password' : 'Show password'"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\Login.tsx",
+        "line": 258,
+        "column": 15
+      },
+      "type": "Button_Component",
+      "variant": "primary",
+      "styling": "component",
+      "props": {
+        "type": "submit",
+        "variant": "primary",
+        "size": "lg",
+        "isLoading": "isLoading",
+        "className": "`w-full text-sm sm:text-base ${getPrimaryButtonClasses(true)}`"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\Login.tsx",
+        "line": 270,
+        "column": 15
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "type": "button",
+        "onClick": "handleToggleMode",
+        "className": "text-xs xs:text-sm sm:text-base text-primary dark:text-primary-light hover:text-accent dark:hover:text-primary-light/80 font-medium py-1 transition-colors duration-200 hover:underline underline-offset-2"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\MessagesPage.tsx",
+        "line": 122,
+        "column": 13
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "loadConversations",
+        "className": "px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\MessagesPage.tsx",
+        "line": 163,
+        "column": 17
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => navigate('/swipe-trading')",
+        "className": "px-6 py-3 bg-gradient-to-r from-primary to-primary-dark dark:from-primary-light dark:to-primary text-white rounded-lg font-medium hover:shadow-lg transition-all"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\MessagesPage.tsx",
+        "line": 212,
+        "column": 15
+      },
+      "type": "Native_Button",
+      "styling": "inline",
+      "props": {
+        "key": "summary.conversation.id",
+        "onClick": "() => handleConversationClick(summary.conversation.id)",
+        "className": "`w-full p-5 hover:bg-gradient-to-r hover:from-primary/5 hover:via-primary/10 hover:to-primary/5 dark:hover:from-primary-light/10 dark:hover:via-primary-light/15 dark:hover:to-primary-light/10 transition-all duration-300 text-left flex items-center gap-5 border-b border-gray-100 dark:border-gray-700/50 last:border-b-0 group relative overflow-hidden ${\r\n                  summary.unreadCount > 0 ? 'bg-primary/5 dark:bg-primary-light/5' : ''\r\n                }`",
+        "style": "{ animationDelay: `${index * 50}ms` }"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\Profile.tsx",
+        "line": 61,
+        "column": 15
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "onClick": "() => navigate('/edit-profile')",
+        "className": "getPrimaryButtonClasses(true)"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\Profile.tsx",
+        "line": 137,
+        "column": 19
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "toggleTheme",
+        "className": "relative inline-flex h-8 w-14 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-gray-800 bg-gray-300 dark:bg-primary"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\SwipeHistory.tsx",
+        "line": 145,
+        "column": 13
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => { setFilter('all'); setCurrentPage(1); }",
+        "className": "`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all ${filter === 'all'\r\n                ? 'bg-gradient-to-r from-accent to-accent-dark dark:from-primary-light dark:to-primary text-white shadow-md'\r\n                : 'bg-white/80 dark:bg-gray-800/80 text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700'\r\n                }`"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\SwipeHistory.tsx",
+        "line": 154,
+        "column": 13
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => { setFilter('right'); setCurrentPage(1); }",
+        "className": "`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 sm:gap-2 ${filter === 'right'\r\n                ? 'bg-green-600 text-white shadow-md'\r\n                : 'bg-white/80 dark:bg-gray-800/80 text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700'\r\n                }`"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\SwipeHistory.tsx",
+        "line": 166,
+        "column": 13
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => { setFilter('left'); setCurrentPage(1); }",
+        "className": "`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 sm:gap-2 ${filter === 'left'\r\n                ? 'bg-gray-600 text-white shadow-md'\r\n                : 'bg-white/80 dark:bg-gray-800/80 text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700'\r\n                }`"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\SwipeHistory.tsx",
+        "line": 184,
+        "column": 15
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "loadSwipeHistory",
+        "className": "mt-2 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\SwipeHistory.tsx",
+        "line": 215,
+        "column": 15
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => navigate('/swipe-trading')",
+        "className": "mt-4 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\SwipeHistory.tsx",
+        "line": 291,
+        "column": 23
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => navigate(`/item/${swipe.item!.id}`)",
+        "className": "mt-3 text-sm text-primary dark:text-primary-light hover:underline font-medium"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\SwipeTradingPage.tsx",
+        "line": 886,
+        "column": 17
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => {\r\n                    setError(null);\r\n                    setShowNewSessionOption(false);\r\n                    setLoadingPhase('idle'); // Reset loading phase for retry\r\n                    if (!tradeAnchor) {\r\n                      loadUserItems();\r\n                    } else if (session && user) {\r\n                      loadItemPool();\r\n                    } else {\r\n                      // If no session, go back to anchor selection\r\n                      setIsSwipeMode(false);\r\n                      setTradeAnchor(null);\r\n                    }\r\n                  }",
+        "className": "px-4 py-2 bg-red-600 dark:bg-red-700 text-white rounded-md hover:bg-red-700 dark:hover:bg-red-800 transition-colors"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\SwipeTradingPage.tsx",
+        "line": 906,
+        "column": 19
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "handleCreateNewSession",
+        "className": "px-4 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-800 transition-colors"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\TradeHistory.tsx",
+        "line": 190,
+        "column": 13
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => { setFilter('all'); setCurrentPage(1); }",
+        "className": "`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all whitespace-nowrap ${filter === 'all'\r\n                ? 'bg-gradient-to-r from-accent to-accent-dark dark:from-primary-light dark:to-primary text-white shadow-md'\r\n                : 'bg-white/80 dark:bg-gray-800/80 text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700'\r\n                }`"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\TradeHistory.tsx",
+        "line": 199,
+        "column": 13
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => { setFilter('accepted'); setCurrentPage(1); }",
+        "className": "`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all whitespace-nowrap ${filter === 'accepted'\r\n                ? 'bg-green-600 text-white shadow-md'\r\n                : 'bg-white/80 dark:bg-gray-800/80 text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700'\r\n                }`"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\TradeHistory.tsx",
+        "line": 208,
+        "column": 13
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => { setFilter('completed'); setCurrentPage(1); }",
+        "className": "`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all whitespace-nowrap ${filter === 'completed'\r\n                ? 'bg-blue-600 text-white shadow-md'\r\n                : 'bg-white/80 dark:bg-gray-800/80 text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700'\r\n                }`"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\TradeHistory.tsx",
+        "line": 217,
+        "column": 13
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => { setFilter('declined'); setCurrentPage(1); }",
+        "className": "`px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all whitespace-nowrap ${filter === 'declined'\r\n                ? 'bg-red-600 text-white shadow-md'\r\n                : 'bg-white/80 dark:bg-gray-800/80 text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700'\r\n                }`"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\TradeHistory.tsx",
+        "line": 232,
+        "column": 15
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "loadTradeHistory",
+        "className": "mt-2 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\TradeHistory.tsx",
+        "line": 263,
+        "column": 15
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => navigate('/swipe-trading')",
+        "className": "mt-4 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\TradeHistory.tsx",
+        "line": 386,
+        "column": 23
+      },
+      "type": "Native_Button",
+      "styling": "className",
+      "props": {
+        "onClick": "() => navigate(`/messages`)",
+        "className": "text-sm text-primary dark:text-primary-light hover:underline font-medium"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\TradeOffers.tsx",
+        "line": 298,
+        "column": 13
+      },
+      "type": "Button_Component",
+      "variant": "primary",
+      "styling": "component",
+      "props": {
+        "onClick": "loadOffers",
+        "variant": "primary"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\TradeOffers.tsx",
+        "line": 348,
+        "column": 17
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "onClick": "() => navigate('/listings')",
+        "className": "getPrimaryButtonClasses(true)"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\TradeOffers.tsx",
+        "line": 428,
+        "column": 17
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "onClick": "() => {\r\n                    setStatusFilter('all');\r\n                    setSortBy('newest');\r\n                  }",
+        "className": "getPrimaryButtonClasses(true)"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\TradeOffers.tsx",
+        "line": 529,
+        "column": 25
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "onClick": "() => handleCompareItems(offer)",
+        "className": "`flex-1 ${getPrimaryButtonClasses(true)}`"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\TradeOffers.tsx",
+        "line": 538,
+        "column": 25
+      },
+      "type": "Button_Component",
+      "variant": "outline",
+      "styling": "component",
+      "props": {
+        "onClick": "() => handleDeclineOffer(offer.id)",
+        "variant": "outline",
+        "className": "flex-1 border-2 border-red-500 text-red-600 hover:bg-red-50 dark:border-red-600 dark:text-red-400 dark:hover:bg-red-900/20",
+        "isLoading": "decliningOfferId === offer.id",
+        "disabled": "acceptingOfferId !== null || decliningOfferId !== null"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\TradeOffers.tsx",
+        "line": 553,
+        "column": 23
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "onClick": "() => handleViewConversation(offer)",
+        "className": "`flex-1 ${getPrimaryButtonClasses(true)}`"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\TradeOffers.tsx",
+        "line": 749,
+        "column": 15
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "onClick": "() => {\r\n                  setCompareModalOpen(false);\r\n                  handleAcceptOffer(selectedOffer);\r\n                }",
+        "className": "`flex-1 text-lg py-4 ${getPrimaryButtonClasses(true)} shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all`",
+        "isLoading": "acceptingOfferId === selectedOffer.id",
+        "disabled": "acceptingOfferId !== null || decliningOfferId !== null"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\TradeOffers.tsx",
+        "line": 763,
+        "column": 15
+      },
+      "type": "Button_Component",
+      "variant": "outline",
+      "styling": "component",
+      "props": {
+        "onClick": "() => {\r\n                  // Set the offer to decline before closing compare modal\r\n                  const offer = offers.find(o => o.id === selectedOffer.id);\r\n                  if (offer) {\r\n                    setOfferToDecline(offer);\r\n                    setDeclineModalOpen(true);\r\n                  }\r\n                  setCompareModalOpen(false);\r\n                }",
+        "variant": "outline",
+        "className": "flex-1 text-lg py-4 border-2 border-red-500 text-red-600 hover:bg-red-50 dark:border-red-600 dark:text-red-400 dark:hover:bg-red-900/20 hover:border-red-600 dark:hover:border-red-500 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all",
+        "isLoading": "decliningOfferId === selectedOffer.id",
+        "disabled": "acceptingOfferId !== null || decliningOfferId !== null"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\TradeOffers.tsx",
+        "line": 886,
+        "column": 15
+      },
+      "type": "Button_Component",
+      "variant": "outline",
+      "styling": "component",
+      "props": {
+        "onClick": "() => {\r\n                  setDeclineModalOpen(false);\r\n                  setOfferToDecline(null);\r\n                  setDeclineReason('');\r\n                  setCustomDeclineReason('');\r\n                }",
+        "variant": "outline",
+        "className": "flex-1",
+        "disabled": "decliningOfferId !== null"
+      }
+    },
+    {
+      "location": {
+        "file": "src\\pages\\TradeOffers.tsx",
+        "line": 899,
+        "column": 15
+      },
+      "type": "Button_Component",
+      "styling": "component",
+      "props": {
+        "onClick": "confirmDeclineOffer",
+        "className": "flex-1 bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800 text-white",
+        "isLoading": "decliningOfferId === offerToDecline.id",
+        "disabled": "decliningOfferId !== null || (declineReason === 'other' && !customDeclineReason.trim())"
+      }
+    }
+  ]
+}

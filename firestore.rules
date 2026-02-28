@@ -45,7 +45,11 @@ service cloud.firestore {
     // ─── Items ────────────────────────────────────────────────────────────────
 
     match /items/{itemId} {
-      allow read: if isAuth();
+      // Users can read their own items regardless of status
+      // Non-owners can only read items with status='available'
+      allow read: if isAuth() 
+        && (resource.data.ownerId == request.auth.uid
+            || resource.data.status == 'available');
 
       allow create: if isAuth()
         && request.resource.data.ownerId == request.auth.uid
@@ -60,22 +64,30 @@ service cloud.firestore {
         && request.resource.data.images is list
         && request.resource.data.images.size() > 0
         && request.resource.data.images.size() <= 10
-        && isValidStatus(request.resource.data.status, ['available', 'pending', 'traded']);
+        && isValidStatus(request.resource.data.status, ['available', 'pending', 'traded', 'deleted']);
 
       allow update: if isAuth() 
-        && resource.data.ownerId == request.auth.uid
-        && request.resource.data.ownerId == resource.data.ownerId
-        && request.resource.data.createdAt == resource.data.createdAt
         && (
-          // Allow status updates
-          (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt']))
-          // Allow full updates by owner
-          || (
-            isValidString(request.resource.data.title, 1, 200)
-            && isValidString(request.resource.data.description, 1, 5000)
-            && request.resource.data.images.size() > 0
-            && request.resource.data.images.size() <= 10
+          // Owner can update their own items
+          (resource.data.ownerId == request.auth.uid
+            && request.resource.data.ownerId == resource.data.ownerId
+            && request.resource.data.createdAt == resource.data.createdAt
+            && (
+              // Allow status updates
+              (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt']))
+              // Allow full updates by owner
+              || (
+                isValidString(request.resource.data.title, 1, 200)
+                && isValidString(request.resource.data.description, 1, 5000)
+                && request.resource.data.images.size() > 0
+                && request.resource.data.images.size() <= 10
+              )
+            )
           )
+          // Allow marking as unavailable when completing a trade (for atomic batch operations)
+          || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt'])
+              && request.resource.data.status == 'unavailable'
+              && resource.data.status == 'available')
         );
       
       allow delete: if isAuth() && resource.data.ownerId == request.auth.uid;
@@ -129,34 +141,43 @@ service cloud.firestore {
 
       // Either party can update (accept / decline / mark read / complete)
       allow update: if isAuth()
-        && (resource.data.offeringUserId == request.auth.uid
-            || resource.data.targetItemOwnerId == request.auth.uid)
-        && request.resource.data.tradeAnchorId == resource.data.tradeAnchorId
-        && request.resource.data.targetItemId == resource.data.targetItemId
-        && request.resource.data.offeringUserId == resource.data.offeringUserId
-        && request.resource.data.targetItemOwnerId == resource.data.targetItemOwnerId
-        && request.resource.data.tradeAnchorOwnerId == resource.data.tradeAnchorOwnerId
-        && request.resource.data.createdAt == resource.data.createdAt
-        && isValidStatus(request.resource.data.status, ['pending', 'read', 'accepted', 'declined', 'completed'])
         && (
-          // Target owner can accept or decline
-          (request.auth.uid == resource.data.targetItemOwnerId 
-            && request.resource.data.status in ['read', 'accepted', 'declined'])
-          // Offering user can mark as read
-          || (request.auth.uid == resource.data.offeringUserId 
-            && request.resource.data.status in ['read'])
-          // Either can add themselves to completedBy array when status is accepted
-          || (resource.data.status == 'accepted'
-            && (!resource.data.keys().hasAny(['completedBy']) 
-                || request.auth.uid in request.resource.data.get('completedBy', []))
-            && request.resource.data.get('completedBy', []) is list
-            && request.resource.data.get('completedBy', []).size() <= 2)
-          // Status can be completed when both users are in completedBy
-          || (resource.data.status == 'accepted'
-            && request.resource.data.status == 'completed'
-            && request.resource.data.get('completedBy', []).size() == 2
-            && resource.data.offeringUserId in request.resource.data.get('completedBy', [])
-            && resource.data.targetItemOwnerId in request.resource.data.get('completedBy', []))
+          // Participants can update their own trades
+          ((resource.data.offeringUserId == request.auth.uid
+              || resource.data.targetItemOwnerId == request.auth.uid)
+            && request.resource.data.tradeAnchorId == resource.data.tradeAnchorId
+            && request.resource.data.targetItemId == resource.data.targetItemId
+            && request.resource.data.offeringUserId == resource.data.offeringUserId
+            && request.resource.data.targetItemOwnerId == resource.data.targetItemOwnerId
+            && request.resource.data.tradeAnchorOwnerId == resource.data.tradeAnchorOwnerId
+            && request.resource.data.createdAt == resource.data.createdAt
+            && isValidStatus(request.resource.data.status, ['pending', 'read', 'accepted', 'declined', 'completed'])
+            && (
+              // Target owner can accept or decline
+              (request.auth.uid == resource.data.targetItemOwnerId 
+                && request.resource.data.status in ['read', 'accepted', 'declined'])
+              // Offering user can mark as read
+              || (request.auth.uid == resource.data.offeringUserId 
+                && request.resource.data.status in ['read'])
+              // Either can add themselves to completedBy array when status is accepted
+              || (resource.data.status == 'accepted'
+                && (!resource.data.keys().hasAny(['completedBy']) 
+                    || request.auth.uid in request.resource.data.get('completedBy', []))
+                && request.resource.data.get('completedBy', []) is list
+                && request.resource.data.get('completedBy', []).size() <= 2)
+              // Status can be completed when both users are in completedBy
+              || (resource.data.status == 'accepted'
+                && request.resource.data.status == 'completed'
+                && request.resource.data.get('completedBy', []).size() == 2
+                && resource.data.offeringUserId in request.resource.data.get('completedBy', [])
+                && resource.data.targetItemOwnerId in request.resource.data.get('completedBy', []))
+            )
+          )
+          // Allow declining conflicting trades when completing another trade (for atomic batch operations)
+          || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'declineReason', 'updatedAt'])
+              && request.resource.data.status == 'declined'
+              && resource.data.status == 'accepted'
+              && request.resource.data.declineReason == 'Item no longer available')
         );
 
       allow delete: if false; // Trade offers should not be deleted
@@ -181,6 +202,13 @@ service cloud.firestore {
         && request.resource.data.read is bool;
       
       allow delete: if isAuth() && resource.data.userId == request.auth.uid;
+    }
+
+    // ─── Rate Limits ──────────────────────────────────────────────────────────
+
+    match /rateLimits/{userId} {
+      // Users can read and write their own rate limit data
+      allow read, write: if isAuth() && isUser(userId);
     }
 
     // ─── Conversations ────────────────────────────────────────────────────────

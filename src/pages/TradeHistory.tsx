@@ -165,7 +165,7 @@ export function TradeHistory() {
     return (
       <div className="flex-1 w-full bg-gray-50 dark:bg-gray-900">
         <div className="flex items-center justify-center min-h-[50vh]">
-          <LoadingSpinner message="Loading trade history..." size="lg" />
+          <LoadingSpinner variant="flow" message="Loading trade history..." size="lg" />
         </div>
       </div>
     );
@@ -410,3 +410,4 @@ export function TradeHistory() {
     </PageTransition>
   );
 }
+

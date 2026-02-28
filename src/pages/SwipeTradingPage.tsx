@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { collection, query, where, getDocs, doc, getDoc, Timestamp } from 'firebase/firestore';
+import { AnimatePresence } from 'framer-motion';
 import { db } from '../firebase';
 import { useAuth } from '../contexts/AuthContext';
 import { useProfile } from '../contexts/ProfileContext';
@@ -8,10 +9,19 @@ import { UserProfile } from '../types/user';
 import { SwipeSession, SwipeFilterPreferences } from '../types/swipe-trading';
 import { TradeAnchorSelector } from '../components/TradeAnchorSelector';
 import { SwipeInterface } from '../components/SwipeInterface';
+import { SwipeFilters } from '../components/SwipeFilters';
+import { Modal } from '../components/ui/Modal';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 import { LoadingProgress } from '../components/LoadingProgress';
 import { PageTransition } from '../components/PageTransition';
-import { buildItemPool } from '../services/itemPoolService';
+import { 
+  loadInitialBatch,
+  loadNextBatch,
+  shouldLoadMore,
+  updateCurrentIndex,
+  PaginationState,
+  createInitialPaginationState,
+} from '../services/itemPoolService';
 import { createTradeOffer } from '../services/tradeOfferService';
 import {
   recordSwipe,
@@ -48,18 +58,17 @@ export function SwipeTradingPage() {
   // State management
   const [tradeAnchor, setTradeAnchor] = useState<Item | null>(null);
   const [userItems, setUserItems] = useState<Item[]>([]);
-  const [itemPool, setItemPool] = useState<Item[]>([]);
+  const [paginationState, setPaginationState] = useState<PaginationState>(createInitialPaginationState());
   const [ownerProfiles, setOwnerProfiles] = useState<Map<string, UserProfile>>(new Map());
   const [session, setSession] = useState<SwipeSession | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadingPhase, setLoadingPhase] = useState<LoadingPhase>('idle');
   const [error, setError] = useState<string | null>(null);
-  // @ts-expect-error - Variable defined for future use
-  const [loadingError, setLoadingError] = useState<string | null>(null);
   const [isSwipeMode, setIsSwipeMode] = useState(false);
   const [syncStatus, setSyncStatus] = useState<string | null>(null);
   const [showExtendedLoadingMessage, setShowExtendedLoadingMessage] = useState(false);
   const [showNewSessionOption, setShowNewSessionOption] = useState(false);
+  const [showFiltersModal, setShowFiltersModal] = useState(false);
   const hasAttemptedRestoreRef = useRef(false);
   const processingSwipesRef = useRef<Set<string>>(new Set());
   const [filterPreferences, setFilterPreferences] = useState<SwipeFilterPreferences>(() => {
@@ -108,7 +117,7 @@ export function SwipeTradingPage() {
     if (loading && (loadingPhase === 'creating-session' || loadingPhase === 'loading-items')) {
       timer = setTimeout(() => {
         setShowExtendedLoadingMessage(true);
-      }, 5000);
+      }, 3000); // Show after 3 seconds per requirement 8.4
     } else {
       // Clear extended message when loading completes or errors
       setShowExtendedLoadingMessage(false);
@@ -131,10 +140,10 @@ export function SwipeTradingPage() {
 
   // Load owner profile for current item
   useEffect(() => {
-    if (itemPool.length > 0) {
-      loadOwnerProfilesForPool(itemPool);
+    if (paginationState.loadedItems.length > 0) {
+      loadOwnerProfilesForPool(paginationState.loadedItems);
     }
-  }, [itemPool]);
+  }, [paginationState.loadedItems]);
 
   /**
    * Fetches all items owned by the current user
@@ -199,10 +208,11 @@ export function SwipeTradingPage() {
   };
 
   /**
-   * Loads the item pool for swiping, excluding:
+   * Loads the item pool for swiping using pagination, excluding:
    * - Current user's items
    * - Items already swiped in this session
    * - Items with status != 'available'
+   * Requirements: 5.1, 5.5
    */
   const loadItemPool = async () => {
     if (!user || !session) {
@@ -215,21 +225,20 @@ export function SwipeTradingPage() {
       setError(null);
 
       const swipeHistory = await getSwipeHistory(session.id, user.uid);
-      const items = await buildItemPool(
+      
+      // Use pagination for initial load
+      const initialState = await loadInitialBatch(
         user.uid,
         swipeHistory,
-        20,
-        undefined,
         filterPreferences,
         profile?.coordinates || null
       );
 
-      // Empty pool is a valid state, not an error
-      setItemPool(items);
+      setPaginationState(initialState);
 
       // Load owner profiles for the items
-      if (items.length > 0) {
-        const profiles = await loadOwnerProfiles(items);
+      if (initialState.loadedItems.length > 0) {
+        const profiles = await loadOwnerProfiles(initialState.loadedItems);
         setOwnerProfiles(profiles);
       }
     } catch (err) {
@@ -369,7 +378,7 @@ export function SwipeTradingPage() {
     } else if (errorMessage.includes('no items') || errorMessage.includes('empty pool')) {
       // This is actually a valid state - no items available
       console.log('[SwipeTradingPage] Empty item pool - no items available for swiping');
-      setItemPool([]);
+      setPaginationState(createInitialPaginationState());
       setIsSwipeMode(true);
       setLoadingPhase('complete');
       return; // Don't set error state for empty pool
@@ -382,7 +391,7 @@ export function SwipeTradingPage() {
     setIsSwipeMode(false);
     setTradeAnchor(null);
     setSession(null);
-    setItemPool([]);
+    setPaginationState(createInitialPaginationState());
   };
 
   /**
@@ -465,26 +474,26 @@ export function SwipeTradingPage() {
         phase: 'history-loaded'
       });
 
-      const items = await buildItemPool(
+      // Use pagination for initial load
+      const initialState = await loadInitialBatch(
         user.uid,
         swipeHistory,
-        20,
-        undefined,
         filterPreferences,
         profile?.coordinates || null
       );
       console.log('[SwipeTradingPage] Item pool loaded:', {
         sessionId: newSession.id,
-        itemCount: items.length,
+        itemCount: initialState.loadedItems.length,
+        hasMore: initialState.hasMore,
         phase: 'items-loaded'
       });
 
       // Phase 3: Load owner profiles and complete transition to swipe mode
-      setItemPool(items);
+      setPaginationState(initialState);
 
       // Load owner profiles for the items
-      if (items.length > 0) {
-        const profiles = await loadOwnerProfiles(items);
+      if (initialState.loadedItems.length > 0) {
+        const profiles = await loadOwnerProfiles(initialState.loadedItems);
         setOwnerProfiles(profiles);
       }
 
@@ -495,7 +504,7 @@ export function SwipeTradingPage() {
         sessionId: newSession.id,
         userId: user.uid,
         anchorId: item.id,
-        itemCount: items.length,
+        itemCount: initialState.loadedItems.length,
         phase: 'complete'
       });
     } catch (err) {
@@ -504,48 +513,6 @@ export function SwipeTradingPage() {
       setLoading(false);
     }
   };
-  /**
-   * Handles filter changes and reloads the item pool
-   * Note: Currently not used in UI but kept for future filter functionality
-   */
-  // @ts-expect-error - Function reserved for future filter functionality
-  const handleFilterChange = async (filters: SwipeFilterPreferences) => {
-    // Save to localStorage
-    localStorage.setItem('swipeFilterPreferences', JSON.stringify(filters));
-    setFilterPreferences(filters);
-
-    // If we're in swipe mode, reload the item pool with new filters
-    if (isSwipeMode && session && user) {
-      try {
-        setLoading(true);
-        setError(null);
-
-        const swipeHistory = await getSwipeHistory(session.id, user.uid);
-        const items = await buildItemPool(
-          user.uid,
-          swipeHistory,
-          20,
-          undefined,
-          filters,
-          profile?.coordinates || null
-        );
-
-        setItemPool(items);
-
-        // Load owner profiles for the items
-        if (items.length > 0) {
-          const profiles = await loadOwnerProfiles(items);
-          setOwnerProfiles(profiles);
-        }
-      } catch (err) {
-        console.error('Error reloading items with new filters:', err);
-        setError('Failed to apply filters. Please try again.');
-      } finally {
-        setLoading(false);
-      }
-    }
-  };
-
   /**
    * Handles creating a new session with the same trade anchor after restoration failure
    * Requirements: 6.4
@@ -580,7 +547,7 @@ export function SwipeTradingPage() {
     setIsSwipeMode(false);
     setTradeAnchor(null);
     setSession(null);
-    setItemPool([]);
+    setPaginationState(createInitialPaginationState());
     setOwnerProfiles(new Map());
   };
 
@@ -589,8 +556,9 @@ export function SwipeTradingPage() {
    * - Records swipe in history
    * - If right swipe: creates trade offer and notification
    * - Removes swiped item from pool
+   * - Updates pagination index and loads more if needed
    * - Handles errors gracefully without blocking progression
-   * Requirements: 3.4, 6.1, 7.1, 7.2
+   * Requirements: 3.4, 5.2, 6.1, 7.1, 7.2
    */
   const handleSwipe = async (itemId: string, direction: 'left' | 'right') => {
     if (!user || !session || !tradeAnchor) {
@@ -603,7 +571,7 @@ export function SwipeTradingPage() {
       return;
     }
 
-    const item = itemPool.find(i => i.id === itemId);
+    const item = paginationState.loadedItems.find(i => i.id === itemId);
     if (!item) {
       console.warn('Item not found in pool:', itemId);
       return;
@@ -639,22 +607,34 @@ export function SwipeTradingPage() {
       }
 
       // Record swipe in history
-      await recordSwipe(session.id, user.uid, itemId, direction);
+      const swipeResult = await recordSwipe(session.id, user.uid, itemId, direction);
+
+      // Show warning if provided
+      if (swipeResult.warning) {
+        setError(swipeResult.warning);
+        // Clear warning after 5 seconds
+        setTimeout(() => setError(null), 5000);
+      }
 
       // If right swipe, create trade offer and notification
       if (direction === 'right') {
         await handleRightSwipe(item);
       }
 
-      // Remove item from pool
-      setItemPool(prev => prev.filter(i => i.id !== itemId));
+      // Update pagination state - increment index and remove swiped item
+      const newState = updateCurrentIndex(paginationState, paginationState.currentIndex + 1);
+      const stateWithoutItem = {
+        ...newState,
+        loadedItems: newState.loadedItems.filter(i => i.id !== itemId),
+      };
+      setPaginationState(stateWithoutItem);
 
       // Clean up processing tracker
       processingSwipesRef.current.delete(itemId);
 
-      // If we're running low on items, preload more (threshold changed from 3 to 5)
-      if (itemPool.length <= 5) {
-        preloadMoreItems();
+      // Check if we should load more items (70% threshold)
+      if (shouldLoadMore(stateWithoutItem)) {
+        loadMoreItems(stateWithoutItem);
       }
     } catch (err) {
       // Clean up processing tracker on error
@@ -677,7 +657,10 @@ export function SwipeTradingPage() {
       if (errorMessage.includes('not found') || errorMessage.includes('no longer available')) {
         setError('This item is no longer available. Moving to the next item.');
         // Still remove item from pool
-        setItemPool(prev => prev.filter(i => i.id !== itemId));
+        setPaginationState(prev => ({
+          ...prev,
+          loadedItems: prev.loadedItems.filter(i => i.id !== itemId),
+        }));
         // Clear error after a few seconds
         setTimeout(() => setError(null), 3000);
       } else if (errorMessage.includes('permission') || errorMessage.includes('unauthorized')) {
@@ -783,40 +766,35 @@ export function SwipeTradingPage() {
   };
 
   /**
-   * Preloads more items when running low
+   * Loads more items when threshold is reached
+   * Requirements: 5.2, 5.3
    */
-  const preloadMoreItems = async () => {
+  const loadMoreItems = async (currentState: PaginationState) => {
     if (!user || !session) return;
 
     try {
-      setLoadingError(null); // Clear any previous loading errors
       const swipeHistory = await getSwipeHistory(session.id, user.uid);
-      const moreItems = await buildItemPool(
+      
+      const newState = await loadNextBatch(
+        currentState,
         user.uid,
         swipeHistory,
-        20,
-        undefined,
         filterPreferences,
         profile?.coordinates || null
       );
 
-      // Add new items that aren't already in the pool
-      const existingIds = new Set(itemPool.map(item => item.id));
-      const newItems = moreItems.filter(item => !existingIds.has(item.id));
+      setPaginationState(newState);
 
+      // Load owner profiles for new items
+      const existingIds = new Set(ownerProfiles.keys());
+      const newItems = newState.loadedItems.filter(item => !existingIds.has(item.ownerId));
+      
       if (newItems.length > 0) {
-        setItemPool(prev => [...prev, ...newItems]);
-
-        // Load owner profiles for new items
         const newProfiles = await loadOwnerProfiles(newItems);
         setOwnerProfiles(prev => new Map([...prev, ...newProfiles]));
       }
     } catch (err) {
-      console.error('Error preloading items:', err);
-      setLoadingError('Failed to load more cards. They will retry automatically.');
-
-      // Clear the error after 5 seconds
-      setTimeout(() => setLoadingError(null), 5000);
+      console.error('Error loading more items:', err);
     }
   };
 
@@ -828,8 +806,8 @@ export function SwipeTradingPage() {
         subtitle: 'Setting up your personalized trading experience',
       },
       'loading-items': {
-        message: 'Finding perfect matches',
-        subtitle: 'Searching for items that match your preferences',
+        message: 'Loading available items',
+        subtitle: 'Finding items that match your preferences',
       },
     };
 
@@ -841,38 +819,23 @@ export function SwipeTradingPage() {
           <div className="max-w-2xl w-full space-y-8">
             {/* Main loading spinner */}
             <LoadingSpinner 
+              variant="flow"
               message={currentPhase.message}
-              subtitle={currentPhase.subtitle}
               size="lg" 
-              showDots={true}
             />
 
             {/* Progress indicator */}
             <LoadingProgress 
               phase={loadingPhase}
               messages={{
-                'creating-session': 'Setting up',
-                'loading-items': 'Finding matches',
+                'creating-session': 'Creating session',
+                'loading-items': 'Loading available items',
+                'loading-profiles': 'Loading item details',
+                'applying-filters': 'Applying filters',
                 'complete': 'Ready to swipe',
               }}
+              showExtendedMessage={showExtendedLoadingMessage}
             />
-
-            {/* Extended loading message */}
-            {showExtendedLoadingMessage && (
-              <div className="mt-8 px-6 py-4 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl shadow-lg border border-primary/20 dark:border-primary-light/20 text-center animate-fadeIn">
-                <div className="flex items-center justify-center gap-3 mb-2">
-                  <svg className="w-5 h-5 text-primary dark:text-primary-light animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                  </svg>
-                  <p className="text-sm text-gray-700 dark:text-gray-300 font-medium">
-                    This is taking longer than usual...
-                  </p>
-                </div>
-                <p className="text-xs text-gray-600 dark:text-gray-400">
-                  We're working on it. Please wait a moment.
-                </p>
-              </div>
-            )}
           </div>
         </div>
       </PageTransition>
@@ -885,18 +848,22 @@ export function SwipeTradingPage() {
       <PageTransition variant="page">
         <div className="flex-1 w-full flex flex-col items-center justify-center min-h-[50vh] relative z-0">
           <LoadingSpinner 
+            variant="flow"
             message="Loading your items" 
-            subtitle="Preparing your trading inventory"
             size="lg" 
-            showDots={true}
           />
           {showExtendedLoadingMessage && (
-            <div className="mt-8 px-6 py-4 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl shadow-lg border border-primary/20 dark:border-primary-light/20 max-w-md text-center animate-fadeIn">
-              <p className="text-sm text-gray-700 dark:text-gray-300 font-medium">
-                This is taking longer than usual...
-              </p>
-              <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                We're working on it. Please wait a moment.
+            <div className="mt-8 px-6 py-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-2xl shadow-lg max-w-md text-center animate-fadeIn">
+              <div className="flex items-center justify-center gap-2 mb-1">
+                <svg className="w-4 h-4 text-amber-600 dark:text-amber-400 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                <p className="text-xs font-semibold text-amber-800 dark:text-amber-200">
+                  This is taking longer than usual
+                </p>
+              </div>
+              <p className="text-xs text-amber-700 dark:text-amber-300">
+                Please wait while we load your items...
               </p>
             </div>
           )}
@@ -963,27 +930,158 @@ export function SwipeTradingPage() {
   }
 
   // Swipe interface view
-  const currentItem = itemPool.length > 0 ? itemPool[0] : null;
+  const currentItem = paginationState.loadedItems.length > 0 ? paginationState.loadedItems[0] : null;
   const currentOwnerProfile = currentItem ? ownerProfiles.get(currentItem.ownerId) || null : null;
+  const hasMoreItems = paginationState.loadedItems.length > 1 || paginationState.hasMore;
+
+  /**
+   * Handles restoring an item to the top of the swipe stack after undo
+   * Requirements: 6.7
+   */
+  const handleItemRestored = (item: Item, ownerProfile: UserProfile) => {
+    // Add the item back to the beginning of the loaded items
+    setPaginationState(prev => ({
+      ...prev,
+      loadedItems: [item, ...prev.loadedItems],
+    }));
+
+    // Ensure the owner profile is in the map
+    setOwnerProfiles(prev => new Map(prev).set(item.ownerId, ownerProfile));
+  };
+
+  /**
+   * Detects the reason for empty state based on current conditions
+   * Requirements: 7.1, 7.2, 7.3, 7.4, 7.5
+   */
+  const detectEmptyStateReason = (): 'no-filters-match' | 'no-location-match' | 'all-swiped' | 'no-anchor' | 'network-error' | 'default' => {
+    // Check if there's no trade anchor
+    if (!tradeAnchor) {
+      return 'no-anchor';
+    }
+
+    // Check if there was a network error
+    if (error && (error.includes('network') || error.includes('connection'))) {
+      return 'network-error';
+    }
+
+    // Check if filters are active
+    const hasActiveFilters = 
+      filterPreferences.maxDistance !== null ||
+      filterPreferences.categories.length > 0 ||
+      filterPreferences.conditions.length > 0;
+
+    // If location filter is active and no items, it's likely a location issue
+    if (filterPreferences.maxDistance !== null && paginationState.loadedItems.length === 0) {
+      return 'no-location-match';
+    }
+
+    // If other filters are active and no items, it's a filter issue
+    if (hasActiveFilters && paginationState.loadedItems.length === 0) {
+      return 'no-filters-match';
+    }
+
+    // If no filters and no items, user has swiped through everything
+    if (!hasActiveFilters && paginationState.loadedItems.length === 0 && !paginationState.hasMore) {
+      return 'all-swiped';
+    }
+
+    return 'default';
+  };
+
+  /**
+   * Handles opening the filters adjustment modal
+   * Requirements: 7.6
+   */
+  const handleAdjustFilters = () => {
+    setShowFiltersModal(true);
+  };
+
+  /**
+   * Handles applying new filters and reloading items
+   * Requirements: 7.6
+   */
+  const handleApplyFilters = async (newFilters: SwipeFilterPreferences) => {
+    setFilterPreferences(newFilters);
+    localStorage.setItem('swipeFilterPreferences', JSON.stringify(newFilters));
+    setShowFiltersModal(false);
+
+    // Reload items with new filters
+    if (user && session) {
+      try {
+        setLoading(true);
+        const swipeHistory = await getSwipeHistory(session.id, user.uid);
+        const initialState = await loadInitialBatch(
+          user.uid,
+          swipeHistory,
+          newFilters,
+          profile?.coordinates || null
+        );
+        setPaginationState(initialState);
+
+        // Load owner profiles for the items
+        if (initialState.loadedItems.length > 0) {
+          const profiles = await loadOwnerProfiles(initialState.loadedItems);
+          setOwnerProfiles(profiles);
+        }
+      } catch (err) {
+        console.error('Error reloading items with new filters:', err);
+        setError('Failed to apply filters. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  /**
+   * Handles retrying after a network error
+   * Requirements: 7.5
+   */
+  const handleRetry = () => {
+    setError(null);
+    if (session && user) {
+      loadItemPool();
+    }
+  };
 
   return (
     <PageTransition variant="page">
       <div className="flex-1 w-full relative z-0">
-        <SwipeInterface
-          tradeAnchor={tradeAnchor}
-          currentItem={currentItem}
-          ownerProfile={currentOwnerProfile}
-          onSwipe={(direction) => {
-            if (currentItem) {
-              handleSwipe(currentItem.id, direction);
-            }
-          }}
-          onChangeAnchor={handleChangeAnchor}
-          hasMoreItems={itemPool.length > 1}
-          loading={loading}
-          syncStatus={syncStatus}
-        />
+        <AnimatePresence mode="wait">
+          <SwipeInterface
+            key={currentItem?.id || 'empty'}
+            tradeAnchor={tradeAnchor}
+            currentItem={currentItem}
+            ownerProfile={currentOwnerProfile}
+            onSwipe={(direction) => {
+              if (currentItem) {
+                handleSwipe(currentItem.id, direction);
+              }
+            }}
+            onChangeAnchor={handleChangeAnchor}
+            hasMoreItems={hasMoreItems}
+            loading={loading || paginationState.isLoading}
+            syncStatus={syncStatus}
+            sessionId={session?.id || ''}
+            onItemRestored={handleItemRestored}
+            emptyStateReason={detectEmptyStateReason()}
+            onAdjustFilters={handleAdjustFilters}
+            onRetry={handleRetry}
+          />
+        </AnimatePresence>
+
+        {/* Filters Modal */}
+        <Modal
+          isOpen={showFiltersModal}
+          onClose={() => setShowFiltersModal(false)}
+          title="Adjust Filters"
+        >
+          <SwipeFilters
+            onApply={handleApplyFilters}
+            initialFilters={filterPreferences}
+          />
+        </Modal>
       </div>
     </PageTransition>
   );
 }
+

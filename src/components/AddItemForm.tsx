@@ -277,46 +277,26 @@ export function AddItemForm({ onSuccess }: AddItemFormProps = {}) {
       </div>
 
       {showSuccessModal && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn">
-          <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-3xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 transform transition-all animate-scaleIn overflow-hidden">
-            {/* Header */}
-            <div className="relative px-6 py-5 bg-gradient-to-r from-emerald-500/10 via-emerald-500/20 to-emerald-500/10 border-b border-gray-200/50 dark:border-gray-700/50">
-              <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-text dark:text-gray-100">
-                  Success!
-                </h2>
-                <button
-                  onClick={handleSuccessModalClose}
-                  className="p-2 hover:bg-white/50 dark:hover:bg-gray-700/50 rounded-xl transition-all duration-200 hover:scale-110 active:scale-95"
-                  aria-label="Close modal"
-                >
-                  <svg className="w-5 h-5 text-text-secondary dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeInFast">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6 animate-scaleIn">
+            <div className="flex flex-col items-center text-center">
+              <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mb-4">
+                <svg className="w-8 h-8 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
               </div>
-            </div>
-
-            {/* Content */}
-            <div className="px-6 py-5">
-              <div className="text-center py-4">
-                <div className="mx-auto w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mb-4">
-                  <svg className="w-8 h-8 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-bold text-text dark:text-gray-100 mb-2">
-                  Item Added Successfully!
-                </h3>
-                <p className="text-sm text-text-secondary dark:text-gray-400">
-                  Your listing is now live and visible to others.
-                </p>
-              </div>
-              <div className="flex justify-center mt-4">
-                <Button onClick={handleSuccessModalClose} className="px-8">
-                  Got it
-                </Button>
-              </div>
+              <h3 className="text-xl font-bold text-text dark:text-gray-100 mb-2">
+                Item Added Successfully!
+              </h3>
+              <p className="text-sm text-text-secondary dark:text-gray-400 mb-6">
+                Your listing is now live and visible to others.
+              </p>
+              <Button
+                onClick={handleSuccessModalClose}
+                className="w-full"
+              >
+                Got it
+              </Button>
             </div>
           </div>
         </div>

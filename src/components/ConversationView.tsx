@@ -183,7 +183,14 @@ export function ConversationView() {
       setSending(true);
       setSendError(null);
 
-      await sendMessage(conversationId, user.uid, messageText);
+      const result = await sendMessage(conversationId, user.uid, messageText);
+
+      // Show warning if provided
+      if (result.warning) {
+        setSendError(result.warning);
+        // Clear warning after 5 seconds
+        setTimeout(() => setSendError(null), 5000);
+      }
 
       // Clear input on success
       setMessageText('');
@@ -291,7 +298,7 @@ export function ConversationView() {
     return (
       <div className="flex-1 w-full bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
         <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
-          <LoadingSpinner message="Loading conversation..." size="lg" />
+          <LoadingSpinner variant="flow" message="Loading conversation..." size="lg" />
         </div>
       </div>
     );
@@ -1168,3 +1175,4 @@ export function ConversationView() {
     </div>
   );
 }
+

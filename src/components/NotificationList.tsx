@@ -99,7 +99,7 @@ const NotificationList: React.FC = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[200px]">
-        <LoadingSpinner />
+        <LoadingSpinner variant="flow" size="md" />
       </div>
     );
   }
@@ -195,3 +195,4 @@ const NotificationList: React.FC = () => {
 };
 
 export default NotificationList;
+

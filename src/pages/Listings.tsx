@@ -15,6 +15,7 @@ import { Pagination } from '../components/ui/Pagination';
 import { useAuth } from '../contexts/AuthContext';
 import { getPageTitleClasses, typography, getPrimaryButtonClasses, getPageContainerClasses } from '../styles/designSystem';
 import { usePageTitle } from '../hooks/usePageTitle';
+import { getResponsiveImageUrl } from '../utils/cloudinary';
 
 type ViewMode = 'grid' | 'list';
 
@@ -154,7 +155,7 @@ export function Listings() {
   if (loading) {
     return (
       <div className="flex-1 w-full flex justify-center items-center min-h-[50vh]">
-        <LoadingSpinner message="Loading items..." size="lg" />
+        <LoadingSpinner variant="flow" message="Loading items..." size="lg" />
       </div>
     );
   }
@@ -467,7 +468,7 @@ export function Listings() {
                             {/* Owner avatar */}
                             <div className="flex items-center gap-1.5 min-w-0">
                               {ownerProfile?.photoUrl ? (
-                                <img src={ownerProfile.photoUrl} alt="" className="w-5 h-5 rounded-full object-cover flex-shrink-0" />
+                                <img src={getResponsiveImageUrl(ownerProfile.photoUrl, { width: 20, height: 20, crop: 'fill' })} alt="" className="w-5 h-5 rounded-full object-cover flex-shrink-0" />
                               ) : (
                                 <div className="w-5 h-5 rounded-full bg-gradient-to-br from-accent to-accent-dark dark:from-primary-light dark:to-primary flex items-center justify-center text-white text-[8px] font-bold flex-shrink-0">
                                   {ownerInitials}
@@ -554,7 +555,7 @@ export function Listings() {
                           <div className="flex items-center justify-between mt-2.5 pt-2 border-t border-gray-100 dark:border-gray-700">
                             <div className="flex items-center gap-1.5 min-w-0">
                               {ownerProfile?.photoUrl ? (
-                                <img src={ownerProfile.photoUrl} alt="" className="w-4 h-4 rounded-full object-cover flex-shrink-0" />
+                                <img src={getResponsiveImageUrl(ownerProfile.photoUrl, { width: 16, height: 16, crop: 'fill' })} alt="" className="w-4 h-4 rounded-full object-cover flex-shrink-0" />
                               ) : (
                                 <div className="w-4 h-4 rounded-full bg-gradient-to-br from-accent to-accent-dark dark:from-primary-light dark:to-primary flex items-center justify-center text-white text-[7px] font-bold flex-shrink-0">
                                   {ownerInitials}
@@ -636,3 +637,4 @@ export function Listings() {
     </PageTransition>
   );
 }
+

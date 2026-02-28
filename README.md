@@ -148,6 +148,10 @@ firebase deploy --only storage:rules
 - `npm run preview` - Preview production build
 - `npm test` - Run tests once
 - `npm run test:watch` - Run tests in watch mode
+- `npm run lint` - Lint TypeScript files
+- `npm run lint:fix` - Auto-fix linting issues
+- `npm run audit:buttons` - Audit button components in codebase
+- `npm run migrate:buttons` - Generate button migration suggestions
 
 ## 🎯 Key Features Explained
 
@@ -190,12 +194,22 @@ Real-time chat for accepted trades:
 
 ## 🎨 Design System
 
-- **Color Themes** - Light and dark mode support
-- **Responsive Grid** - Mobile-first design
-- **Card Components** - Consistent card styling
-- **Loading States** - Skeleton screens and spinners
-- **Error Handling** - User-friendly error messages
-- **Accessibility** - ARIA labels and keyboard navigation
+### UI Components
+The project includes a comprehensive design system with reusable components:
+
+- **Button Component** - 5 variants (primary, secondary, outline, ghost, danger) with loading states, icon support, and full accessibility
+- **LoadingSpinner** - 9 stylish variants (default, dots, pulse, gradient, orbit, bars, flow, ripple, wave) with size options
+- **Card, Input, Select** - Consistent form and layout components
+- **Modal, Toast, Alert** - Feedback and notification components
+- **Dropdown, Checkbox, Pagination** - Interactive UI elements
+
+### Design Principles
+- **Color Themes** - Light and dark mode with smooth transitions
+- **Responsive Grid** - Mobile-first design with touch-optimized interactions
+- **Loading States** - Skeleton screens and animated spinners
+- **Error Handling** - User-friendly error messages with recovery options
+- **Accessibility** - WCAG 2.1 compliant with ARIA labels, keyboard navigation, and 48px minimum touch targets
+- **Animations** - Smooth transitions using Framer Motion with reduced motion support
 
 ## 🧪 Testing
 
@@ -209,6 +223,21 @@ Run tests with:
 ```bash
 npm test
 ```
+
+## 🛠️ Development Tools
+
+### Button Audit & Migration
+The project includes automated tools for maintaining UI consistency:
+
+- **Button Audit** - Scans codebase to identify all button components and native elements
+- **Button Migration** - Analyzes native buttons and provides automated migration suggestions with confidence levels
+
+See [scripts/README.md](scripts/README.md) for detailed documentation.
+
+### Component Documentation
+Detailed component documentation is available in:
+- [src/components/README.md](src/components/README.md) - Component usage guides
+- [scripts/README.md](scripts/README.md) - Development tool documentation
 
 ## 📄 License
 

@@ -267,7 +267,7 @@ export function TradeOffers() {
     return (
       <div className="flex-1 w-full">
         <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
-          <LoadingSpinner message="Loading trade offers..." size="lg" />
+          <LoadingSpinner variant="flow" message="Loading trade offers..." size="lg" />
         </div>
       </div>
     );
@@ -914,3 +914,4 @@ export function TradeOffers() {
     </PageTransition >
   );
 }
+

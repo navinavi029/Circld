@@ -16,6 +16,11 @@ import { Conversation, Message, ConversationSummary } from '../types/swipe-tradi
 import { retryWithBackoff } from '../utils/retryWithBackoff';
 import { createMessageNotification } from './notificationService';
 import { calculateTotalUnreadCount } from '../utils/messagingUtils';
+import { checkRateLimit, recordAction } from '../utils/rateLimiter';
+import { createLogger } from '../utils/logger';
+
+// Create logger instance for this service
+const logger = createLogger('messagingService');
 
 // Cache for item and user details to minimize Firestore reads
 interface ItemDetails {
@@ -247,23 +252,21 @@ export async function getUserConversations(userId: string): Promise<Conversation
       orderBy('lastMessageAt', 'desc')
     );
 
-    console.log('[getUserConversations] Querying conversations for user:', userId);
+    logger.debug('Querying conversations for user', { userId });
 
     const querySnapshot = await getDocs(q);
 
-    console.log('[getUserConversations] Found conversations:', {
-      count: querySnapshot.docs.length,
-      conversationIds: querySnapshot.docs.map(doc => doc.id),
+    logger.info('Found conversations', {
+      count: querySnapshot.docs.length.toString(),
+      userId,
     });
 
     const conversations = querySnapshot.docs.map(doc => {
       const data = doc.data();
-      console.log('[getUserConversations] Conversation data:', {
+      logger.debug('Conversation data', {
         id: doc.id,
-        participantIds: data.participantIds,
         tradeOfferId: data.tradeOfferId,
-        lastMessageAt: data.lastMessageAt,
-        lastMessageText: data.lastMessageText,
+        participantCount: data.participantIds?.length?.toString() || '0',
       });
       return {
         id: doc.id,
@@ -312,14 +315,14 @@ function validateMessageText(text: string): void {
  * @param conversationId - ID of the conversation
  * @param senderId - ID of the user sending the message
  * @param text - The message text content
- * @returns The created message
- * @throws Error if validation fails or user is not authorized
+ * @returns Object containing the created message and optional warning
+ * @throws Error if validation fails, user is not authorized, or rate limit is exceeded
  */
 export async function sendMessage(
   conversationId: string,
   senderId: string,
   text: string
-): Promise<Message> {
+): Promise<{ message: Message; warning?: string }> {
   if (!conversationId || !senderId) {
     throw new Error('Missing required field: conversationId and senderId are required');
   }
@@ -327,7 +330,20 @@ export async function sendMessage(
   // Validate message text
   validateMessageText(text);
 
-  return retryWithBackoff(async () => {
+  // Check rate limit before sending message
+  const rateLimitResult = await checkRateLimit(senderId, 'message');
+  
+  if (!rateLimitResult.allowed) {
+    throw new Error(rateLimitResult.error || "You've reached the hourly message limit. Please wait before sending more messages.");
+  }
+
+  // Prepare warning message if within 10 actions of limit
+  let warningMessage: string | undefined;
+  if (rateLimitResult.remaining <= 10 && rateLimitResult.remaining > 0) {
+    warningMessage = `You have ${rateLimitResult.remaining} message${rateLimitResult.remaining !== 1 ? 's' : ''} remaining this hour`;
+  }
+
+  const message = await retryWithBackoff(async () => {
     // Fetch conversation to validate access
     const conversationDoc = await getDoc(doc(db, 'conversations', conversationId));
 
@@ -366,6 +382,9 @@ export async function sendMessage(
       ...newMessage,
       createdAt: serverTimestamp(),
     });
+
+    // Record the action for rate limiting after successful message send
+    await recordAction(senderId, 'message');
 
     // Update conversation's lastMessageAt and lastMessageText
     const recipientId = conversation.participantIds.find(id => id !== senderId);
@@ -408,7 +427,7 @@ export async function sendMessage(
       const targetItemDoc = await getDoc(doc(db, 'items', conversation.targetItemId));
       const targetItemTitle = targetItemDoc.exists() ? targetItemDoc.data().title || 'Item' : 'Item';
 
-      console.log('[sendMessage] Creating message notification:', {
+      logger.debug('Creating message notification', {
         conversationId,
         senderId,
         senderName,
@@ -428,10 +447,13 @@ export async function sendMessage(
         targetItemTitle
       );
 
-      console.log('[sendMessage] Message notification created successfully');
+      logger.info('Message notification created successfully', { conversationId });
     } catch (notificationError) {
       // Log error but don't fail message send
-      console.error('[sendMessage] Failed to create message notification:', notificationError);
+      logger.error('Failed to create message notification', {
+        conversationId,
+        error: notificationError instanceof Error ? notificationError.message : 'Unknown error',
+      });
     }
 
     return {
@@ -439,6 +461,8 @@ export async function sendMessage(
       id: messageRef.id,
     };
   });
+
+  return { message, warning: warningMessage };
 }
 
 /**
@@ -459,27 +483,27 @@ export async function getMessages(
   }
 
   return retryWithBackoff(async () => {
-    console.log('[getMessages] Fetching conversation:', { conversationId, userId });
+    logger.debug('Fetching conversation', { conversationId, userId });
 
     // Fetch conversation to validate access
     const conversationDoc = await getDoc(doc(db, 'conversations', conversationId));
 
     if (!conversationDoc.exists()) {
-      console.error('[getMessages] Conversation not found:', conversationId);
+      logger.error('Conversation not found', { conversationId });
       throw new Error('Conversation not found');
     }
 
     const conversation = conversationDoc.data() as Conversation;
 
-    console.log('[getMessages] Conversation data:', {
+    logger.debug('Conversation data retrieved', {
       id: conversationId,
-      participantIds: conversation.participantIds,
+      participantCount: conversation.participantIds?.length?.toString() || '0',
       tradeOfferId: conversation.tradeOfferId,
     });
 
     // Validate user is a participant
     if (!conversation.participantIds.includes(userId)) {
-      console.error('[getMessages] User not authorized:', { userId, participantIds: conversation.participantIds });
+      logger.error('User not authorized', { userId, conversationId });
       throw new Error('User is not authorized to access this conversation');
     }
 
@@ -487,22 +511,21 @@ export async function getMessages(
     const messagesRef = collection(db, 'conversations', conversationId, 'messages');
     const q = query(messagesRef, orderBy('createdAt', 'asc'));
 
-    console.log('[getMessages] Querying messages for conversation:', conversationId);
+    logger.debug('Querying messages for conversation', { conversationId });
 
     const querySnapshot = await getDocs(q);
 
-    console.log('[getMessages] Found messages:', {
-      count: querySnapshot.docs.length,
+    logger.info('Found messages', {
+      count: querySnapshot.docs.length.toString(),
       conversationId,
     });
 
     const messages = querySnapshot.docs.map(doc => {
       const data = doc.data();
-      console.log('[getMessages] Message data:', {
+      logger.debug('Message data', {
         id: doc.id,
         senderId: data.senderId,
-        text: data.text?.substring(0, 50),
-        createdAt: data.createdAt,
+        textLength: data.text?.length?.toString() || '0',
       });
       return {
         id: doc.id,
@@ -611,7 +634,7 @@ export function subscribeToMessages(
       const conversationDoc = await getDoc(doc(db, 'conversations', conversationId));
 
       if (!conversationDoc.exists()) {
-        console.error('Failed to establish message subscription: Conversation not found');
+        logger.error('Failed to establish message subscription: Conversation not found', { conversationId });
         return;
       }
 
@@ -619,7 +642,10 @@ export function subscribeToMessages(
 
       // Validate user is a participant
       if (!conversation.participantIds.includes(userId)) {
-        console.error('Failed to establish message subscription: User is not authorized to access this conversation');
+        logger.error('Failed to establish message subscription: User is not authorized', {
+          userId,
+          conversationId,
+        });
         return;
       }
 
@@ -641,12 +667,18 @@ export function subscribeToMessages(
           callback(messages);
         },
         (error) => {
-          console.error('Message subscription error:', error);
+          logger.error('Message subscription error', {
+            conversationId,
+            error: error.message,
+          });
 
           // Attempt reconnection if still active and under max attempts
           if (isActive && reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
             reconnectAttempts++;
-            console.log(`Attempting to reconnect (${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})...`);
+            logger.info('Attempting to reconnect', {
+              attempt: reconnectAttempts.toString(),
+              maxAttempts: MAX_RECONNECT_ATTEMPTS.toString(),
+            });
 
             setTimeout(() => {
               if (isActive) {
@@ -654,12 +686,15 @@ export function subscribeToMessages(
               }
             }, RECONNECT_DELAY_MS * reconnectAttempts); // Exponential backoff
           } else if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
-            console.error('Max reconnection attempts reached. Subscription failed.');
+            logger.error('Max reconnection attempts reached. Subscription failed.');
           }
         }
       );
     } catch (error) {
-      console.error('Failed to establish message subscription:', error);
+      logger.error('Failed to establish message subscription', {
+        conversationId,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
     }
   };
 
@@ -692,25 +727,27 @@ export async function enrichConversations(
     throw new Error('Invalid input: Current user ID is required');
   }
 
-  console.log('[enrichConversations] Enriching conversations:', {
-    count: conversations.length,
+  logger.info('Enriching conversations', {
+    count: conversations.length.toString(),
     currentUserId,
-    conversationIds: conversations.map(c => c.id),
   });
 
   return retryWithBackoff(async () => {
     // Fetch all required details in parallel for better performance
     const enrichmentPromises = conversations.map(async (conversation) => {
       try {
-        console.log('[enrichConversations] Processing conversation:', {
+        logger.debug('Processing conversation', {
           id: conversation.id,
-          participantIds: conversation.participantIds,
+          participantCount: conversation.participantIds?.length?.toString() || '0',
           tradeOfferId: conversation.tradeOfferId,
         });
 
         // Validate that current user is a participant
         if (!conversation.participantIds.includes(currentUserId)) {
-          console.warn(`[enrichConversations] Current user ${currentUserId} is not a participant in conversation ${conversation.id}`);
+          logger.warn('Current user is not a participant in conversation', {
+            userId: currentUserId,
+            conversationId: conversation.id,
+          });
           return null;
         }
 
@@ -718,11 +755,11 @@ export async function enrichConversations(
         const partnerId = conversation.participantIds.find(id => id !== currentUserId);
 
         if (!partnerId) {
-          console.warn(`[enrichConversations] Could not determine partner for conversation ${conversation.id}`);
+          logger.warn('Could not determine partner for conversation', { conversationId: conversation.id });
           return null;
         }
 
-        console.log('[enrichConversations] Fetching details for conversation:', {
+        logger.debug('Fetching details for conversation', {
           conversationId: conversation.id,
           partnerId,
           tradeAnchorId: conversation.tradeAnchorId,
@@ -736,7 +773,7 @@ export async function enrichConversations(
           getUserDetails(partnerId),
         ]);
 
-        console.log('[enrichConversations] Fetched details:', {
+        logger.debug('Fetched details', {
           conversationId: conversation.id,
           tradeAnchorTitle: tradeAnchorDetails.title,
           targetItemTitle: targetItemDetails.title,
@@ -760,7 +797,10 @@ export async function enrichConversations(
 
         return summary;
       } catch (error) {
-        console.error(`[enrichConversations] Error enriching conversation ${conversation.id}:`, error);
+        logger.error('Error enriching conversation', {
+          conversationId: conversation.id,
+          error: error instanceof Error ? error.message : 'Unknown error',
+        });
         return null;
       }
     });
@@ -770,10 +810,10 @@ export async function enrichConversations(
     // Filter out null results (failed enrichments)
     const enrichedSummaries = results.filter((summary): summary is ConversationSummary => summary !== null);
 
-    console.log('[enrichConversations] Enrichment complete:', {
-      totalConversations: conversations.length,
-      successfullyEnriched: enrichedSummaries.length,
-      failed: conversations.length - enrichedSummaries.length,
+    logger.info('Enrichment complete', {
+      totalConversations: conversations.length.toString(),
+      successfullyEnriched: enrichedSummaries.length.toString(),
+      failed: (conversations.length - enrichedSummaries.length).toString(),
     });
 
     return enrichedSummaries;

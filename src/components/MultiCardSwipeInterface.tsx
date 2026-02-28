@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
 import { Item } from '../types/item';
 import { UserProfile } from '../types/user';
 import { CardGrid } from './CardGrid';
@@ -216,12 +217,15 @@ export function MultiCardSwipeInterface({
             <p className="text-text-secondary dark:text-gray-400 mb-6">
               There are no available items to trade right now. Check back later for new listings, or try changing your trade anchor.
             </p>
-            <button
+            <motion.button
               onClick={onChangeAnchor}
-              className="px-6 py-3 bg-gradient-to-r from-accent to-accent-dark dark:from-primary-light dark:to-primary text-white rounded-lg font-medium hover:shadow-lg hover:shadow-accent/30 dark:hover:shadow-primary/30 transition-all hover:scale-105 active:scale-95"
+              className="px-6 py-3 bg-gradient-to-r from-accent to-accent-dark dark:from-primary-light dark:to-primary text-white rounded-lg font-medium hover:shadow-lg hover:shadow-accent/30 dark:hover:shadow-primary/30 transition-all"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ duration: 0.2 }}
             >
               Change Trade Anchor
-            </button>
+            </motion.button>
           </div>
         </div>
       </div>
@@ -251,10 +255,13 @@ export function MultiCardSwipeInterface({
       <TradeAnchorDisplay item={tradeAnchor} onChangeClick={onChangeAnchor} />
 
       {/* Tips Button - Fixed at top right */}
-      <button
+      <motion.button
         onClick={() => setShowTips(!showTips)}
-        className="fixed top-6 right-6 z-20 p-3 bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg rounded-full shadow-lg border border-gray-200/60 dark:border-gray-700/60 hover:bg-white dark:hover:bg-gray-700 hover:scale-110 active:scale-95 transition-all duration-300"
+        className="fixed top-6 right-6 z-20 p-3 bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg rounded-full shadow-lg border border-gray-200/60 dark:border-gray-700/60 hover:bg-white dark:hover:bg-gray-700 transition-all duration-300"
         aria-label="Show tips"
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.95 }}
+        transition={{ duration: 0.2 }}
       >
         <svg
           className="w-5 h-5 text-accent dark:text-primary-light"
@@ -269,7 +276,7 @@ export function MultiCardSwipeInterface({
             d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
           />
         </svg>
-      </button>
+      </motion.button>
 
       {/* Tips Panel */}
       {showTips && (
@@ -281,15 +288,18 @@ export function MultiCardSwipeInterface({
               </svg>
               Swipe Tips
             </h3>
-            <button
+            <motion.button
               onClick={() => setShowTips(false)}
               className="text-white hover:bg-white/20 rounded-full p-1 transition-colors"
               aria-label="Close tips"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ duration: 0.2 }}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
-            </button>
+            </motion.button>
           </div>
           <div className="p-4 space-y-3 max-h-96 overflow-y-auto">
             <div className="flex gap-3">

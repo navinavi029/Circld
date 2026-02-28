@@ -99,6 +99,37 @@ export const CardGrid = memo(function CardGrid({
     onSwipe(itemId, direction);
   };
 
+  // Track previous items to detect when cards are added/removed
+  const prevItemsRef = useRef<Item[]>([]);
+  const [slidingCards, setSlidingCards] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    const prevItems = prevItemsRef.current;
+    const currentItems = items;
+
+    // Detect if a card was removed (swiped away)
+    if (prevItems.length > currentItems.length) {
+      // Find which card was removed
+      const removedCard = prevItems.find(
+        prevItem => !currentItems.some(item => item.id === prevItem.id)
+      );
+
+      if (removedCard) {
+        // Trigger slide animation for remaining cards
+        const remainingCardIds = currentItems.map(item => item.id);
+        setSlidingCards(new Set(remainingCardIds));
+
+        // Clear sliding state after animation completes
+        setTimeout(() => {
+          setSlidingCards(new Set());
+        }, 400);
+      }
+    }
+
+    // Update ref for next comparison
+    prevItemsRef.current = currentItems;
+  }, [items]);
+
   // Render loading placeholder
   const renderLoadingPlaceholder = (index: number) => {
     // If there's a loading error, show error state instead of loading
@@ -108,7 +139,7 @@ export const CardGrid = memo(function CardGrid({
           key={`loading-error-${index}`}
           className="card-grid-item animate-fade-in"
           style={{
-            animationDelay: `${index * 50}ms`,
+            animationDelay: `${index * 100}ms`,
           }}
           role="alert"
           aria-label="Error loading card"
@@ -146,7 +177,7 @@ export const CardGrid = memo(function CardGrid({
         key={`loading-${index}`}
         className="card-grid-item animate-fade-in"
         style={{
-          animationDelay: `${index * 50}ms`,
+          animationDelay: `${index * 100}ms`,
         }}
         role="status"
         aria-label="Loading card"
@@ -220,13 +251,15 @@ export const CardGrid = memo(function CardGrid({
 
           const isAnimating = animatingCards.has(item.id);
 
+          const isSliding = slidingCards.has(item.id);
+
           return (
             <div
               key={item.id}
               ref={el => { cardRefs.current[index] = el; }}
-              className={`card-grid-item ${isAnimating ? 'animate-fade-out' : 'animate-fade-in'}`}
+              className={`card-grid-item ${isAnimating ? 'animate-fade-out' : isSliding ? 'animate-slide-fill' : 'animate-fade-in'}`}
               style={{
-                animationDelay: isAnimating ? '0ms' : `${index * 50}ms`,
+                animationDelay: isAnimating ? '0ms' : `${index * 100}ms`,
               }}
               tabIndex={0}
               role="article"
@@ -266,25 +299,25 @@ export const CardGrid = memo(function CardGrid({
           touch-action: none; /* Prevent browser gestures during swipe */
         }
 
-        /* Desktop: 3 columns, up to 5 cards */
+        /* Desktop: 5 cards in grid layout (≥1280px) - Requirement 10.1 */
         @media (min-width: 1280px) {
           .card-grid {
             grid-template-columns: repeat(3, 1fr);
-            max-width: 1400px;
+            max-width: 1600px;
             gap: 1.5rem;
           }
         }
 
-        /* Tablet: 2 columns, up to 4 cards */
+        /* Tablet: 4 cards in grid layout (768-1279px) - Requirement 10.2 */
         @media (min-width: 768px) and (max-width: 1279px) {
           .card-grid {
             grid-template-columns: repeat(2, 1fr);
-            max-width: 900px;
+            max-width: 1000px;
             gap: 1.25rem;
           }
         }
 
-        /* Mobile landscape: 3 columns, up to 3 cards */
+        /* Mobile: 2-3 cards in grid layout (<768px) - Requirement 10.3 */
         @media (min-width: 640px) and (max-width: 767px) {
           .card-grid {
             grid-template-columns: repeat(3, 1fr);
@@ -293,7 +326,7 @@ export const CardGrid = memo(function CardGrid({
           }
         }
 
-        /* Mobile portrait: 2 columns, minimum 2 cards */
+        /* Mobile portrait: 2 cards */
         @media (max-width: 639px) {
           .card-grid {
             grid-template-columns: repeat(2, 1fr);
@@ -305,9 +338,14 @@ export const CardGrid = memo(function CardGrid({
         .card-grid-item {
           width: 100%;
           height: 100%;
+          /* Maintain 4:3 aspect ratio - Requirement 10.6 */
+          aspect-ratio: 4 / 3;
+          display: flex;
+          flex-direction: column;
         }
 
         /* Entrance animation: fade + scale - GPU accelerated with transform and opacity */
+        /* Requirement 10.5: Stagger entrance animations by 100ms */
         @keyframes fadeIn {
           from {
             opacity: 0;
@@ -331,6 +369,17 @@ export const CardGrid = memo(function CardGrid({
           }
         }
 
+        /* Slide-to-fill animation: smooth transition when cards shift positions */
+        /* Requirement 10.4: Slide remaining cards to fill gap when card is swiped */
+        @keyframes slideFill {
+          from {
+            transform: scale(1.05) translateZ(0);
+          }
+          to {
+            transform: scale(1) translateZ(0);
+          }
+        }
+
         .animate-fade-in {
           animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
           will-change: transform, opacity;
@@ -341,10 +390,17 @@ export const CardGrid = memo(function CardGrid({
           will-change: transform, opacity;
         }
 
-        /* Ensure cards maintain aspect ratio and don't overflow */
+        .animate-slide-fill {
+          animation: slideFill 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+          will-change: transform;
+        }
+
+        /* Ensure cards maintain aspect ratio and fill container */
         .card-grid-item > div {
-          max-width: 100%;
-          height: auto;
+          width: 100%;
+          height: 100%;
+          display: flex;
+          flex-direction: column;
         }
       `}</style>
     </div>

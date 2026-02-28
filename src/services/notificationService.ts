@@ -14,6 +14,10 @@ import {
 import { db } from '../firebase';
 import { Notification, TradeOffer, TradeOfferNotificationData, MessageNotificationData } from '../types/swipe-trading';
 import { retryWithBackoff } from '../utils/retryWithBackoff';
+import { createLogger } from '../utils/logger';
+
+// Create logger instance for this service
+const logger = createLogger('notificationService');
 
 /**
  * Creates a notification for a trade offer.
@@ -68,6 +72,12 @@ export async function createTradeOfferNotification(
     await setDoc(newNotificationRef, {
       ...newNotification,
       createdAt: serverTimestamp(),
+    });
+
+    logger.info('Created trade offer notification', {
+      notificationId: newNotificationRef.id,
+      tradeOfferId: tradeOffer.id,
+      recipientId: tradeOffer.targetItemOwnerId,
     });
 
     return {
@@ -136,6 +146,12 @@ export async function createMessageNotification(
       createdAt: serverTimestamp(),
     });
 
+    logger.info('Created message notification', {
+      notificationId: newNotificationRef.id,
+      conversationId,
+      recipientId,
+    });
+
     return {
       ...newNotification,
       id: newNotificationRef.id,
@@ -163,6 +179,11 @@ export async function getUserNotifications(userId: string): Promise<Notification
     );
 
     const querySnapshot = await getDocs(q);
+
+    logger.info('Retrieved user notifications', {
+      userId,
+      count: querySnapshot.docs.length.toString(),
+    });
 
     return querySnapshot.docs.map(doc => ({
       id: doc.id,
@@ -193,5 +214,7 @@ export async function markAsRead(notificationId: string): Promise<void> {
     await updateDoc(notificationRef, {
       read: true,
     });
+
+    logger.debug('Marked notification as read', { notificationId });
   });
 }

@@ -110,8 +110,8 @@ function sanitizeErrorMessage(message: string): string {
   sanitized = sanitized.replace(/token[:\s=]+[a-zA-Z0-9_-]+/gi, '[TOKEN_REDACTED]');
   
   // Remove file system paths (Windows and Unix)
-  sanitized = sanitized.replace(/[A-Za-z]:\\[\w\\\-\.]+/g, '[PATH_REDACTED]');
-  sanitized = sanitized.replace(/\/[\w\/\-\.]+/g, '[PATH_REDACTED]');
+  sanitized = sanitized.replace(/[A-Za-z]:\\[\w\\\-.]+/g, '[PATH_REDACTED]');
+  sanitized = sanitized.replace(/\/[\w/\-.]+/g, '[PATH_REDACTED]');
   
   // Remove IP addresses
   sanitized = sanitized.replace(/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/g, '[IP_REDACTED]');
@@ -188,6 +188,29 @@ function mapCloudinaryError(errorData: any, statusCode: number): string {
 }
 
 /**
+ * Device type for responsive image sizing
+ */
+export type DeviceType = 'mobile' | 'desktop' | 'auto';
+
+/**
+ * Options for responsive image transformations
+ */
+export interface ResponsiveImageOptions {
+  /** Device type to optimize for (mobile: max 800px, desktop: max 1200px) */
+  deviceType?: DeviceType;
+  /** Custom width override (takes precedence over deviceType) */
+  width?: number;
+  /** Custom height */
+  height?: number;
+  /** Crop mode (e.g., 'fill', 'fit', 'scale', 'limit') */
+  crop?: string;
+  /** Quality setting (default: 'auto') */
+  quality?: string;
+  /** Format setting (default: 'auto' for WebP with fallback) */
+  format?: string;
+}
+
+/**
  * Applies automatic optimization transformations to a Cloudinary URL
  * Adds f_auto (format) and q_auto (quality) transformations
  * 
@@ -232,6 +255,128 @@ function applyOptimizationTransformations(
   const afterUpload = url.substring(uploadIndex + uploadPath.length);
   
   return `${beforeUpload}${transformations}/${afterUpload}`;
+}
+
+/**
+ * Generates a responsive Cloudinary image URL with optimizations
+ * Automatically applies device-appropriate sizing, WebP format support, and quality optimization
+ * 
+ * @param url - The original Cloudinary image URL
+ * @param options - Responsive image options
+ * @returns Optimized Cloudinary URL with transformations
+ * 
+ * Requirements: 4.1, 4.2, 4.4, 4.5, 4.6
+ * 
+ * @example
+ * ```typescript
+ * // Mobile-optimized image (max 800px)
+ * const mobileUrl = getResponsiveImageUrl(originalUrl, { deviceType: 'mobile' });
+ * 
+ * // Desktop-optimized image (max 1200px)
+ * const desktopUrl = getResponsiveImageUrl(originalUrl, { deviceType: 'desktop' });
+ * 
+ * // Auto-detect based on window width
+ * const autoUrl = getResponsiveImageUrl(originalUrl, { deviceType: 'auto' });
+ * 
+ * // Custom size with specific crop
+ * const customUrl = getResponsiveImageUrl(originalUrl, { 
+ *   width: 600, 
+ *   height: 400, 
+ *   crop: 'fill' 
+ * });
+ * ```
+ */
+export function getResponsiveImageUrl(
+  url: string,
+  options: ResponsiveImageOptions = {}
+): string {
+  // Return original URL if it's not a Cloudinary URL
+  if (!url || !url.includes('cloudinary.com')) {
+    return url;
+  }
+
+  const uploadPath = '/upload/';
+  const uploadIndex = url.indexOf(uploadPath);
+  
+  if (uploadIndex === -1) {
+    return url;
+  }
+
+  // Determine width based on device type or custom width
+  let width = options.width;
+  
+  if (!width && options.deviceType) {
+    if (options.deviceType === 'mobile') {
+      width = 800; // Mobile-optimized max width (Requirement 4.4)
+    } else if (options.deviceType === 'desktop') {
+      width = 1200; // Desktop-optimized max width (Requirement 4.5)
+    } else if (options.deviceType === 'auto') {
+      // Auto-detect based on window width
+      if (typeof window !== 'undefined') {
+        width = window.innerWidth <= 768 ? 800 : 1200;
+      } else {
+        width = 1200; // Default to desktop for SSR
+      }
+    }
+  }
+
+  // Build transformation parameters
+  const transformationParts: string[] = [];
+  
+  // Add format transformation (f_auto enables WebP with fallback) (Requirement 4.6)
+  transformationParts.push(options.format || 'f_auto');
+  
+  // Add quality transformation
+  transformationParts.push(options.quality || 'q_auto');
+  
+  // Add width transformation (Requirement 4.1, 4.2)
+  if (width) {
+    transformationParts.push(`w_${width}`);
+  }
+  
+  // Add height transformation
+  if (options.height) {
+    transformationParts.push(`h_${options.height}`);
+  }
+  
+  // Add crop mode (default to 'limit' to prevent upscaling)
+  transformationParts.push(`c_${options.crop || 'limit'}`);
+  
+  // Construct the new URL
+  const transformations = transformationParts.join(',');
+  const beforeUpload = url.substring(0, uploadIndex + uploadPath.length);
+  const afterUpload = url.substring(uploadIndex + uploadPath.length);
+  
+  // Remove any existing transformations from the URL
+  // Transformations are between /upload/ and the public_id
+  const afterUploadParts = afterUpload.split('/');
+  let publicIdStartIndex = 0;
+  
+  // Find where the public_id starts (skip transformation parameters)
+  for (let i = 0; i < afterUploadParts.length; i++) {
+    const part = afterUploadParts[i];
+    // If part contains transformation syntax (like f_auto, w_400, etc.), skip it
+    if (!/^[a-z]_/.test(part)) {
+      publicIdStartIndex = i;
+      break;
+    }
+  }
+  
+  const publicIdPath = afterUploadParts.slice(publicIdStartIndex).join('/');
+  
+  return `${beforeUpload}${transformations}/${publicIdPath}`;
+}
+
+/**
+ * Detects the current device type based on window width
+ * 
+ * @returns 'mobile' if width <= 768px, 'desktop' otherwise
+ */
+export function detectDeviceType(): DeviceType {
+  if (typeof window === 'undefined') {
+    return 'desktop'; // Default for SSR
+  }
+  return window.innerWidth <= 768 ? 'mobile' : 'desktop';
 }
 
 /**
@@ -285,7 +430,7 @@ export function extractPublicIdFromUrl(url: string): string | null {
     }
     
     return publicIdWithExt.substring(0, lastDotIndex);
-  } catch (error) {
+  } catch (_error) {
     return null;
   }
 }

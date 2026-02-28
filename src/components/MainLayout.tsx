@@ -12,7 +12,7 @@ export function MainLayout() {
             >
                 <Navigation />
             </motion.div>
-            <main className="flex-1 flex flex-col">
+            <main id="main-content" tabIndex={-1} className="flex-1 flex flex-col">
                 <Outlet />
             </main>
         </div>

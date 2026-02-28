@@ -241,7 +241,7 @@ export function ProfilePhotoUpload({
       }
       
       setShowCropper(false);
-    } catch (error) {
+    } catch (_error) {
       onError('Failed to crop image. Please try again.');
     }
   };

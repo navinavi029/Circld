@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { getResponsiveImageUrl } from '../utils/cloudinary';
 
 interface ImageGalleryProps {
   images: string[];
@@ -9,6 +10,21 @@ interface ImageGalleryProps {
 export function ImageGallery({ images, title, onImageChange }: ImageGalleryProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+
+  // Get responsive URLs for images
+  const responsiveImages = images.map(url => 
+    getResponsiveImageUrl(url, { deviceType: 'auto' })
+  );
+  
+  // Get high-res URLs for lightbox
+  const lightboxImages = images.map(url => 
+    getResponsiveImageUrl(url, { width: 1920, crop: 'limit' })
+  );
+
+  // Get thumbnail URLs
+  const thumbnailImages = images.map(url => 
+    getResponsiveImageUrl(url, { width: 80, height: 80, crop: 'fill' })
+  );
 
   // Handle image selection
   const handleThumbnailClick = (index: number) => {
@@ -85,7 +101,7 @@ export function ImageGallery({ images, title, onImageChange }: ImageGalleryProps
             aria-label="Open image in fullscreen"
           >
             <img
-              src={images[selectedIndex]}
+              src={responsiveImages[selectedIndex]}
               alt={`${title} - Image ${selectedIndex + 1} of ${images.length}`}
               className="w-full h-full object-contain"
             />
@@ -104,7 +120,7 @@ export function ImageGallery({ images, title, onImageChange }: ImageGalleryProps
         {images.length > 1 && (
           <div className="p-4 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-200 dark:border-gray-700">
             <div className="flex gap-2 overflow-x-auto pb-2" role="list" aria-label="Image thumbnails">
-              {images.map((image, index) => (
+              {images.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => handleThumbnailClick(index)}
@@ -118,7 +134,7 @@ export function ImageGallery({ images, title, onImageChange }: ImageGalleryProps
                   role="listitem"
                 >
                   <img
-                    src={image}
+                    src={thumbnailImages[index]}
                     alt={`${title} thumbnail ${index + 1}`}
                     className="w-full h-full object-cover"
                   />
@@ -164,7 +180,7 @@ export function ImageGallery({ images, title, onImageChange }: ImageGalleryProps
           {/* Main Image */}
           <div className="max-w-7xl max-h-[90vh] px-16">
             <img
-              src={images[selectedIndex]}
+              src={lightboxImages[selectedIndex]}
               alt={`${title} - Image ${selectedIndex + 1} of ${images.length}`}
               className="max-w-full max-h-[90vh] object-contain"
             />

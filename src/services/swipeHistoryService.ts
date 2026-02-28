@@ -5,6 +5,7 @@ import {
   setDoc,
   updateDoc,
   arrayUnion,
+  arrayRemove,
   serverTimestamp,
   Timestamp,
 } from 'firebase/firestore';
@@ -18,6 +19,11 @@ import {
   cacheSessionState,
   getCachedSessionState,
 } from '../utils/localStorageCache';
+import { checkRateLimit, recordAction } from '../utils/rateLimiter';
+import { createLogger } from '../utils/logger';
+
+// Create logger instance for this service
+const logger = createLogger('swipeHistoryService');
 
 /**
  * Records a swipe action in the current session.
@@ -28,13 +34,15 @@ import {
  * @param userId - ID of the user performing the swipe
  * @param itemId - ID of the item being swiped on
  * @param direction - Direction of the swipe ('left' or 'right')
+ * @returns Object with success status and optional warning message
+ * @throws Error if rate limit is exceeded or validation fails
  */
 export async function recordSwipe(
   sessionId: string,
   userId: string,
   itemId: string,
   direction: 'left' | 'right'
-): Promise<void> {
+): Promise<{ success: boolean; warning?: string }> {
   // Validate inputs
   if (!sessionId || !userId || !itemId || !direction) {
     throw new Error('Invalid input: All parameters are required');
@@ -42,6 +50,19 @@ export async function recordSwipe(
 
   if (direction !== 'left' && direction !== 'right') {
     throw new Error('Invalid direction: Must be "left" or "right"');
+  }
+
+  // Check rate limit before recording swipe
+  const rateLimitResult = await checkRateLimit(userId, 'swipe');
+  
+  if (!rateLimitResult.allowed) {
+    throw new Error(rateLimitResult.error || "You've reached the hourly swipe limit. Take a break and come back soon!");
+  }
+
+  // Prepare warning message if within 10 actions of limit
+  let warningMessage: string | undefined;
+  if (rateLimitResult.remaining <= 10 && rateLimitResult.remaining > 0) {
+    warningMessage = `You have ${rateLimitResult.remaining} swipe${rateLimitResult.remaining !== 1 ? 's' : ''} remaining this hour`;
   }
 
   try {
@@ -70,6 +91,9 @@ export async function recordSwipe(
         lastActivityAt: serverTimestamp(),
       });
 
+      // Record the action for rate limiting after successful swipe
+      await recordAction(userId, 'swipe');
+
       // Update cached session state after successful sync
       try {
         const updatedSession = {
@@ -82,22 +106,24 @@ export async function recordSwipe(
         if (updatedSession.id && updatedSession.userId && updatedSession.createdAt && updatedSession.lastActivityAt) {
           cacheSessionState(updatedSession);
         } else {
-          console.warn('Session data incomplete, skipping cache:', {
-            hasId: !!updatedSession.id,
-            hasUserId: !!updatedSession.userId,
-            hasCreatedAt: !!updatedSession.createdAt,
-            hasLastActivityAt: !!updatedSession.lastActivityAt
+          logger.warn('Session data incomplete, skipping cache', {
+            hasId: (!!updatedSession.id).toString(),
+            hasUserId: (!!updatedSession.userId).toString(),
+            hasCreatedAt: (!!updatedSession.createdAt).toString(),
+            hasLastActivityAt: (!!updatedSession.lastActivityAt).toString(),
           });
         }
       } catch (cacheError) {
-        console.error('Failed to cache session state after swipe:', {
+        logger.error('Failed to cache session state after swipe', {
           sessionId,
           userId,
           itemId,
-          error: cacheError instanceof Error ? cacheError.message : 'Unknown error'
+          error: cacheError instanceof Error ? cacheError.message : 'Unknown error',
         });
       }
     });
+
+    return { success: true, warning: warningMessage };
   } catch (error) {
     // If offline or network error, cache the swipe for later sync
     const errorMessage = error instanceof Error ? error.message : '';
@@ -124,25 +150,111 @@ export async function recordSwipe(
           if (cachedSession.userId && cachedSession.createdAt && cachedSession.lastActivityAt) {
             cacheSessionState(cachedSession);
           } else {
-            console.warn('Cached session data incomplete, skipping update:', {
-              hasUserId: !!cachedSession.userId,
-              hasCreatedAt: !!cachedSession.createdAt,
-              hasLastActivityAt: !!cachedSession.lastActivityAt
+            logger.warn('Cached session data incomplete, skipping update', {
+              hasUserId: (!!cachedSession.userId).toString(),
+              hasCreatedAt: (!!cachedSession.createdAt).toString(),
+              hasLastActivityAt: (!!cachedSession.lastActivityAt).toString(),
             });
           }
         }
       } catch (cacheError) {
-        console.error('Failed to update cached session state optimistically:', {
+        logger.error('Failed to update cached session state optimistically', {
           sessionId,
           userId,
           itemId,
-          error: cacheError instanceof Error ? cacheError.message : 'Unknown error'
+          error: cacheError instanceof Error ? cacheError.message : 'Unknown error',
         });
       }
+
+      return { success: true, warning: warningMessage };
     } else {
       throw error;
     }
   }
+}
+
+/**
+ * Removes a swipe record from the session.
+ * Used for undo functionality to restore a swiped item.
+ * 
+ * @param sessionId - ID of the swipe session
+ * @param userId - ID of the user performing the undo
+ * @param itemId - ID of the item to remove from swipe history
+ * @throws Error if validation fails or swipe not found
+ */
+export async function removeSwipe(
+  sessionId: string,
+  userId: string,
+  itemId: string
+): Promise<void> {
+  // Validate inputs
+  if (!sessionId || !userId || !itemId) {
+    throw new Error('Invalid input: All parameters are required');
+  }
+
+  return retryWithBackoff(async () => {
+    const sessionRef = doc(db, 'swipeSessions', sessionId);
+    
+    // Verify session exists and belongs to user
+    const sessionDoc = await getDoc(sessionRef);
+    if (!sessionDoc.exists()) {
+      throw new Error('Swipe session not found');
+    }
+    
+    const sessionData = sessionDoc.data() as SwipeSession;
+    if (sessionData.userId !== userId) {
+      throw new Error('Session does not belong to user');
+    }
+    
+    // Find the swipe record to remove
+    const swipeToRemove = sessionData.swipes.find(
+      (swipe) => swipe.itemId === itemId
+    );
+    
+    if (!swipeToRemove) {
+      throw new Error('Swipe record not found for this item');
+    }
+    
+    // Remove the swipe using arrayRemove
+    await updateDoc(sessionRef, {
+      swipes: arrayRemove(swipeToRemove),
+      lastActivityAt: serverTimestamp(),
+    });
+
+    // Update cached session state after successful removal
+    try {
+      const cachedSession = getCachedSessionState();
+      if (cachedSession && cachedSession.id === sessionId) {
+        cachedSession.swipes = cachedSession.swipes.filter(
+          (swipe) => swipe.itemId !== itemId
+        );
+        
+        // Validate session data before caching
+        if (cachedSession.userId && cachedSession.createdAt && cachedSession.lastActivityAt) {
+          cacheSessionState(cachedSession);
+        } else {
+          logger.warn('Cached session data incomplete after swipe removal', {
+            hasUserId: (!!cachedSession.userId).toString(),
+            hasCreatedAt: (!!cachedSession.createdAt).toString(),
+            hasLastActivityAt: (!!cachedSession.lastActivityAt).toString(),
+          });
+        }
+      }
+    } catch (cacheError) {
+      logger.error('Failed to update cached session state after swipe removal', {
+        sessionId,
+        userId,
+        itemId,
+        error: cacheError instanceof Error ? cacheError.message : 'Unknown error',
+      });
+    }
+
+    logger.info('Swipe removed successfully', {
+      sessionId,
+      userId,
+      itemId,
+    });
+  });
 }
 
 /**
@@ -181,18 +293,18 @@ export async function getSwipeHistory(
         if (sessionData.id && sessionData.userId && sessionData.createdAt && sessionData.lastActivityAt) {
           cacheSessionState(sessionData);
         } else {
-          console.warn('Session data incomplete, skipping cache:', {
-            hasId: !!sessionData.id,
-            hasUserId: !!sessionData.userId,
-            hasCreatedAt: !!sessionData.createdAt,
-            hasLastActivityAt: !!sessionData.lastActivityAt
+          logger.warn('Session data incomplete, skipping cache', {
+            hasId: (!!sessionData.id).toString(),
+            hasUserId: (!!sessionData.userId).toString(),
+            hasCreatedAt: (!!sessionData.createdAt).toString(),
+            hasLastActivityAt: (!!sessionData.lastActivityAt).toString(),
           });
         }
       } catch (cacheError) {
-        console.error('Failed to cache session state after fetching history:', {
+        logger.error('Failed to cache session state after fetching history', {
           sessionId,
           userId,
-          error: cacheError instanceof Error ? cacheError.message : 'Unknown error'
+          error: cacheError instanceof Error ? cacheError.message : 'Unknown error',
         });
       }
       
@@ -309,21 +421,27 @@ export async function createSwipeSession(
       if (session.id && session.userId && session.createdAt && session.lastActivityAt) {
         cacheSessionState(session);
       } else {
-        console.warn('New session data incomplete, skipping cache:', {
-          hasId: !!session.id,
-          hasUserId: !!session.userId,
-          hasCreatedAt: !!session.createdAt,
-          hasLastActivityAt: !!session.lastActivityAt
+        logger.warn('New session data incomplete, skipping cache', {
+          hasId: (!!session.id).toString(),
+          hasUserId: (!!session.userId).toString(),
+          hasCreatedAt: (!!session.createdAt).toString(),
+          hasLastActivityAt: (!!session.lastActivityAt).toString(),
         });
       }
     } catch (cacheError) {
-      console.error('Failed to cache new session state:', {
+      logger.error('Failed to cache new session state', {
         sessionId: newSessionRef.id,
         userId,
         tradeAnchorId,
-        error: cacheError instanceof Error ? cacheError.message : 'Unknown error'
+        error: cacheError instanceof Error ? cacheError.message : 'Unknown error',
       });
     }
+    
+    logger.info('Created new swipe session', {
+      sessionId: newSessionRef.id,
+      userId,
+      tradeAnchorId,
+    });
     
     return session;
   });
@@ -341,6 +459,8 @@ export async function syncPendingSwipes(): Promise<number> {
     return 0;
   }
 
+  logger.info('Syncing pending swipes', { count: pendingSwipes.length.toString() });
+
   let syncedCount = 0;
   
   for (const cachedSwipe of pendingSwipes) {
@@ -351,13 +471,13 @@ export async function syncPendingSwipes(): Promise<number> {
         // Verify session still exists
         const sessionDoc = await getDoc(sessionRef);
         if (!sessionDoc.exists()) {
-          console.warn(`Session ${cachedSwipe.sessionId} no longer exists, skipping sync`);
+          logger.warn('Session no longer exists, skipping sync', { sessionId: cachedSwipe.sessionId });
           return;
         }
         
         const sessionData = sessionDoc.data() as SwipeSession;
         if (sessionData.userId !== cachedSwipe.userId) {
-          console.warn(`Session ${cachedSwipe.sessionId} does not belong to user, skipping sync`);
+          logger.warn('Session does not belong to user, skipping sync', { sessionId: cachedSwipe.sessionId });
           return;
         }
         
@@ -377,10 +497,19 @@ export async function syncPendingSwipes(): Promise<number> {
       removePendingSwipe(cachedSwipe);
       syncedCount++;
     } catch (error) {
-      console.error('Failed to sync swipe:', error);
+      logger.error('Failed to sync swipe', {
+        sessionId: cachedSwipe.sessionId,
+        itemId: cachedSwipe.itemId,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
       // Keep in cache for next sync attempt
     }
   }
+
+  logger.info('Pending swipes sync complete', {
+    syncedCount: syncedCount.toString(),
+    totalPending: pendingSwipes.length.toString(),
+  });
 
   return syncedCount;
 }

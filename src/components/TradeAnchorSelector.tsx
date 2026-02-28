@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { Input } from './ui/Input';
 import { Dropdown } from './ui/Dropdown';
 import { Button } from './ui/Button';
+import { getResponsiveImageUrl } from '../utils/cloudinary';
 
 type ViewMode = 'grid' | 'list';
 
@@ -474,7 +475,7 @@ export const TradeAnchorSelector: React.FC<TradeAnchorSelectorProps> = ({
                 }`}>
                   {item.images.length > 0 ? (
                     <img
-                      src={item.images[0]}
+                      src={getResponsiveImageUrl(item.images[0], { width: 400, height: 300, crop: 'fill' })}
                       alt={item.title}
                       loading="lazy"
                       className={`w-full h-full object-cover transition-transform duration-500 ${isHovered && !isItemLoading && !isLoading ? 'scale-110' : 'scale-100'}`}
@@ -594,7 +595,7 @@ export const TradeAnchorSelector: React.FC<TradeAnchorSelectorProps> = ({
                   <p className="text-xs font-semibold text-text-secondary dark:text-gray-400 mb-2">Trading with:</p>
                   <div className="flex items-center gap-3">
                     {selectedItem.images.length > 0 ? (
-                      <img src={selectedItem.images[0]} alt={selectedItem.title} className="w-16 h-16 rounded-lg object-cover flex-shrink-0" />
+                      <img src={getResponsiveImageUrl(selectedItem.images[0], { width: 64, height: 64, crop: 'fill' })} alt={selectedItem.title} className="w-16 h-16 rounded-lg object-cover flex-shrink-0" />
                     ) : (
                       <div className="w-16 h-16 rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
                         <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

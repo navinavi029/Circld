@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useAuth } from '../contexts/AuthContext';
 import { LoadingSpinner, Button, Card } from '../components/ui';
@@ -19,6 +19,9 @@ export function ItemDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   usePageTitle(item ? item.title : 'Item Detail');
 
@@ -117,12 +120,37 @@ export function ItemDetail() {
     }
   };
 
+  const handleDeleteClick = () => {
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!id) return;
+
+    setDeleting(true);
+    try {
+      await deleteDoc(doc(db, 'items', id));
+      setShowDeleteModal(false);
+      setShowSuccessModal(true);
+    } catch (err) {
+      console.error('Error deleting item:', err);
+      setError(err instanceof Error ? err.message : 'Failed to delete item');
+      setShowDeleteModal(false);
+      setDeleting(false);
+    }
+  };
+
+  const handleSuccessClose = () => {
+    setShowSuccessModal(false);
+    navigate('/listings');
+  };
+
   if (loading) {
     console.log('Rendering loading state');
     return (
       <div className="flex-1 w-full flex items-center justify-center py-20">
         <div className="flex items-center justify-center py-20">
-          <LoadingSpinner message="Loading item..." size="lg" />
+          <LoadingSpinner variant="flow" message="Loading item..." size="lg" />
         </div>
       </div>
     );
@@ -267,6 +295,32 @@ export function ItemDetail() {
                   {item.title}
                 </h1>
 
+                {/* Edit Button - Only for owners */}
+                {isOwner && (
+                  <div className="space-y-3 mb-4">
+                    <Button
+                      onClick={() => navigate(`/listings/${item.id}/edit`)}
+                      variant="outline"
+                      className="w-full flex items-center justify-center gap-2"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                      Edit Listing
+                    </Button>
+                    <Button
+                      onClick={handleDeleteClick}
+                      variant="outline"
+                      className="w-full flex items-center justify-center gap-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 border-red-200 dark:border-red-800"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                      Delete Item
+                    </Button>
+                  </div>
+                )}
+
                 {/* Details Grid */}
                 <div className="space-y-3 mb-6">
                   <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700">
@@ -321,25 +375,7 @@ export function ItemDetail() {
                     </Button>
                   )}
                   {isOwner && (
-                    <>
-                      <Button
-                        variant="primary"
-                        size="lg"
-                        className={`w-full ${getPrimaryButtonClasses(true)}`}
-                        onClick={() => navigate(`/listings/edit/${item.id}`)}
-                      >
-                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                        </svg>
-                        Edit Item
-                      </Button>
-                      <Button variant="outline" size="lg" className="w-full">
-                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                        Delete Item
-                      </Button>
-                    </>
+                    <></>
                   )}
                 </div>
               </div>
@@ -392,7 +428,73 @@ export function ItemDetail() {
             </div>
           </div>
         </div>
+
+        {/* Delete Confirmation Modal */}
+        {showDeleteModal && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeInFast">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6 animate-scaleIn">
+              <div className="flex flex-col items-center text-center">
+                <div className="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mb-4">
+                  <svg className="w-8 h-8 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-text dark:text-gray-100 mb-2">
+                  Delete This Item?
+                </h3>
+                <p className="text-sm text-text-secondary dark:text-gray-400 mb-6">
+                  This action cannot be undone. Your listing will be permanently removed.
+                </p>
+                <div className="flex gap-3 w-full">
+                  <Button
+                    onClick={() => setShowDeleteModal(false)}
+                    variant="outline"
+                    disabled={deleting}
+                    className="flex-1"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleDeleteConfirm}
+                    disabled={deleting}
+                    className="flex-1 bg-red-600 hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700"
+                  >
+                    {deleting ? 'Deleting...' : 'Delete'}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Success Modal */}
+        {showSuccessModal && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeInFast">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6 animate-scaleIn">
+              <div className="flex flex-col items-center text-center">
+                <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mb-4">
+                  <svg className="w-8 h-8 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-text dark:text-gray-100 mb-2">
+                  Item Deleted Successfully!
+                </h3>
+                <p className="text-sm text-text-secondary dark:text-gray-400 mb-6">
+                  Your listing has been permanently removed.
+                </p>
+                <Button
+                  onClick={handleSuccessClose}
+                  className="w-full"
+                >
+                  Back to Listings
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </PageTransition>
   );
 }
+

@@ -2,6 +2,8 @@ import { ReactElement, ReactNode } from 'react';
 import { render, RenderOptions } from '@testing-library/react';
 import { ProfileProvider } from '../contexts/ProfileContext';
 import { AuthProvider } from '../contexts/AuthContext';
+import { HapticProvider } from '../contexts/HapticContext';
+import { AudioProvider } from '../contexts/AudioContext';
 import { UserProfile } from '../types/user';
 
 // Mock user for testing
@@ -52,7 +54,11 @@ export function TestWrapper({ children, profile = mockProfile }: TestWrapperProp
   return (
     <AuthProvider>
       <ProfileProvider>
-        {children}
+        <HapticProvider>
+          <AudioProvider>
+            {children}
+          </AudioProvider>
+        </HapticProvider>
       </ProfileProvider>
     </AuthProvider>
   );

@@ -40,6 +40,12 @@ export function Dropdown({
   const triggerRef = useRef<HTMLButtonElement>(null);
   const optionsRef = useRef<(HTMLButtonElement | null)[]>([]);
 
+  // Generate unique IDs for accessibility
+  const dropdownId = `dropdown-${Math.random().toString(36).substr(2, 9)}`;
+  const labelId = label ? `${dropdownId}-label` : undefined;
+  const errorId = error ? `${dropdownId}-error` : undefined;
+  const helperId = helperText && !error ? `${dropdownId}-helper` : undefined;
+
   const selectedOption = options.find(opt => opt.value === value);
   const displayText = selectedOption ? selectedOption.label : placeholder;
 
@@ -197,7 +203,7 @@ export function Dropdown({
   return (
     <div className={`flex-shrink-0 ${className}`} ref={dropdownRef}>
       {label && (
-        <label className="block text-sm font-semibold mb-2 text-text dark:text-gray-200">
+        <label id={labelId} className="block text-sm font-semibold mb-2 text-text dark:text-gray-200">
           {label}
           {required && <span className="text-error dark:text-error-light ml-1">*</span>}
         </label>
@@ -213,6 +219,10 @@ export function Dropdown({
           className={`${baseStyles} ${stateStyles} flex items-center justify-between gap-2`}
           aria-haspopup="listbox"
           aria-expanded={isOpen}
+          aria-labelledby={labelId}
+          aria-describedby={errorId || helperId}
+          aria-invalid={error ? 'true' : 'false'}
+          aria-required={required}
         >
           <span className={`truncate ${selectedOption ? 'text-gray-900 dark:text-gray-100' : 'text-gray-400 dark:text-gray-500'}`}>
             {displayText}
@@ -315,8 +325,8 @@ export function Dropdown({
 
       {/* Error Message */}
       {error && (
-        <p className="mt-1.5 text-sm text-error dark:text-error-light flex items-center gap-1.5 animate-fadeInFast">
-          <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+        <p id={errorId} className="mt-1.5 text-sm text-error dark:text-error-light flex items-center gap-1.5 animate-fadeInFast" role="alert">
+          <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
             <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
           </svg>
           {error}
@@ -325,7 +335,7 @@ export function Dropdown({
 
       {/* Helper Text */}
       {helperText && !error && (
-        <p className="mt-1.5 text-xs text-text-secondary dark:text-gray-400">
+        <p id={helperId} className="mt-1.5 text-xs text-text-secondary dark:text-gray-400">
           {helperText}
         </p>
       )}

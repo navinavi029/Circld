@@ -51,9 +51,7 @@ export async function retryWithBackoff<T>(
       // If this was the last attempt, throw the error
       if (attempt === config.maxRetries) {
         console.error('[retryWithBackoff] All retries exhausted');
-        throw new Error(
-          `Operation failed after ${config.maxRetries} retries: ${lastError.message}`
-        );
+        throw error;
       }
 
       // Call retry callback if provided

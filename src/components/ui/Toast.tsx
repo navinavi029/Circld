@@ -60,9 +60,12 @@ export function Toast({ message, type = 'info', duration = 3000, onClose }: Toas
       className={`fixed top-20 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-300 ${
         isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
       }`}
+      role={type === 'error' ? 'alert' : 'status'}
+      aria-live={type === 'error' ? 'assertive' : 'polite'}
+      aria-atomic="true"
     >
       <div className={`${typeStyles[type]} px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 min-w-[200px] max-w-md`}>
-        <div className="flex-shrink-0">{icons[type]}</div>
+        <div className="flex-shrink-0" aria-hidden="true">{icons[type]}</div>
         <span className="font-semibold text-sm">{message}</span>
         <button
           onClick={() => {
@@ -72,7 +75,7 @@ export function Toast({ message, type = 'info', duration = 3000, onClose }: Toas
           className="ml-2 hover:bg-white/20 rounded-full p-1 transition-colors flex-shrink-0"
           aria-label="Close notification"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>

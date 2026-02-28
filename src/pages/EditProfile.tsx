@@ -47,7 +47,6 @@ export function EditProfile() {
   const [lastName, setLastName] = useState('');
   const [location, setLocation] = useState('');
   const [coordinates, setCoordinates] = useState<Coordinates | null>(null);
-  const [eligibleToMatch, setEligibleToMatch] = useState(false);
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
 
   // New photo state for deferred upload
@@ -60,6 +59,7 @@ export function EditProfile() {
   const [photoError, setPhotoError] = useState<string | null>(null);
   const [hasChanges, setHasChanges] = useState(false);
   const [showMapPicker, setShowMapPicker] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   // Check if user can update location (14-day cooldown)
   const canUpdateLocation = () => {
@@ -95,7 +95,6 @@ export function EditProfile() {
     lastName: '',
     location: '',
     coordinates: null as Coordinates | null,
-    eligibleToMatch: false,
     photoUrl: null as string | null
   });
 
@@ -121,7 +120,6 @@ export function EditProfile() {
         lastName,
         location: profile.location,
         coordinates: profile.coordinates,
-        eligibleToMatch: profile.eligible_to_match,
         photoUrl: profile.photoUrl
       };
 
@@ -129,7 +127,6 @@ export function EditProfile() {
       setLastName(values.lastName);
       setLocation(values.location);
       setCoordinates(values.coordinates);
-      setEligibleToMatch(values.eligibleToMatch);
       setPhotoUrl(values.photoUrl);
       setOriginalValues(values);
     }
@@ -152,12 +149,11 @@ export function EditProfile() {
       lastName !== originalValues.lastName ||
       location !== originalValues.location ||
       coordinates !== originalValues.coordinates ||
-      eligibleToMatch !== originalValues.eligibleToMatch ||
       photoUrl !== originalValues.photoUrl ||
       newPhotoBlob !== null; // New photo selected
 
     setHasChanges(changed);
-  }, [firstName, lastName, location, coordinates, eligibleToMatch, photoUrl, newPhotoBlob, originalValues]);
+  }, [firstName, lastName, location, coordinates, photoUrl, newPhotoBlob, originalValues]);
 
   /**
    * Validate first name field
@@ -232,36 +228,6 @@ export function EditProfile() {
       }
       return next;
     });
-  };
-
-  /**
-   * Handle location field change
-   * Requirements: 2.4, 7.2
-   */
-  // @ts-expect-error - Function defined for future use
-  const handleLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setLocation(value);
-
-    // Clear validation error when user modifies the field
-    const error = validateLocation(value);
-    setValidationErrors(prev => {
-      const next = { ...prev };
-      if (error) {
-        next.location = error;
-      } else {
-        delete next.location;
-      }
-      return next;
-    });
-  };
-
-  /**
-   * Handle eligible to match toggle
-   * Requirements: 2.5
-   */
-  const handleEligibleToMatchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEligibleToMatch(e.target.checked);
   };
 
   /**
@@ -376,12 +342,29 @@ export function EditProfile() {
       lastName: lastName.trim(),
       location: location.trim(),
       coordinates: coordinates,
-      eligible_to_match: eligibleToMatch,
+      eligible_to_match: profile?.eligible_to_match || false, // Keep existing value
       photoUrl: finalPhotoUrl,
       previousPhotoUrl: originalValues.photoUrl,
       previousLocation: originalValues.location,
       previousCoordinates: originalValues.coordinates
     });
+  };
+
+  /**
+   * Show success modal when update succeeds
+   */
+  useEffect(() => {
+    if (success && !updateLoading) {
+      setShowSuccessModal(true);
+    }
+  }, [success, updateLoading]);
+
+  /**
+   * Handle success modal close
+   */
+  const handleSuccessClose = () => {
+    setShowSuccessModal(false);
+    navigate('/profile');
   };
 
   /**
@@ -406,7 +389,7 @@ export function EditProfile() {
   if (profileLoading) {
     return (
       <div className={getPageBackgroundClasses() + " flex items-center justify-center"}>
-        <LoadingSpinner message="Loading profile..." size="lg" />
+        <LoadingSpinner variant="flow" message="Loading profile..." size="lg" />
       </div>
     );
   }
@@ -449,7 +432,7 @@ export function EditProfile() {
             </div>
 
             {/* Success Message */}
-            {success && (
+            {success && !showSuccessModal && (
               <div className="mb-6 bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500 dark:border-green-400 p-4 rounded animate-fadeInFast">
                 <div className="flex items-center">
                   <svg className="w-5 h-5 text-green-500 dark:text-green-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
@@ -588,20 +571,6 @@ export function EditProfile() {
                 </p>
               </div>
 
-              {/* Eligible to Match Toggle */}
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="eligibleToMatch"
-                  checked={eligibleToMatch}
-                  onChange={handleEligibleToMatchChange}
-                  className="w-4 h-4 text-accent border-border dark:border-gray-600 rounded focus:ring-accent"
-                />
-                <label htmlFor="eligibleToMatch" className="ml-2 block text-sm text-text dark:text-gray-200">
-                  Eligible to match
-                </label>
-              </div>
-
               {/* Action Buttons */}
               <div className="flex space-x-4 pt-4">
                 <button
@@ -642,7 +611,35 @@ export function EditProfile() {
             onClose={() => setShowMapPicker(false)}
           />
         )}
+
+        {/* Success Modal */}
+        {showSuccessModal && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeInFast">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6 animate-scaleIn">
+              <div className="flex flex-col items-center text-center">
+                <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 rounded-full flex items-center justify-center mb-4">
+                  <svg className="w-8 h-8 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-text dark:text-gray-100 mb-2">
+                  Profile Updated Successfully!
+                </h3>
+                <p className="text-sm text-text-secondary dark:text-gray-400 mb-6">
+                  Your profile information has been updated.
+                </p>
+                <button
+                  onClick={handleSuccessClose}
+                  className="w-full bg-gradient-to-r from-accent to-accent-dark dark:from-primary-light dark:to-primary text-white font-medium py-3 px-6 rounded-xl hover:shadow-lg transition-all"
+                >
+                  View Profile
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </PageTransition>
   );
 }
+

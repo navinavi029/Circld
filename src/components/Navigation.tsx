@@ -78,12 +78,13 @@ export function Navigation() {
 
   return (
     <div className="sticky top-0 z-50 pt-3 px-4 sm:px-6 lg:px-8 w-full max-w-6xl mx-auto pointer-events-none">
-      <nav className="pointer-events-auto bg-white/95 dark:bg-gray-900/95 backdrop-blur-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-lg dark:shadow-[0_8px_30px_rgb(0,0,0,0.4)] rounded-3xl sm:rounded-full transition-all duration-300 group/nav">
+      <nav id="main-navigation" tabIndex={-1} className="pointer-events-auto bg-white/95 dark:bg-gray-900/95 backdrop-blur-2xl border border-gray-200/50 dark:border-gray-700/50 shadow-lg dark:shadow-[0_8px_30px_rgb(0,0,0,0.4)] rounded-3xl sm:rounded-full transition-all duration-300 group/nav">
         <div className="px-3 sm:px-6 h-16 flex justify-between items-center">
           {/* Logo Section */}
           <button
             onClick={() => navigate('/')}
             className="flex items-center space-x-2 sm:space-x-3 group outline-none"
+            aria-label="Go to home page"
           >
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-br from-primary to-primary-dark dark:from-primary-light dark:to-primary rounded-full blur-md opacity-50 group-hover:opacity-100 transition-opacity duration-300" />
@@ -108,6 +109,8 @@ export function Navigation() {
                 ? 'bg-primary/20 dark:bg-primary/30 text-primary-dark dark:text-primary-light font-bold'
                 : 'text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light hover:bg-gray-100/50 dark:hover:bg-gray-800/50'
                 }`}
+              aria-label="View your listings"
+              aria-current={isActive('/listings') ? 'page' : undefined}
             >
               <svg className={`w-4 h-4 lg:w-5 lg:h-5 transition-transform duration-300 ${!isActive('/listings') && 'group-hover:scale-110'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={isActive('/listings') ? 2.5 : 2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
@@ -122,6 +125,8 @@ export function Navigation() {
                 ? 'bg-primary/20 dark:bg-primary/30 text-primary-dark dark:text-primary-light font-bold'
                 : 'text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light hover:bg-gray-100/50 dark:hover:bg-gray-800/50'
                 }`}
+              aria-label="Go to swipe trading"
+              aria-current={isActive('/swipe-trading') ? 'page' : undefined}
             >
               <svg className={`w-4 h-4 lg:w-5 lg:h-5 transition-transform duration-300 ${!isActive('/swipe-trading') && 'group-hover:scale-110'}`} fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
@@ -136,6 +141,8 @@ export function Navigation() {
                 ? 'bg-primary/20 dark:bg-primary/30 text-primary-dark dark:text-primary-light font-bold'
                 : 'text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light hover:bg-gray-100/50 dark:hover:bg-gray-800/50'
                 }`}
+              aria-label={unreadCount > 0 ? `View messages, ${unreadCount} unread` : 'View messages'}
+              aria-current={(isActive('/messages') || location.pathname.startsWith('/messages/')) ? 'page' : undefined}
             >
               <div className="relative">
                 <svg className={`w-4 h-4 lg:w-5 lg:h-5 transition-transform duration-300 ${!(isActive('/messages') || location.pathname.startsWith('/messages/')) && 'group-hover:scale-110'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -159,6 +166,8 @@ export function Navigation() {
                 ? 'bg-primary/20 dark:bg-primary/30 text-primary-dark dark:text-primary-light font-bold'
                 : 'text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light hover:bg-gray-100/50 dark:hover:bg-gray-800/50'
                 }`}
+              aria-label="View trade offers"
+              aria-current={isActive('/trade-offers') ? 'page' : undefined}
             >
               <svg className={`w-4 h-4 lg:w-5 lg:h-5 transition-transform duration-300 ${!isActive('/trade-offers') && 'group-hover:scale-110'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={isActive('/trade-offers') ? 2.5 : 2} d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4" />
@@ -174,6 +183,7 @@ export function Navigation() {
               <button
                 onClick={() => navigate('/login')}
                 className="flex items-center space-x-2 px-4 py-2 rounded-full bg-gradient-to-r from-primary to-primary-dark dark:from-primary-light dark:to-primary text-white font-semibold text-sm lg:text-base shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-200 outline-none"
+                aria-label="Login to your account"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
@@ -185,6 +195,9 @@ export function Navigation() {
                 <button
                   onClick={toggleDropdown}
                   className="flex items-center space-x-3 px-3 py-1.5 rounded-full hover:bg-gray-100/80 dark:hover:bg-gray-800/80 transition-all duration-200 group outline-none"
+                  aria-label="Open user menu"
+                  aria-expanded={isDropdownOpen}
+                  aria-haspopup="true"
                 >
                   {/* Profile Photo with status indicator */}
                   <div className="relative">
@@ -290,6 +303,7 @@ export function Navigation() {
                           <button
                             onClick={handleProfileClick}
                             className="w-full px-4 py-3 text-left hover:bg-primary/5 dark:hover:bg-primary-light/10 transition-colors flex items-center space-x-3 group"
+                            aria-label="Go to my profile"
                           >
                             <div className="w-9 h-9 rounded-lg bg-primary/10 dark:bg-primary-light/20 flex items-center justify-center group-hover:bg-primary/20 dark:group-hover:bg-primary-light/30 transition-colors">
                               <svg className="w-5 h-5 text-primary dark:text-primary-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -308,6 +322,7 @@ export function Navigation() {
                               navigate('/swipe-history');
                             }}
                             className="w-full px-4 py-3 text-left hover:bg-primary/5 dark:hover:bg-primary-light/10 transition-colors flex items-center space-x-3 group"
+                            aria-label="View swipe history"
                           >
                             <div className="w-9 h-9 rounded-lg bg-primary/10 dark:bg-primary-light/20 flex items-center justify-center group-hover:bg-primary/20 dark:group-hover:bg-primary-light/30 transition-colors">
                               <svg className="w-5 h-5 text-primary dark:text-primary-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -326,6 +341,7 @@ export function Navigation() {
                               navigate('/trade-history');
                             }}
                             className="w-full px-4 py-3 text-left hover:bg-primary/5 dark:hover:bg-primary-light/10 transition-colors flex items-center space-x-3 group"
+                            aria-label="View trade history"
                           >
                             <div className="w-9 h-9 rounded-lg bg-primary/10 dark:bg-primary-light/20 flex items-center justify-center group-hover:bg-primary/20 dark:group-hover:bg-primary-light/30 transition-colors">
                               <svg className="w-5 h-5 text-primary dark:text-primary-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -343,6 +359,7 @@ export function Navigation() {
                           <button
                             onClick={handleLogoutClick}
                             className="w-full px-4 py-3 text-left hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center space-x-3 group"
+                            aria-label="Logout from your account"
                           >
                             <div className="w-9 h-9 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center group-hover:bg-red-200 dark:group-hover:bg-red-900/50 transition-colors">
                               <svg className="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -367,7 +384,9 @@ export function Navigation() {
           <button
             onClick={toggleMobileMenu}
             className="md:hidden p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-all z-50 relative outline-none"
-            aria-label="Toggle menu"
+            aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={isMobileMenuOpen}
+            aria-controls="mobile-menu"
           >
             <div className="relative w-6 h-5 flex flex-col justify-between items-center">
               <span className={`block w-6 h-0.5 bg-current transform transition duration-300 ease-in-out ${isMobileMenuOpen ? 'rotate-45 translate-y-2.5' : ''}`} />
@@ -382,11 +401,14 @@ export function Navigation() {
         {isMobileMenuOpen && (
           <motion.div
             key="mobile-menu"
+            id="mobile-menu"
             className="fixed inset-0 z-40 md:hidden flex flex-col pointer-events-auto"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
+            role="dialog"
+            aria-label="Mobile navigation menu"
           >
             {/* Blur Backdrop */}
             <motion.div
@@ -409,7 +431,7 @@ export function Navigation() {
               <button
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="absolute top-6 right-4 sm:right-6 p-2.5 rounded-full bg-white/50 dark:bg-gray-800/50 hover:bg-white/80 dark:hover:bg-gray-700/80 text-gray-800 dark:text-gray-200 backdrop-blur-md transition-all shadow-sm border border-white/40 dark:border-white/10 z-50 outline-none hover:scale-105 active:scale-95"
-                aria-label="Close menu"
+                aria-label="Close mobile menu"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
@@ -421,6 +443,7 @@ export function Navigation() {
                 <button
                   onClick={() => { setIsMobileMenuOpen(false); navigate('/login'); }}
                   className="mb-6 w-full p-4 rounded-3xl flex items-center justify-center space-x-3 bg-gradient-to-r from-primary to-primary-dark dark:from-primary-light dark:to-primary text-white font-bold text-base sm:text-lg shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 outline-none"
+                  aria-label="Login to your account"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
@@ -468,6 +491,8 @@ export function Navigation() {
                     ? 'bg-primary/20 dark:bg-primary/30 text-primary-dark dark:text-primary-light font-bold'
                     : 'bg-white/40 dark:bg-gray-800/40 hover:bg-white/60 dark:hover:bg-gray-700/50 text-gray-800 dark:text-gray-100 border border-white/20 dark:border-white/5'
                     }`}
+                  aria-label="View your listings"
+                  aria-current={isActive('/listings') ? 'page' : undefined}
                 >
                   <div className="p-2.5 rounded-xl bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light">
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -483,6 +508,8 @@ export function Navigation() {
                     ? 'bg-primary/20 dark:bg-primary/30 text-primary-dark dark:text-primary-light font-bold'
                     : 'bg-white/40 dark:bg-gray-800/40 hover:bg-white/60 dark:hover:bg-gray-700/50 text-gray-800 dark:text-gray-100 border border-white/20 dark:border-white/5'
                     }`}
+                  aria-label="Go to swipe trading"
+                  aria-current={isActive('/swipe-trading') ? 'page' : undefined}
                 >
                   <div className="p-2.5 rounded-xl bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light">
                     <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -498,6 +525,8 @@ export function Navigation() {
                     ? 'bg-primary/20 dark:bg-primary/30 text-primary-dark dark:text-primary-light font-bold'
                     : 'bg-white/40 dark:bg-gray-800/40 hover:bg-white/60 dark:hover:bg-gray-700/50 text-gray-800 dark:text-gray-100 border border-white/20 dark:border-white/5'
                     }`}
+                  aria-label={unreadCount > 0 ? `View messages, ${unreadCount} unread` : 'View messages'}
+                  aria-current={(isActive('/messages') || location.pathname.startsWith('/messages/')) ? 'page' : undefined}
                 >
                   <div className="relative">
                     <div className="p-2.5 rounded-xl bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light">
@@ -527,6 +556,8 @@ export function Navigation() {
                     ? 'bg-primary/20 dark:bg-primary/30 text-primary-dark dark:text-primary-light font-bold'
                     : 'bg-white/40 dark:bg-gray-800/40 hover:bg-white/60 dark:hover:bg-gray-700/50 text-gray-800 dark:text-gray-100 border border-white/20 dark:border-white/5'
                     }`}
+                  aria-label="View trade offers"
+                  aria-current={isActive('/trade-offers') ? 'page' : undefined}
                 >
                   <div className="p-2.5 rounded-xl bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light">
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -542,6 +573,8 @@ export function Navigation() {
                     ? 'bg-primary/20 dark:bg-primary/30 text-primary-dark dark:text-primary-light font-bold'
                     : 'bg-white/40 dark:bg-gray-800/40 hover:bg-white/60 dark:hover:bg-gray-700/50 text-gray-800 dark:text-gray-100 border border-white/20 dark:border-white/5'
                     }`}
+                  aria-label="Go to my profile"
+                  aria-current={isActive('/profile') ? 'page' : undefined}
                 >
                   <div className="p-2.5 rounded-xl bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light">
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -557,6 +590,8 @@ export function Navigation() {
                     ? 'bg-primary/20 dark:bg-primary/30 text-primary-dark dark:text-primary-light font-bold'
                     : 'bg-white/40 dark:bg-gray-800/40 hover:bg-white/60 dark:hover:bg-gray-700/50 text-gray-800 dark:text-gray-100 border border-white/20 dark:border-white/5'
                     }`}
+                  aria-label="View swipe history"
+                  aria-current={isActive('/swipe-history') ? 'page' : undefined}
                 >
                   <div className="p-2.5 rounded-xl bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light">
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -572,6 +607,8 @@ export function Navigation() {
                     ? 'bg-primary/20 dark:bg-primary/30 text-primary-dark dark:text-primary-light font-bold'
                     : 'bg-white/40 dark:bg-gray-800/40 hover:bg-white/60 dark:hover:bg-gray-700/50 text-gray-800 dark:text-gray-100 border border-white/20 dark:border-white/5'
                     }`}
+                  aria-label="View trade history"
+                  aria-current={isActive('/trade-history') ? 'page' : undefined}
                 >
                   <div className="p-2.5 rounded-xl bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light">
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -588,6 +625,7 @@ export function Navigation() {
                   <button
                     onClick={handleLogoutClick}
                     className="w-full p-3.5 sm:p-4 rounded-2xl flex items-center justify-center space-x-3 text-red-600 dark:text-red-400 bg-red-50/50 dark:bg-red-900/10 hover:bg-red-100/50 dark:hover:bg-red-900/20 border border-red-100 dark:border-red-900/30 transition-all font-bold tracking-wide outline-none text-base sm:text-lg"
+                    aria-label="Logout from your account"
                   >
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />

@@ -33,7 +33,7 @@ export async function getCurrentLocation(): Promise<LocationData> {
           // Reverse geocode to get readable address
           const address = await reverseGeocode(coordinates);
           resolve({ address, coordinates });
-        } catch (error) {
+        } catch (_error) {
           // If reverse geocoding fails, still return coordinates with a fallback address
           resolve({
             address: `${coordinates.latitude.toFixed(4)}, ${coordinates.longitude.toFixed(4)}`,

@@ -1,24 +1,41 @@
+import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { ThemeProvider } from './contexts/ThemeContext';
-import { Login } from './pages/Login';
-import { ForgotPassword } from './pages/ForgotPassword';
-import { Profile } from './pages/Profile';
-import { CompleteProfile } from './pages/CompleteProfile';
-import { EditProfile } from './pages/EditProfile';
-import { Listings } from './pages/Listings';
-import { ItemDetail } from './pages/ItemDetail';
-import { SwipeTradingPage } from './pages/SwipeTradingPage';
-import { SwipeHistory } from './pages/SwipeHistory';
-import { MessagesPage } from './pages/MessagesPage';
-import { ConversationView } from './components/ConversationView';
-import { TradeOffers } from './pages/TradeOffers';
-import { TradeHistory } from './pages/TradeHistory';
-import { Home } from './pages/Home';
-import { Demo } from './pages/Demo';
+import { HapticProvider } from './contexts/HapticContext';
+import { AudioProvider } from './contexts/AudioContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { PublicRoute } from './components/PublicRoute';
 import { MainLayout } from './components/MainLayout';
+import { LoadingSpinner } from './components/ui/LoadingSpinner';
+import { SkipLinks } from './components/SkipLinks';
+
+// Lazy load all route components for code splitting
+const Login = lazy(() => import('./pages/Login').then(m => ({ default: m.Login })));
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword').then(m => ({ default: m.ForgotPassword })));
+const Profile = lazy(() => import('./pages/Profile').then(m => ({ default: m.Profile })));
+const CompleteProfile = lazy(() => import('./pages/CompleteProfile').then(m => ({ default: m.CompleteProfile })));
+const EditProfile = lazy(() => import('./pages/EditProfile').then(m => ({ default: m.EditProfile })));
+const Listings = lazy(() => import('./pages/Listings').then(m => ({ default: m.Listings })));
+const ItemDetail = lazy(() => import('./pages/ItemDetail').then(m => ({ default: m.ItemDetail })));
+const EditItem = lazy(() => import('./pages/EditItem').then(m => ({ default: m.EditItem })));
+const SwipeTradingPage = lazy(() => import('./pages/SwipeTradingPage').then(m => ({ default: m.SwipeTradingPage })));
+const SwipeHistory = lazy(() => import('./pages/SwipeHistory').then(m => ({ default: m.SwipeHistory })));
+const MessagesPage = lazy(() => import('./pages/MessagesPage').then(m => ({ default: m.MessagesPage })));
+const ConversationView = lazy(() => import('./components/ConversationView').then(m => ({ default: m.ConversationView })));
+const TradeOffers = lazy(() => import('./pages/TradeOffers').then(m => ({ default: m.TradeOffers })));
+const TradeHistory = lazy(() => import('./pages/TradeHistory').then(m => ({ default: m.TradeHistory })));
+const Home = lazy(() => import('./pages/Home').then(m => ({ default: m.Home })));
+const Demo = lazy(() => import('./pages/Demo').then(m => ({ default: m.Demo })));
+
+// Loading fallback component for route transitions
+function RouteLoadingFallback() {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <LoadingSpinner message="Loading page" size="lg" showDots />
+    </div>
+  );
+}
 
 /**
  * Inner component so useLocation works inside BrowserRouter.
@@ -45,7 +62,9 @@ function AppRoutes() {
               path="/login"
               element={
                 <PublicRoute>
-                  <Login />
+                  <Suspense fallback={<RouteLoadingFallback />}>
+                    <Login />
+                  </Suspense>
                 </PublicRoute>
               }
             />
@@ -53,7 +72,9 @@ function AppRoutes() {
               path="/forgot-password"
               element={
                 <PublicRoute>
-                  <ForgotPassword />
+                  <Suspense fallback={<RouteLoadingFallback />}>
+                    <ForgotPassword />
+                  </Suspense>
                 </PublicRoute>
               }
             />
@@ -61,7 +82,9 @@ function AppRoutes() {
               path="/complete-profile"
               element={
                 <ProtectedRoute requireProfile={false}>
-                  <CompleteProfile />
+                  <Suspense fallback={<RouteLoadingFallback />}>
+                    <CompleteProfile />
+                  </Suspense>
                 </ProtectedRoute>
               }
             />
@@ -72,14 +95,30 @@ function AppRoutes() {
       {/* Main layout routes — AnimatePresence inside MainLayout handles page transitions */}
       {!isAuthPath && (
         <Routes>
-          <Route path="/demo" element={<Demo />} />
+          <Route 
+            path="/demo" 
+            element={
+              <Suspense fallback={<RouteLoadingFallback />}>
+                <Demo />
+              </Suspense>
+            } 
+          />
           <Route element={<MainLayout />}>
-            <Route path="/" element={<Home />} />
+            <Route 
+              path="/" 
+              element={
+                <Suspense fallback={<RouteLoadingFallback />}>
+                  <Home />
+                </Suspense>
+              } 
+            />
             <Route
               path="/profile"
               element={
                 <ProtectedRoute>
-                  <Profile />
+                  <Suspense fallback={<RouteLoadingFallback />}>
+                    <Profile />
+                  </Suspense>
                 </ProtectedRoute>
               }
             />
@@ -87,7 +126,9 @@ function AppRoutes() {
               path="/edit-profile"
               element={
                 <ProtectedRoute>
-                  <EditProfile />
+                  <Suspense fallback={<RouteLoadingFallback />}>
+                    <EditProfile />
+                  </Suspense>
                 </ProtectedRoute>
               }
             />
@@ -95,7 +136,9 @@ function AppRoutes() {
               path="/listings"
               element={
                 <ProtectedRoute>
-                  <Listings />
+                  <Suspense fallback={<RouteLoadingFallback />}>
+                    <Listings />
+                  </Suspense>
                 </ProtectedRoute>
               }
             />
@@ -103,7 +146,19 @@ function AppRoutes() {
               path="/listings/:id"
               element={
                 <ProtectedRoute>
-                  <ItemDetail />
+                  <Suspense fallback={<RouteLoadingFallback />}>
+                    <ItemDetail />
+                  </Suspense>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/listings/:id/edit"
+              element={
+                <ProtectedRoute>
+                  <Suspense fallback={<RouteLoadingFallback />}>
+                    <EditItem />
+                  </Suspense>
                 </ProtectedRoute>
               }
             />
@@ -111,7 +166,9 @@ function AppRoutes() {
               path="/swipe-trading"
               element={
                 <ProtectedRoute>
-                  <SwipeTradingPage />
+                  <Suspense fallback={<RouteLoadingFallback />}>
+                    <SwipeTradingPage />
+                  </Suspense>
                 </ProtectedRoute>
               }
             />
@@ -119,7 +176,9 @@ function AppRoutes() {
               path="/swipe-history"
               element={
                 <ProtectedRoute>
-                  <SwipeHistory />
+                  <Suspense fallback={<RouteLoadingFallback />}>
+                    <SwipeHistory />
+                  </Suspense>
                 </ProtectedRoute>
               }
             />
@@ -127,7 +186,9 @@ function AppRoutes() {
               path="/messages"
               element={
                 <ProtectedRoute>
-                  <MessagesPage />
+                  <Suspense fallback={<RouteLoadingFallback />}>
+                    <MessagesPage />
+                  </Suspense>
                 </ProtectedRoute>
               }
             />
@@ -135,7 +196,9 @@ function AppRoutes() {
               path="/messages/:conversationId"
               element={
                 <ProtectedRoute>
-                  <ConversationView />
+                  <Suspense fallback={<RouteLoadingFallback />}>
+                    <ConversationView />
+                  </Suspense>
                 </ProtectedRoute>
               }
             />
@@ -143,7 +206,9 @@ function AppRoutes() {
               path="/trade-offers"
               element={
                 <ProtectedRoute>
-                  <TradeOffers />
+                  <Suspense fallback={<RouteLoadingFallback />}>
+                    <TradeOffers />
+                  </Suspense>
                 </ProtectedRoute>
               }
             />
@@ -151,7 +216,9 @@ function AppRoutes() {
               path="/trade-history"
               element={
                 <ProtectedRoute>
-                  <TradeHistory />
+                  <Suspense fallback={<RouteLoadingFallback />}>
+                    <TradeHistory />
+                  </Suspense>
                 </ProtectedRoute>
               }
             />
@@ -179,9 +246,14 @@ function AnimatedApp() {
 function App() {
   return (
     <ThemeProvider>
-      <BrowserRouter>
-        <AnimatedApp />
-      </BrowserRouter>
+      <HapticProvider>
+        <AudioProvider>
+          <BrowserRouter>
+            <SkipLinks />
+            <AnimatedApp />
+          </BrowserRouter>
+        </AudioProvider>
+      </HapticProvider>
     </ThemeProvider>
   );
 }

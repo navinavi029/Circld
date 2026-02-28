@@ -32,7 +32,7 @@ export function ProtectedRoute({ children, requireProfile = true }: ProtectedRou
   if (authLoading || profileLoading) {
     return (
       <div className="min-h-screen bg-background dark:bg-gray-900 flex items-center justify-center">
-        <LoadingSpinner message="Loading..." size="lg" />
+        <LoadingSpinner variant="flow" message="Loading..." size="lg" />
       </div>
     );
   }
@@ -56,3 +56,4 @@ export function ProtectedRoute({ children, requireProfile = true }: ProtectedRou
 
   return <>{children}</>;
 }
+

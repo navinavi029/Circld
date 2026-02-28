@@ -92,7 +92,7 @@ export function MessagesPage() {
   if (loading) {
     return (
       <div className="flex-1 w-full flex items-center justify-center h-[calc(100vh-4rem)] min-h-[50vh]">
-        <LoadingSpinner message="Loading conversations..." size="lg" />
+        <LoadingSpinner variant="flow" message="Loading conversations..." size="lg" />
       </div>
     );
   }
@@ -337,3 +337,4 @@ export function MessagesPage() {
     </PageTransition>
   );
 }
+

@@ -46,7 +46,7 @@ export const RelatedItems: React.FC<RelatedItemsProps> = ({ currentItem, maxItem
 
       {loading ? (
         <div className="flex items-center justify-center py-8">
-          <LoadingSpinner size="md" message="Loading related items..." />
+          <LoadingSpinner variant="flow" size="md" message="Loading related items..." />
         </div>
       ) : (
         <div className="overflow-x-auto">
@@ -108,3 +108,4 @@ export const RelatedItems: React.FC<RelatedItemsProps> = ({ currentItem, maxItem
     </div>
   );
 };
+

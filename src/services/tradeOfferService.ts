@@ -14,6 +14,10 @@ import {
 import { db } from '../firebase';
 import { TradeOffer } from '../types/swipe-trading';
 import { retryWithBackoff } from '../utils/retryWithBackoff';
+import { createLogger } from '../utils/logger';
+
+// Create logger instance for this service
+const logger = createLogger('tradeOfferService');
 
 /**
  * Creates a trade offer with idempotency check.
@@ -54,6 +58,12 @@ export async function createTradeOffer(
       
       await updateDoc(doc(db, 'tradeOffers', existingDoc.id), {
         updatedAt: serverTimestamp(),
+      });
+      
+      logger.info('Updated existing trade offer timestamp', {
+        offerId: existingDoc.id,
+        tradeAnchorId,
+        targetItemId,
       });
       
       return {
@@ -119,6 +129,13 @@ export async function createTradeOffer(
     const currentSwipeCount = targetItemData.swipeInterestCount || 0;
     await updateDoc(targetItemRef, {
       swipeInterestCount: currentSwipeCount + 1,
+    });
+    
+    logger.info('Created new trade offer', {
+      offerId: newTradeOfferRef.id,
+      tradeAnchorId,
+      targetItemId,
+      offeringUserId,
     });
     
     return {
@@ -318,7 +335,11 @@ export async function declineTradeOffer(
 
     await updateDoc(offerRef, updateData);
 
-    console.log(`[Trade Offer] Offer ${offerId} declined at ${new Date().toISOString()}${reason ? ` with reason: ${reason}` : ''}`);
+    logger.info('Trade offer declined', {
+      offerId,
+      userId,
+      reason: reason || 'none',
+    });
 
     return {
       ...offerData,
@@ -376,6 +397,26 @@ export async function completeTradeOffer(
       throw new Error('You have already confirmed completion of this trade');
     }
 
+    // Validate that both items are still available
+    const tradeAnchorItemRef = doc(db, 'items', offerData.tradeAnchorId);
+    const targetItemRef = doc(db, 'items', offerData.targetItemId);
+    
+    const [tradeAnchorItemDoc, targetItemDoc] = await Promise.all([
+      getDoc(tradeAnchorItemRef),
+      getDoc(targetItemRef)
+    ]);
+
+    if (!tradeAnchorItemDoc.exists() || !targetItemDoc.exists()) {
+      throw new Error('One or more items no longer exist');
+    }
+
+    const tradeAnchorItemData = tradeAnchorItemDoc.data();
+    const targetItemData = targetItemDoc.data();
+
+    if (tradeAnchorItemData.status !== 'available' || targetItemData.status !== 'available') {
+      throw new Error('One or more items are no longer available for trading');
+    }
+
     // Add user to completedBy array
     const updatedCompletedBy = [...completedBy, userId];
 
@@ -384,12 +425,87 @@ export async function completeTradeOffer(
       updatedCompletedBy.includes(offerData.offeringUserId) &&
       updatedCompletedBy.includes(offerData.targetItemOwnerId);
 
-    // Update trade offer
-    await updateDoc(offerRef, {
+    // Create batch for atomic operations
+    const batch = writeBatch(db);
+
+    // Add trade offer update to batch
+    batch.update(offerRef, {
       completedBy: updatedCompletedBy,
       status: bothConfirmed ? 'completed' : 'accepted',
       updatedAt: serverTimestamp(),
     });
+
+    // If both users confirmed, mark items as unavailable
+    if (bothConfirmed) {
+      batch.update(tradeAnchorItemRef, {
+        status: 'unavailable',
+        updatedAt: serverTimestamp(),
+      });
+
+      batch.update(targetItemRef, {
+        status: 'unavailable',
+        updatedAt: serverTimestamp(),
+      });
+
+      // Query and decline all conflicting accepted trades
+      const tradeOffersRef = collection(db, 'tradeOffers');
+      
+      // Query for trades where tradeAnchorId matches either item
+      const conflictingQuery1 = query(
+        tradeOffersRef,
+        where('status', '==', 'accepted'),
+        where('tradeAnchorId', '==', offerData.tradeAnchorId)
+      );
+      
+      const conflictingQuery2 = query(
+        tradeOffersRef,
+        where('status', '==', 'accepted'),
+        where('targetItemId', '==', offerData.tradeAnchorId)
+      );
+      
+      const conflictingQuery3 = query(
+        tradeOffersRef,
+        where('status', '==', 'accepted'),
+        where('tradeAnchorId', '==', offerData.targetItemId)
+      );
+      
+      const conflictingQuery4 = query(
+        tradeOffersRef,
+        where('status', '==', 'accepted'),
+        where('targetItemId', '==', offerData.targetItemId)
+      );
+
+      // Execute all queries in parallel
+      const [results1, results2, results3, results4] = await Promise.all([
+        getDocs(conflictingQuery1),
+        getDocs(conflictingQuery2),
+        getDocs(conflictingQuery3),
+        getDocs(conflictingQuery4)
+      ]);
+
+      // Collect all conflicting trade offers (excluding current offer)
+      const conflictingOffers = new Set<string>();
+      [results1, results2, results3, results4].forEach(querySnapshot => {
+        querySnapshot.docs.forEach(docSnapshot => {
+          if (docSnapshot.id !== offerId) {
+            conflictingOffers.add(docSnapshot.id);
+          }
+        });
+      });
+
+      // Add decline updates to batch for all conflicting offers
+      conflictingOffers.forEach(conflictingOfferId => {
+        const conflictingOfferRef = doc(db, 'tradeOffers', conflictingOfferId);
+        batch.update(conflictingOfferRef, {
+          status: 'declined',
+          declineReason: 'Item no longer available',
+          updatedAt: serverTimestamp(),
+        });
+      });
+    }
+
+    // Commit all updates atomically
+    await batch.commit();
 
     // If both users confirmed, disable conflicting conversations
     if (bothConfirmed) {
@@ -401,9 +517,19 @@ export async function completeTradeOffer(
         );
       } catch (error) {
         // Log error but don't fail trade completion
-        console.error('[Trade Offer] Error disabling conflicting conversations:', error);
+        logger.error('Error disabling conflicting conversations', {
+          offerId,
+          error: error instanceof Error ? error.message : 'Unknown error',
+        });
       }
     }
+
+    logger.info('Trade offer completion processed', {
+      offerId,
+      userId,
+      bothConfirmed: bothConfirmed.toString(),
+      status: bothConfirmed ? 'completed' : 'accepted',
+    });
 
     return {
       ...offerData,
@@ -488,11 +614,11 @@ async function disableConflictingConversations(
       
       if (conversationIds.size > 0) {
         await batch.commit();
-        console.log(`[Trade Offer] Disabled ${conversationIds.size} conflicting conversations at ${new Date().toISOString()}`, {
+        logger.info('Disabled conflicting conversations', {
+          count: conversationIds.size.toString(),
           tradeAnchorId,
           targetItemId,
           completedTradeOfferId,
-          disabledConversationIds: Array.from(conversationIds),
         });
       }
       
@@ -501,14 +627,17 @@ async function disableConflictingConversations(
       retryCount++;
       const delay = Math.pow(2, retryCount) * 1000; // Exponential backoff
       
-      console.error(`[Trade Offer] Failed to disable conversations (attempt ${retryCount}/${maxRetries}):`, error);
+      logger.error('Failed to disable conversations', {
+        attempt: retryCount.toString(),
+        maxRetries: maxRetries.toString(),
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
       
       if (retryCount >= maxRetries) {
-        console.error('[Trade Offer] Max retries reached for disabling conversations. Trade completion will proceed.', {
+        logger.error('Max retries reached for disabling conversations', {
           tradeAnchorId,
           targetItemId,
           completedTradeOfferId,
-          error,
         });
         return 0;
       }

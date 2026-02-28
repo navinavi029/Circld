@@ -121,7 +121,7 @@ export function SwipeHistory() {
   if (loading) {
     return (
       <div className="flex-1 w-full bg-gray-50 dark:bg-gray-900 flex flex-col items-center justify-center min-h-[50vh]">
-        <LoadingSpinner message="Loading swipe history..." size="lg" />
+        <LoadingSpinner variant="flow" message="Loading swipe history..." size="lg" />
       </div>
     );
   }
@@ -315,3 +315,4 @@ export function SwipeHistory() {
     </PageTransition>
   );
 }
+
