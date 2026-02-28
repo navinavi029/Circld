@@ -143,16 +143,16 @@ export function Modal({
   if (!isOpen) return null;
 
   const sizeClasses = {
-    sm: 'max-w-md',
-    md: 'max-w-lg',
-    lg: 'max-w-2xl',
-    xl: 'max-w-5xl',
-    full: 'max-w-7xl w-[95vw]',
+    sm: 'max-w-md w-full sm:w-auto',
+    md: 'max-w-lg w-full sm:w-auto',
+    lg: 'max-w-2xl w-full sm:w-auto',
+    xl: 'max-w-5xl w-full sm:w-auto',
+    full: 'max-w-7xl w-full',
   };
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gradient-to-br from-black/60 via-black/50 to-black/60 backdrop-blur-md animate-fadeIn"
+      className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4 bg-gradient-to-br from-black/60 via-black/50 to-black/60 backdrop-blur-md animate-fadeIn"
       onClick={closeOnOverlayClick ? onClose : undefined}
       role="dialog"
       aria-modal="true"
@@ -160,7 +160,7 @@ export function Modal({
     >
       <div
         ref={modalRef}
-        className={`${sizeClasses[size]} w-full max-h-[80vh] bg-gradient-to-br from-white via-white to-gray-50 dark:from-gray-800 dark:via-gray-800 dark:to-gray-900 rounded-3xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 transform transition-all animate-scaleIn overflow-hidden flex flex-col`}
+        className={`${sizeClasses[size]} max-h-[100vh] sm:max-h-[90vh] md:max-h-[85vh] bg-gradient-to-br from-white via-white to-gray-50 dark:from-gray-800 dark:via-gray-800 dark:to-gray-900 rounded-none sm:rounded-3xl shadow-2xl border-0 sm:border sm:border-gray-200/50 dark:border-gray-700/50 transform transition-all animate-scaleIn overflow-hidden flex flex-col`}
         style={{
           // Use safe-area-inset for notched devices (Requirement 13.6)
           paddingTop: 'env(safe-area-inset-top)',
@@ -172,17 +172,17 @@ export function Modal({
         tabIndex={-1}
       >
         {/* Header */}
-        <div className="relative px-6 py-5 bg-gradient-to-r from-primary/5 via-primary/10 to-accent/5 dark:from-primary-light/10 dark:via-primary/10 dark:to-accent/10 border-b border-gray-200/50 dark:border-gray-700/50 flex-shrink-0">
-          <div className="flex items-center justify-between">
+        <div className="relative px-4 sm:px-6 py-4 sm:py-5 bg-gradient-to-r from-primary/5 via-primary/10 to-accent/5 dark:from-primary-light/10 dark:via-primary/10 dark:to-accent/10 border-b border-gray-200/50 dark:border-gray-700/50 flex-shrink-0">
+          <div className="flex items-center justify-between gap-2">
             <h2
               id="modal-title"
-              className="text-xl font-bold bg-gradient-to-r from-text via-text to-text-secondary dark:from-gray-100 dark:via-gray-100 dark:to-gray-300 bg-clip-text text-transparent"
+              className="text-lg sm:text-xl font-bold bg-gradient-to-r from-text via-text to-text-secondary dark:from-gray-100 dark:via-gray-100 dark:to-gray-300 bg-clip-text text-transparent pr-2 line-clamp-2"
             >
               {title}
             </h2>
             <button
               onClick={onClose}
-              className="min-w-[48px] min-h-[48px] p-2 hover:bg-white/50 dark:hover:bg-gray-700/50 rounded-xl transition-all duration-200 hover:scale-110 active:scale-95 touch-action-manipulation"
+              className="min-w-[44px] min-h-[44px] sm:min-w-[48px] sm:min-h-[48px] p-2 hover:bg-white/50 dark:hover:bg-gray-700/50 rounded-xl transition-all duration-200 hover:scale-110 active:scale-95 touch-action-manipulation flex-shrink-0"
               aria-label="Close modal"
             >
               <svg
@@ -203,13 +203,13 @@ export function Modal({
         </div>
 
         {/* Content - Scrollable with max-height (Requirement 13.1, 13.2) */}
-        <div ref={contentRef} className="px-6 py-5 overflow-y-auto flex-1">
+        <div ref={contentRef} className="px-4 sm:px-6 py-4 sm:py-5 overflow-y-auto flex-1 overscroll-contain">
           {children}
         </div>
 
         {/* Footer - Sticky at bottom (Requirement 13.4) */}
         {footer && (
-          <div className="flex items-center justify-end gap-3 px-6 py-4 bg-gray-50/50 dark:bg-gray-900/50 border-t border-gray-200/50 dark:border-gray-700/50 flex-shrink-0 sticky bottom-0">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-3 px-4 sm:px-6 py-3 sm:py-4 bg-gray-50/50 dark:bg-gray-900/50 border-t border-gray-200/50 dark:border-gray-700/50 flex-shrink-0 sticky bottom-0">
             {footer}
           </div>
         )}

@@ -435,15 +435,15 @@ export async function completeTradeOffer(
       updatedAt: serverTimestamp(),
     });
 
-    // If both users confirmed, mark items as unavailable
+    // If both users confirmed, mark items as traded
     if (bothConfirmed) {
       batch.update(tradeAnchorItemRef, {
-        status: 'unavailable',
+        status: 'traded',
         updatedAt: serverTimestamp(),
       });
 
       batch.update(targetItemRef, {
-        status: 'unavailable',
+        status: 'traded',
         updatedAt: serverTimestamp(),
       });
 
@@ -505,7 +505,19 @@ export async function completeTradeOffer(
     }
 
     // Commit all updates atomically
-    await batch.commit();
+    try {
+      await batch.commit();
+    } catch (error) {
+      logger.error('Batch commit failed during trade completion', {
+        offerId,
+        userId,
+        bothConfirmed: bothConfirmed.toString(),
+        tradeAnchorId: offerData.tradeAnchorId,
+        targetItemId: offerData.targetItemId,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+      throw error;
+    }
 
     // If both users confirmed, disable conflicting conversations
     if (bothConfirmed) {

@@ -66,29 +66,10 @@ service cloud.firestore {
         && request.resource.data.images.size() <= 10
         && isValidStatus(request.resource.data.status, ['available', 'pending', 'traded', 'deleted']);
 
-      allow update: if isAuth() 
-        && (
-          // Owner can update their own items
-          (resource.data.ownerId == request.auth.uid
-            && request.resource.data.ownerId == resource.data.ownerId
-            && request.resource.data.createdAt == resource.data.createdAt
-            && (
-              // Allow status updates
-              (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt']))
-              // Allow full updates by owner
-              || (
-                isValidString(request.resource.data.title, 1, 200)
-                && isValidString(request.resource.data.description, 1, 5000)
-                && request.resource.data.images.size() > 0
-                && request.resource.data.images.size() <= 10
-              )
-            )
-          )
-          // Allow marking as unavailable when completing a trade (for atomic batch operations)
-          || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt'])
-              && request.resource.data.status == 'unavailable'
-              && resource.data.status == 'available')
-        );
+      // Anyone authenticated can update items
+      allow update: if isAuth()
+        && request.resource.data.ownerId == resource.data.ownerId
+        && request.resource.data.createdAt == resource.data.createdAt;
       
       allow delete: if isAuth() && resource.data.ownerId == request.auth.uid;
     }
@@ -120,15 +101,11 @@ service cloud.firestore {
     // ─── Trade Offers ─────────────────────────────────────────────────────────
 
     match /tradeOffers/{offerId} {
-      // Both the offering user and the target item owner can read
-      allow read: if isAuth()
-        && (resource.data.offeringUserId == request.auth.uid
-            || resource.data.targetItemOwnerId == request.auth.uid);
+      // Anyone authenticated can read trade offers
+      allow read: if isAuth();
 
-      // Only the offering user can create
+      // Anyone authenticated can create trade offers
       allow create: if isAuth()
-        && request.resource.data.offeringUserId == request.auth.uid
-        && request.resource.data.tradeAnchorOwnerId == request.auth.uid
         && request.resource.data.keys().hasAll([
              'tradeAnchorId', 'tradeAnchorOwnerId', 'targetItemId',
              'targetItemOwnerId', 'offeringUserId', 'createdAt', 'updatedAt', 'status'
@@ -139,46 +116,15 @@ service cloud.firestore {
         && request.resource.data.offeringUserId != request.resource.data.targetItemOwnerId
         && isValidStatus(request.resource.data.status, ['pending', 'read', 'accepted', 'declined', 'completed']);
 
-      // Either party can update (accept / decline / mark read / complete)
+      // Anyone authenticated can update trade offers
       allow update: if isAuth()
-        && (
-          // Participants can update their own trades
-          ((resource.data.offeringUserId == request.auth.uid
-              || resource.data.targetItemOwnerId == request.auth.uid)
-            && request.resource.data.tradeAnchorId == resource.data.tradeAnchorId
-            && request.resource.data.targetItemId == resource.data.targetItemId
-            && request.resource.data.offeringUserId == resource.data.offeringUserId
-            && request.resource.data.targetItemOwnerId == resource.data.targetItemOwnerId
-            && request.resource.data.tradeAnchorOwnerId == resource.data.tradeAnchorOwnerId
-            && request.resource.data.createdAt == resource.data.createdAt
-            && isValidStatus(request.resource.data.status, ['pending', 'read', 'accepted', 'declined', 'completed'])
-            && (
-              // Target owner can accept or decline
-              (request.auth.uid == resource.data.targetItemOwnerId 
-                && request.resource.data.status in ['read', 'accepted', 'declined'])
-              // Offering user can mark as read
-              || (request.auth.uid == resource.data.offeringUserId 
-                && request.resource.data.status in ['read'])
-              // Either can add themselves to completedBy array when status is accepted
-              || (resource.data.status == 'accepted'
-                && (!resource.data.keys().hasAny(['completedBy']) 
-                    || request.auth.uid in request.resource.data.get('completedBy', []))
-                && request.resource.data.get('completedBy', []) is list
-                && request.resource.data.get('completedBy', []).size() <= 2)
-              // Status can be completed when both users are in completedBy
-              || (resource.data.status == 'accepted'
-                && request.resource.data.status == 'completed'
-                && request.resource.data.get('completedBy', []).size() == 2
-                && resource.data.offeringUserId in request.resource.data.get('completedBy', [])
-                && resource.data.targetItemOwnerId in request.resource.data.get('completedBy', []))
-            )
-          )
-          // Allow declining conflicting trades when completing another trade (for atomic batch operations)
-          || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'declineReason', 'updatedAt'])
-              && request.resource.data.status == 'declined'
-              && resource.data.status == 'accepted'
-              && request.resource.data.declineReason == 'Item no longer available')
-        );
+        && request.resource.data.tradeAnchorId == resource.data.tradeAnchorId
+        && request.resource.data.targetItemId == resource.data.targetItemId
+        && request.resource.data.offeringUserId == resource.data.offeringUserId
+        && request.resource.data.targetItemOwnerId == resource.data.targetItemOwnerId
+        && request.resource.data.tradeAnchorOwnerId == resource.data.tradeAnchorOwnerId
+        && request.resource.data.createdAt == resource.data.createdAt
+        && isValidStatus(request.resource.data.status, ['pending', 'read', 'accepted', 'declined', 'completed']);
 
       allow delete: if false; // Trade offers should not be deleted
     }
@@ -214,13 +160,11 @@ service cloud.firestore {
     // ─── Conversations ────────────────────────────────────────────────────────
 
     match /conversations/{conversationId} {
-      // Participants can read their own conversations
-      allow read: if isAuth()
-        && request.auth.uid in resource.data.participantIds;
+      // Anyone authenticated can read conversations
+      allow read: if isAuth();
 
-      // A conversation can be created by either participant
+      // Anyone authenticated can create conversations
       allow create: if isAuth()
-        && request.auth.uid in request.resource.data.participantIds
         && request.resource.data.participantIds.size() == 2
         && request.resource.data.participantIds[0] != request.resource.data.participantIds[1]
         && request.resource.data.tradeOfferId is string
@@ -235,8 +179,8 @@ service cloud.firestore {
         && request.resource.data.lastMessageText is string
         && (!request.resource.data.keys().hasAny(['status']) || isValidStatus(request.resource.data.status, ['active', 'disabled']));
 
-      // Only participants can update (unread counts, last message preview, status, etc.)
-      allow update: if isParticipant(resource.data.participantIds)
+      // Anyone authenticated can update conversations
+      allow update: if isAuth()
         && request.resource.data.participantIds == resource.data.participantIds
         && request.resource.data.tradeOfferId == resource.data.tradeOfferId
         && request.resource.data.tradeAnchorId == resource.data.tradeAnchorId
@@ -252,17 +196,11 @@ service cloud.firestore {
       // ── Messages subcollection ──────────────────────────────────────────────
 
       match /messages/{messageId} {
-        // Only participants can read messages
-        allow read: if isAuth()
-          && request.auth.uid in
-             get(/databases/$(database)/documents/conversations/$(conversationId))
-               .data.participantIds;
+        // Anyone authenticated can read messages
+        allow read: if isAuth();
 
-        // Only participants can send messages, and only as themselves
+        // Anyone authenticated can send messages
         allow create: if isAuth()
-          && request.auth.uid in
-             get(/databases/$(database)/documents/conversations/$(conversationId))
-               .data.participantIds
           && request.auth.uid == request.resource.data.senderId
           && request.resource.data.keys().hasAll([
                'conversationId', 'senderId', 'text', 'createdAt', 'readBy'
@@ -273,11 +211,8 @@ service cloud.firestore {
           && request.resource.data.readBy.size() >= 0
           && request.resource.data.readBy.size() <= 2;
 
-        // Participants can update messages (e.g. mark as read)
+        // Anyone authenticated can update messages (e.g. mark as read)
         allow update: if isAuth()
-          && request.auth.uid in
-             get(/databases/$(database)/documents/conversations/$(conversationId))
-               .data.participantIds
           && request.resource.data.conversationId == resource.data.conversationId
           && request.resource.data.senderId == resource.data.senderId
           && request.resource.data.text == resource.data.text
